@@ -1,0 +1,12 @@
+{
+  "name": "alt_2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "js.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "browser-sync --server --files \"./index.html, ./css/*.css, ./js/*.js, ./js/CNV/*.js"
+  },
+  "author": "",
+  "license": "ISC"
+}

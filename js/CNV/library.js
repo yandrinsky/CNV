@@ -1,0 +1,478 @@
+function uniqueId(){
+    let id = String(Math.random())
+    id.replace(".", "");
+    return id;
+}
+
+class Shape{
+    constructor(link, id) {
+        this.link = link;
+        this.id = id;
+    }
+    get classList(){
+        let link = this.link;
+        return {
+            add(className){
+                if(!link.classList.includes(className)){
+                    link.classList.push(className)
+                    CNV.redraw();
+                }
+            },
+            remove(className){
+                const index = link.classList.indexOf(className);
+                if(index !== -1){
+                    link.classList.splice(index, 1);
+                    CNV.redraw();
+                }
+            },
+            toggle(className){
+                const index = link.classList.indexOf(className);
+                if(index){
+                    link.classList.splice(index, 1);
+                    CNV.redraw();
+                } else {
+                    link.classList.push(className);
+                    CNV.redraw();
+                }
+            }
+        }
+    }
+
+    get update(){
+        const link = this.link;
+        return {
+            get startPosition (){
+                return {
+                    set x(x){
+                        link.start.x = x;
+                        CNV.redraw();
+                    },
+                    set y(y){
+                        link.start.y = y;
+                        CNV.redraw();
+                    }
+                }
+            },
+            get endPosition (){
+                return {
+                    set x(x){
+                        link.end.x = x;
+                        CNV.redraw();
+                    },
+                    set y(y){
+                        link.end.y = y;
+                        CNV.redraw();
+                    }
+                }
+            }
+        }
+    }
+
+    set onmouseover(callback){
+        CNV.state.mouseover[this.id] = callback;
+        if(!CNV.state.__mouseMoveTargets.includes(this.id)){
+            CNV.state.__mouseMoveTargets.push(this.id)
+        }
+    }
+
+    set onmouseenter(callback){
+        CNV.state.mouseenter[this.id] = callback;
+        if(!CNV.state.__mouseMoveTargets.includes(this.id)){
+            CNV.state.__mouseMoveTargets.push(this.id)
+        }
+    }
+
+    set onmouseleave(callback){
+        CNV.state.mouseleave[this.id] = callback;
+        if(!CNV.state.__mouseMoveTargets.includes(this.id)){
+            CNV.state.__mouseMoveTargets.push(this.id)
+        }
+    }
+
+    set onclick(callback){
+        if(!CNV.state.__mouseClickTargets.includes(this.id)){
+            CNV.state.__mouseClickTargets.push(this.id)
+        }
+        CNV.state.click[this.id] = callback;
+    }
+
+}
+
+const CNV = {
+    state: {
+        __shapes: {}, //id: {type: "line", start: {x, y}, end: {x, y}, classList: [], id},
+        shapes: {}, //"id: ShapeInstance"
+        mouseover: {},
+        mouseleave: {},
+        mouseenter: {},
+        click: {},
+        __mouseMoveTargets: [],
+        __mouseClickTargets: [],
+
+    },
+    context: undefined,
+    canvas: undefined,
+    css: undefined,
+
+    setCanvas(canvas){
+        this.canvas = canvas;
+        canvas.addEventListener("mousemove", this.__mouseMove.bind(this));
+        canvas.addEventListener("click", this.__mouseClick.bind(this));
+    },
+
+    setContext(context){
+        this.context = context;
+    },
+
+    setCSS(css){
+        this.css = css;
+    },
+
+    __mouseMove(e){
+        let needToRedraw = false;
+
+        const successCallback = (link, e) => {
+            let selfE = {...e, target: this.state.shapes[link.id]};
+            if(this.state.mouseover[link.id]){
+                this.state.mouseover[link.id](selfE)
+                needToRedraw = true
+            }
+            if(this.state.mouseenter[link.id]){
+                if(!link.events.mouseenter){
+                    this.state.mouseenter[link.id](selfE)
+                    link.events.mouseenter = true;
+                    needToRedraw = true;
+                }
+            }
+            if(this.state.mouseleave[link.id]){
+                link.events.mouseleave = true;
+            }
+        }
+
+        const failCallback = (link, e) => {
+            let selfE = {...e, target: this.state.shapes[link.id]};
+            if(this.state.mouseleave[link.id]){
+                // console.log("here", link.events.mouseenter)
+                if(link.events.mouseenter){
+                    this.state.mouseleave[link.id](selfE)
+                    link.events.mouseenter = false;
+                    needToRedraw = true;
+                }
+            }
+            if(this.state.mouseenter[link.id]){
+                link.events.mouseenter = false;
+            }
+        }
+
+        for(let i = 0; i < this.state.__mouseMoveTargets.length; i++){
+            let link = this.state.__shapes[this.state.__mouseMoveTargets[i]];
+            if(link.type === "line"){
+                this.nearLine({
+                        distance: 5,
+                        userX: e.clientX,
+                        userY: e.clientY,
+                        x1: link.start.x,
+                        y1: link.start.y,
+                        x2: link.end?.x || link.start.x,
+                        y2: link.end?.y || link.start.y,
+                    }, successCallback.bind(this, link, e),
+                    failCallback.bind(this, link, e)
+                )
+            } else if(link.type === "circle"){
+                this.nearDot({
+                        distance: 5,
+                        userX: e.clientX,
+                        userY: e.clientY,
+                        x0: link.start.x,
+                        y0: link.start.y,
+                    }, successCallback.bind(this, link, e),
+                    failCallback.bind(this, link, e)
+                )
+            }
+
+
+        }
+        if(needToRedraw){
+            this.redraw();
+        }
+    },
+
+    __mouseClick(e){
+        let needToRedraw = false;
+        for(let i = 0; i < this.state.__mouseClickTargets.length; i++){
+            let link = this.state.__shapes[this.state.__mouseClickTargets[i]];
+            if(link.type === "line"){
+                this.nearLine({
+                    distance: 5,
+                    userX: e.clientX,
+                    userY: e.clientY,
+                    x1: link.start.x,
+                    y1: link.start.y,
+                    x2: link.end.x,
+                    y2: link.end.y,
+                }, (e)=> {
+                    let selfE = {...e, target: this.state.shapes[link.id]};
+
+                    if(this.state.click[link.id]){
+                        this.state.click[link.id](selfE)
+                    }
+
+                })
+            } else if (link.type === "circle"){
+                this.nearDot({
+                    distance: 5,
+                    userX: e.clientX,
+                    userY: e.clientY,
+                    x0: link.start.x,
+                    y0: link.start.y,
+                }, (e)=> {
+                    let selfE = {...e, target: this.state.shapes[link.id]};
+
+                    if(this.state.click[link.id]){
+                        this.state.click[link.id](selfE)
+                    }
+
+                })
+            }
+
+
+        }
+        if(needToRedraw){
+            console.log("redraw")
+            this.redraw();
+        }
+    },
+
+    __mouseMoveHandler(){
+        canvas.addEventListener("mousemove", )
+    },
+
+    __clearCanvas(){
+        context.beginPath();
+        context.moveTo(0, 0);
+        context.fillStyle = "white";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+    },
+
+    querySelector(selector){
+        for(let id in this.state.__shapes){
+            const shape = this.state.__shapes[id];
+            if(selector[0] === "."){
+                if(shape.classList.includes(selector.slice(1))){
+                    return this.state.shapes[id];
+                }
+            } else {
+                if(shape.type === selector){
+                    return this.state.shapes[id];
+                }
+            }
+        }
+    },
+
+    querySelectorAll(selector){
+        const result = [];
+        for(let id in this.state.__shapes){
+            const shape = this.state.__shapes[id];
+            if(selector[0] === "."){
+                if(shape.classList.includes(selector.slice(1))){
+                    result.push(this.state.shapes[id]);
+                }
+            } else {
+                if(shape.type === selector){
+                    result.push(this.state.shapes[id]);
+                }
+            }
+        }
+        return result;
+    },
+
+    createLine(config){
+        let id = uniqueId();
+        this.state.__shapes[id] = {
+            start: {
+                x: config.x0,
+                y: config.y0,
+            },
+            end: {
+                x: config.x1,
+                y: config.y1,
+            },
+            type: "line",
+            id,
+            classList: config.className ? [config.className] : [],
+            events: {
+                mouseenter: false,
+            }
+        }
+        let link = this.state.__shapes[id]
+        let shape = new Shape(link, id);
+        this.state.shapes[id] = shape;
+
+        this.line(link);
+        return shape;
+    },
+
+    createCircle(config){
+        let id = uniqueId();
+        if(config.className){
+            if(!config.className instanceof Array){
+                config.className = [config.className]
+            }
+        }
+        this.state.__shapes[id] = {
+            start: {
+                x: config.x0,
+                y: config.y0,
+            },
+            type: "circle",
+            id,
+            classList: config.className ? config.className : [],
+            events: {
+                mouseenter: false,
+            }
+        }
+        let link = this.state.__shapes[id]
+        let shape = new Shape(link, id);
+        this.state.shapes[id] = shape;
+
+        this.circle(link);
+        return shape;
+    },
+
+    line(link){
+        const style = cssEngine(this.css, link.classList, link.type);
+        if(!(style.visibility === "hidden")){
+            this.context.beginPath();
+            this.context.moveTo(link.start.x, link.start.y);
+            this.context.lineTo(link.end.x, link.end.y);
+
+            this.context.lineWidth = style.lineWidth;
+            this.context.strokeStyle = style.color; //config.color;
+            this.context.stroke();
+        }
+    },
+
+    circle(link){
+        console.log("circle render")
+        const style = cssEngine(this.css, link.classList, link.type);
+        if(!(style.visibility === "hidden")){
+            this.context.beginPath();
+            this.context.fillStyle = style.color;
+            this.context.arc(link.start.x, link.start.y, style.radius, style.startAngle, style.endAngle);
+            this.context.fill();
+        }
+    },
+
+    nearLine(config, callbackSuccess = [], callbackFail = []){
+        !config.distance ? config.distance = 1 : config
+
+        if(callbackSuccess){
+            if(callbackSuccess instanceof Function){
+                callbackSuccess = [callbackSuccess];
+            }
+        }
+
+        if(callbackFail){
+            if(callbackFail instanceof Function){
+                callbackFail = [callbackFail];
+            }
+        }
+
+        const {userX, userY, x1, y1, y2, x2} = config;
+        const x0 = userX;
+        const y0 = userY;
+
+        let res = this.isNearLineCalc({
+            x0,
+            y0,
+            x1,
+            y1,
+            x2,
+            y2,
+        })
+
+        if (res) {
+            callbackSuccess.forEach((callback)=>{
+                callback();
+            })
+        } else {
+            callbackFail.forEach((callback)=>{
+                callback();
+            })
+        }
+        return res;
+    },
+
+    isNearLineCalc(config){
+        function dist (x1,y1,x2,y2){
+            return Math.sqrt((x2-x1)**2 + (y2-y1)**2);
+        }
+        const {x0,y0, x1, y1, x2, y2} = config;
+        let r1 = dist(x0, y0, x1, y1);
+        let r2 = dist(x0, y0, x2, y2);
+        let r12 = dist(x1, y1, x2, y2);
+
+
+        if(r1 < dist(r2, r12,0,0) && r2 < dist(r1,r12,0,0)){
+            let a = y2 - y1;
+            let b = x1 - x2;
+            let c = -x1 * (y2 - y1) + y1 * (x2 - x1);
+            let t = dist (a,b,0,0);
+            if (c>0){
+                a = -a;
+                b = -b;
+                c = -c;
+            }
+            let r0 =(a * x0 + b * y0 + c) / t;
+            // console.log('Расстояние от точки до отрезка=',r0);
+            if(r0 > -5 && r0 < 5){
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+
+    },
+
+    nearDot(config, callbackSuccess = [], callbackFail = []){
+        !config.distance ? config.distance = 1 : config
+        if(callbackSuccess){
+            if(callbackSuccess instanceof Function){
+                callbackSuccess = [callbackSuccess];
+            }
+        }
+        if(callbackFail){
+            if(callbackFail instanceof Function){
+                callbackFail = [callbackFail];
+            }
+        }
+
+        const {userX, userY, x0, y0} = config;
+
+        if((userX < x0 + 10 && userX > x0 - 10) && (userY < y0 + 10 && userY > y0 - 10)) {
+            callbackSuccess.forEach((callback)=>{
+                callback();
+            })
+            return true;
+        } else {
+            callbackFail.forEach((callback)=>{
+                callback();
+            })
+            return false
+        }
+    },
+
+    redraw(){
+        this.__clearCanvas();
+        for(let id in this.state.__shapes){
+            let shape = this.state.__shapes[id];
+            if(shape.type === "line") this.line(shape);
+            else if(shape.type === "circle") this.circle(shape);
+        }
+    }
+}
+
+
+
