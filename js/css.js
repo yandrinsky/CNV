@@ -10,6 +10,9 @@ const css = {
     black: {
         color: "black",
     },
+    startCircleActive: {
+        color: "gray",
+    },
     hidden:{
         visibility: "hidden",
     }

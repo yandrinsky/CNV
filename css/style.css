@@ -3,9 +3,16 @@ body{
     padding: 0;
 }
 #canvas{
-
-
     border: 1px solid black;
     display: block;
+}
 
+.saved_code{
+    display: inline-block;
+    position: absolute;
+    left: -1000px;
+}
+
+.saveOk{
+    background-color: yellowgreen;
 }

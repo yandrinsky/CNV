@@ -34,6 +34,9 @@ class Shape{
                     link.classList.push(className);
                     CNV.redraw();
                 }
+            },
+            contains(className){
+                return link.classList.includes(className);
             }
         }
     }
@@ -94,6 +97,29 @@ class Shape{
             CNV.state.__mouseClickTargets.push(this.id)
         }
         CNV.state.click[this.id] = callback;
+    }
+
+    remove(){
+        //удаляем информацию
+        delete CNV.state.__shapes[this.id];
+        //удаляем инстанс класса
+        delete CNV.state.shapes[this.id];
+        //удаляем слушатели событий
+        delete CNV.state.mouseenter[this.id];
+        delete CNV.state.mouseleave[this.id];
+        delete CNV.state.mouseenter[this.id];
+        delete CNV.state.click[this.id];
+
+        let MMT = CNV.state.__mouseMoveTargets;
+        let MCT = CNV.state.__mouseClickTargets;
+
+        if(MMT.indexOf(this.id) >= 0){
+            MMT.splice(MMT.indexOf(this.id), 1);
+        }
+        if(MCT.indexOf(this.id) >= 0){
+            MCT.splice(MCT.indexOf(this.id), 1);
+        }
+        CNV.redraw();
     }
 
 }
@@ -197,6 +223,8 @@ const CNV = {
         }
     },
 
+
+
     __mouseClick(e){
         let needToRedraw = false;
         for(let i = 0; i < this.state.__mouseClickTargets.length; i++){
@@ -210,6 +238,7 @@ const CNV = {
                     y1: link.start.y,
                     x2: link.end.x,
                     y2: link.end.y,
+                    e: e,
                 }, (e)=> {
                     let selfE = {...e, target: this.state.shapes[link.id]};
 
@@ -225,9 +254,28 @@ const CNV = {
                     userY: e.clientY,
                     x0: link.start.x,
                     y0: link.start.y,
+                    e: e,
                 }, (e)=> {
-                    let selfE = {...e, target: this.state.shapes[link.id]};
-
+                    let selfE = {
+                        clientY: e.clientY,
+                        clientX: e.clientX,
+                        altKey: e.altKey,
+                        button: e.button,
+                        ctrlKey: e.ctrlKey,
+                        layerX: e.layerX,
+                        layerY: e.layerY,
+                        movementX: e.movementX,
+                        movementY: e.movementY,
+                        currentTarget: e.currentTarget,
+                        offsetX: e.offsetX,
+                        offsetY: e.offsetY,
+                        pageX: e.pageX,
+                        pageY: e.pageY,
+                        x: e.x,
+                        y: e.y,
+                        which: e.which,
+                        target: this.state.shapes[link.id]
+                    };
                     if(this.state.click[link.id]){
                         this.state.click[link.id](selfE)
                     }
@@ -353,7 +401,6 @@ const CNV = {
     },
 
     circle(link){
-        console.log("circle render")
         const style = cssEngine(this.css, link.classList, link.type);
         if(!(style.visibility === "hidden")){
             this.context.beginPath();
@@ -393,11 +440,11 @@ const CNV = {
 
         if (res) {
             callbackSuccess.forEach((callback)=>{
-                callback();
+                callback(config.e);
             })
         } else {
             callbackFail.forEach((callback)=>{
-                callback();
+                callback(config.e);
             })
         }
         return res;
@@ -453,12 +500,12 @@ const CNV = {
 
         if((userX < x0 + 10 && userX > x0 - 10) && (userY < y0 + 10 && userY > y0 - 10)) {
             callbackSuccess.forEach((callback)=>{
-                callback();
+                callback(config.e);
             })
             return true;
         } else {
             callbackFail.forEach((callback)=>{
-                callback();
+                callback(config.e);
             })
             return false
         }
@@ -470,6 +517,17 @@ const CNV = {
             let shape = this.state.__shapes[id];
             if(shape.type === "line") this.line(shape);
             else if(shape.type === "circle") this.circle(shape);
+        }
+    },
+
+    save(){
+        return JSON.stringify(this.state)
+    },
+
+    recover(data){
+        this.state = JSON.parse(data);
+        for(let key in this.state.shapes) {
+            this.state.shapes[key] = new Shape(this.state.__shapes[key], key);
         }
     }
 }
