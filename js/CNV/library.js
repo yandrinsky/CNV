@@ -626,18 +626,19 @@ function getEquationForLine(x1, y1, equation){
         k,
         //b: -Math.sqrt(x1 **2 +  y1 ** 2), //equation.b,
         //b: -Math.sqrt((a/ k) ** 2 + a **2),
-        b: -Math.sqrt((a * k) ** 2 + a**2)
+        b: (equation.y2 - equation.y1 >= 0 ? -1 : 1) * Math.sqrt((a * k) ** 2 + a**2) - (equation.y1 + equation.x1 / equation.k),
     };
+
 }
 
 let equation;
 let eqInit;
 function smth(){
     const config = {
-        x0: 0,
-        y0: 100,
-        x1: 100,
-        y1: 300,
+        x0: 250,
+        y0: 250,
+        x1: 50,
+        y1: 50,
     }
 
     const dist = 0;
