@@ -1,10 +1,12 @@
 const canvas = document.querySelector("#canvas");
 const delLineBtn = document.querySelector("#delLine");
+const recoverBtn = document.querySelector("#recover");
+const analyzeBtn = document.querySelector("#analyze");
 const modeField = document.querySelector("#mode");
 const savedCodeField = document.querySelector(".saved_code");
 const saveBtn = document.querySelector("#save");
-canvas.width = 500;
-canvas.height = 500;
+canvas.width = 700;
+canvas.height = 700;
 let context = canvas.getContext("2d");
 
 
@@ -98,23 +100,44 @@ function resetStickToTailHandler(){
 }
 
 function setStickToTailHandler(currentData){
+    currentData.startCircle.onmouseenter = undefined;
+    currentData.startCircle.onmouseleave = undefined;
+    currentData.startCircle.onclick = undefined;
+    currentData.endCircle.classList.add("hidden");
+
     for(let key in store.state.lines){
         let data = store.state.lines[key];
-        if(data !== currentData){
+
+        if(data.ids.line !== currentData.ids.line){
             data.startCircle.onmouseenter = e => {
                 e.target.classList.add("startCircleActive");
                 e.target.classList.remove("hidden");
+                CNV.querySelectorAll(".endCircle").forEach(item => {
+                    item.classList.add("hidden");
+                })
             }
             data.startCircle.onmouseleave = e => {
                 e.target.classList.remove("red");
                 e.target.classList.add("hidden");
+                for(let key in store.state.lines){
+                    let item = store.state.lines[key];
+                    if(item.children.length > 0){
+                        item.endCircle.classList.remove("hidden");
+                    }
+                }
             }
             setTimeout(()=> {
                 data.startCircle.onclick = e => {
-                    console.log("data.startCircle.onclick")
                     currentData.line.update.endPosition.x = currentData.endCircle.link.start.x;
                     currentData.line.update.endPosition.y = currentData.endCircle.link.start.y;
-                    // currentData
+                    data.parents.push(currentData);
+                    addChildren(currentData, data);
+                    for(let key in store.state.lines){
+                        let item = store.state.lines[key];
+                        if(item.children.length > 0){
+                            item.endCircle.classList.remove("hidden");
+                        }
+                    }
                 }
             }, 10);
         }
@@ -123,9 +146,16 @@ function setStickToTailHandler(currentData){
     }
 }
 
+//функция для добавбления ребёнка к родителю
+function addChildren(parent, children){
+    parent.children.push(children);
+    parent.endCircle.classList.remove("hidden");
+}
+
+
 //событие нажатия на круглешок линии - чтобы повести новую линию
 function endCircleClick(data, e){
-    console.log("!!endCircleClick!!")
+    CNV.querySelectorAll(".finishLine").forEach(el => el.classList.remove("finishLine"));
     //вести можно только 2 линии, не больше
     if(data.children.length < 2){
         //после того, как начали вести линию сбрасываем у всех круглешков событие нажатия
@@ -133,8 +163,7 @@ function endCircleClick(data, e){
         //создаём новуб линию
         const newData = createLine(e);
         newData.parents.push(data) ;
-        data.children.push(newData);
-        data.endCircle.classList.remove("hidden");
+        addChildren(data, newData);
 
         newData.line.onmouseenter = undefined;
         newData.line.onmouseleave = undefined;
@@ -163,11 +192,11 @@ function lineMouseLeave(data, e){
 }
 
 function endCircleMouseEnter(data, e){
-    e.target.classList.add("black");
+    e.target.classList.add("endCircleActive");
 }
 
 function endCircleMouseLeave(data, e){
-    e.target.classList.remove("black");
+    e.target.classList.remove("endCircleActive");
 }
 
 function resetAllEndCircleClick(){
@@ -227,7 +256,7 @@ function createLine(e){
     let endCircle = CNV.createCircle({
         x0: e.clientX,
         y0: e.clientY,
-        className: ["red", "hidden"],
+        className: ["endCircle", "hidden"],
 
     })
 
@@ -275,6 +304,12 @@ delLineBtn.onclick = e => {
         setDrawingMode();
     }
 }
+recoverBtn.onclick = e => {
+    recover();
+}
+analyzeBtn.onclick = e => {
+    analyze();
+}
 function save(){
     const prepData = {...store.state, lines: {}};
     for(let key in store.state.lines){
@@ -297,9 +332,115 @@ function save(){
         }
     }
 
-    console.log(prepData);
-    return JSON.stringify(prepData);
+    const saved = JSON.stringify({
+        SCRIPT: JSON.stringify(prepData),
+        CNV: CNV.save(),
+    });
+    localStorage.setItem("__saved", saved);
+    return saved;
 }
+
+function recover(data){
+    const disk = JSON.parse(data || localStorage.getItem("__saved"));
+    CNV.recover(disk.CNV);
+    let script = JSON.parse(disk.SCRIPT);
+    for(let key in script.lines){
+        let item = script.lines[key];
+        item.line = CNV.getElementByUniqueId(item.line);
+        item.endCircle = CNV.getElementByUniqueId(item.endCircle);
+        item.startCircle = CNV.getElementByUniqueId(item.startCircle);
+        item.children = item.children.map(id => {
+            return script.lines[id];
+        })
+        item.parents = item.parents.map(id => {
+            return script.lines[id];
+        })
+
+        item.line.onmouseenter = e => lineMouseEnter(item, e);
+        item.line.onmouseleave = e => lineMouseLeave(item, e);
+        item.endCircle.onmouseenter = e => endCircleMouseEnter(item, e);
+        item.endCircle.onmouseleave = e => endCircleMouseLeave(item, e);
+        item.endCircle.onclick = e => endCircleClick(item, e);
+    }
+    if(Object.keys(script.lines).length > 0){
+        canvas.onclick = undefined;
+    }
+    store.state = script;
+}
+
+function analyze(){
+    CNV.querySelectorAll(".finishLine").forEach(item => item.classList.remove("finishLine"));
+    let startLines = [];
+    let results = {};
+
+    for(let key in store.state.lines){
+        if(store.state.lines[key].parents.length === 0){
+            startLines.push(store.state.lines[key])
+        }
+    }
+    if(startLines.length > 1){
+        console.error("Граф имеет разрывы. Анализ невозможен");
+        console.log(startLines)
+        return;
+    }
+    function step(target, power){
+        target.power = power;
+        let fullPower = 0;
+
+        for(let i = 0; i < target.parents.length; i++){
+            let item = target.parents[i];
+            if(item.power) {
+                fullPower += item.power / item.children.length;
+            }
+            // } else {
+            //     console.log("returned")
+            //     return;
+            // }
+        }
+
+        if(fullPower){
+            target.power = fullPower;
+        }
+
+
+        if(target.children.length === 0){
+            CNV.preventRender(() => target.line.classList.add("finishLine"));
+            results[target.ids.line] = {
+                text: 1 + "/" + 1 / (fullPower || target.power),
+                x: target.endCircle.link.start.x + 10,
+                y: target.endCircle.link.start.y - 10,
+                fontSize: "14",
+                color: "green",
+            }
+            // results.push({
+            //     text: 1 + "/" + 1 / (fullPower || target.power),
+            //     x: target.endCircle.link.start.x + 10,
+            //     y: target.endCircle.link.start.y - 10,
+            //     fontSize: "14",
+            //     color: "green",
+            // });
+            console.log("finishZone", fullPower || target.power);
+        }
+        target.children.forEach(item => {
+            step(item, power / target.children.length)
+        })
+    }
+    try{
+        step(startLines[0], 1);
+        CNV.render();
+        for(let key in results){
+            CNV.text(results[key])
+        }
+        // results.forEach(result => CNV.text(result));
+        for(let key in store.state.lines){
+            store.state.lines[key].power = undefined;
+        }
+    } catch (e){
+        console.error("Граф замкнут. Анализ невозможен", e);
+    }
+
+}
+
 saveBtn.onclick = e => {
     saveBtn.classList.remove("saveOk");
     const CNVrecoveryData = CNV.save();
@@ -318,3 +459,6 @@ saveBtn.onclick = e => {
         saveBtn.classList.remove("saveOk");
     }, 1000)
 }
+
+
+smth();

@@ -15,24 +15,24 @@ class Shape{
             add(className){
                 if(!link.classList.includes(className)){
                     link.classList.push(className)
-                    CNV.redraw();
+                    CNV.render();
                 }
             },
             remove(className){
                 const index = link.classList.indexOf(className);
                 if(index !== -1){
                     link.classList.splice(index, 1);
-                    CNV.redraw();
+                    CNV.render();
                 }
             },
             toggle(className){
                 const index = link.classList.indexOf(className);
                 if(index){
                     link.classList.splice(index, 1);
-                    CNV.redraw();
+                    CNV.render();
                 } else {
                     link.classList.push(className);
-                    CNV.redraw();
+                    CNV.render();
                 }
             },
             contains(className){
@@ -48,11 +48,11 @@ class Shape{
                 return {
                     set x(x){
                         link.start.x = x;
-                        CNV.redraw();
+                        CNV.render();
                     },
                     set y(y){
                         link.start.y = y;
-                        CNV.redraw();
+                        CNV.render();
                     }
                 }
             },
@@ -60,11 +60,11 @@ class Shape{
                 return {
                     set x(x){
                         link.end.x = x;
-                        CNV.redraw();
+                        CNV.render();
                     },
                     set y(y){
                         link.end.y = y;
-                        CNV.redraw();
+                        CNV.render();
                     }
                 }
             }
@@ -119,7 +119,7 @@ class Shape{
         if(MCT.indexOf(this.id) >= 0){
             MCT.splice(MCT.indexOf(this.id), 1);
         }
-        CNV.redraw();
+        CNV.render();
     }
 
 }
@@ -134,11 +134,12 @@ const CNV = {
         click: {},
         __mouseMoveTargets: [],
         __mouseClickTargets: [],
-
+        shouldRenderUpdates: true,
     },
     context: undefined,
     canvas: undefined,
     css: undefined,
+
 
     setCanvas(canvas){
         this.canvas = canvas;
@@ -219,7 +220,7 @@ const CNV = {
 
         }
         if(needToRedraw){
-            this.redraw();
+            this.render();
         }
     },
 
@@ -287,7 +288,7 @@ const CNV = {
         }
         if(needToRedraw){
             console.log("redraw")
-            this.redraw();
+            this.render();
         }
     },
 
@@ -332,6 +333,10 @@ const CNV = {
             }
         }
         return result;
+    },
+
+    getElementByUniqueId(id){
+        return this.state.shapes[id];
     },
 
     createLine(config){
@@ -408,6 +413,48 @@ const CNV = {
             this.context.arc(link.start.x, link.start.y, style.radius, style.startAngle, style.endAngle);
             this.context.fill();
         }
+    },
+
+    text(config){
+        this.context.font = `${config.fontSize || 14}px serif`;
+        this.context.fillStyle = config.color || "black";
+        this.context.fillText(config.text, config.x, config.y);
+    },
+
+    pointer(line){
+        const config = {
+            x0: line.start.x,
+            y0: line.start.y,
+            x1: line.end.x,
+            y1: line.end.y,
+        }
+        const dist = 7;
+        let eqInit = getEquationFor2points(config.x0, config.y0, config.x1, config.y1);
+        let equation = getEquationForLine(config.x1 - dist, config.y1 - dist, eqInit);
+
+        let sign = 1;
+        if(config.y0 <= config.y1){
+            sign = -1;
+        }
+        CNV.createCircle({
+            x0: getCoordinates(eqInit, line.end.y + sign * 3),
+            // x0: line.end.x + sign * 3,
+            y0: line.end.y + sign * 3,
+            className: ["pointer"],
+        })
+        // CNV.createLine({
+        //     x0: config.x1 - 5 - dist,
+        //     y0: getCoordinates(equation, config.x1 - 5 - dist),
+        //     x1: config.x1 + 5 - dist,
+        //     y1: getCoordinates(equation, config.x1 + 5 - dist),
+        //     className: ["green"],
+        // })
+        // this.context.fillStyle = "black";
+        // this.context.beginPath();
+        // this.context.moveTo(config.x1 - 5 - dist, getCoordinates(equation, config.x1 - 5 - dist));
+        // this.context.lineTo(config.x1 + 5 - dist, getCoordinates(equation, config.x1 + 5 - dist));
+        // this.context.lineTo(config.x1,config.y1);
+        // this.context.fill();
     },
 
     nearLine(config, callbackSuccess = [], callbackFail = []){
@@ -511,13 +558,21 @@ const CNV = {
         }
     },
 
-    redraw(){
-        this.__clearCanvas();
-        for(let id in this.state.__shapes){
-            let shape = this.state.__shapes[id];
-            if(shape.type === "line") this.line(shape);
-            else if(shape.type === "circle") this.circle(shape);
+    render(){
+        if(this.state.shouldRenderUpdates){
+            this.__clearCanvas();
+            for(let id in this.state.__shapes){
+                let shape = this.state.__shapes[id];
+                if(shape.type === "line") this.line(shape);
+                else if(shape.type === "circle") this.circle(shape);
+            }
         }
+    },
+
+    preventRender(callback){
+        this.state.shouldRenderUpdates = false;
+        callback();
+        this.state.shouldRenderUpdates = true;
     },
 
     save(){
@@ -529,8 +584,73 @@ const CNV = {
         for(let key in this.state.shapes) {
             this.state.shapes[key] = new Shape(this.state.__shapes[key], key);
         }
+        this.render();
+    }
+}
+function getCoordinates(equation, x, y){
+    if(x !== undefined){
+        return (x + equation.xTop) / (equation.xBottom) * (equation.yBottom) - equation.yTop;
+    } else if(y !== undefined){
+        return (y + equation.yTop) / (equation.yBottom) * (equation.xBottom) - equation.xTop;
+    }
+}
+function getEquationFor2points(x1, y1, x2, y2){
+    let xTop = -x1
+    let xBottom = (x2 - x1);
+    let yTop = -y1
+    let yBottom = (y2 - y1);
+
+    return {
+        xTop,
+        xBottom,
+        yTop,
+        yBottom,
     }
 }
 
 
+function getEquationForLine(x1, y1, equation){
+    return  {
+        xTop: -x1,
+        xBottom: -(equation.xTop || 1) / equation.xBottom,
+        yTop: -y1,
+        yBottom: (equation.yTop  || 1) / equation.yBottom
+    };
+}
+
+let equation;
+let eqInit;
+function smth(){
+    const config = {
+        x0: 10,
+        y0: 10,
+        x1: 60,
+        y1: 60,
+    }
+
+    eqInit = getEquationFor2points(config.x0, config.y0, config.x1, config.y1);
+    equation = getEquationForLine(config.x1 - 7, config.y1 - 7, eqInit);
+
+    console.log("eqInit x = 0, y = ", getCoordinates(eqInit, 0), ", x = 1, y = ", getCoordinates(eqInit, 1));
+    console.log("equation x = 8, y = ", getCoordinates(equation, 8), ", x = 28, y = ", getCoordinates(equation, 28));
+
+    console.log("eqInit", eqInit)
+    console.log("equation", equation)
+
+    CNV.createLine({
+        x0: config.x0,
+        y0: getCoordinates(eqInit, config.x0),
+        x1: config.x1,
+        y1: getCoordinates(eqInit, config.x1),
+    });
+
+    CNV.createLine({
+        x0: config.x1 - 5 - 7,
+        y0: getCoordinates(equation, config.x1 - 5 - 7),
+        x1: config.x1 + 5 - 7,
+        y1: getCoordinates(equation, config.x1 + 5 - 7),
+        className: "green",
+    })
+
+}
 
