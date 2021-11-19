@@ -428,27 +428,27 @@ const CNV = {
             x1: line.end.x,
             y1: line.end.y,
         }
-        const dist = 7;
+        const dist = 0;
         let eqInit = getEquationFor2points(config.x0, config.y0, config.x1, config.y1);
         let equation = getEquationForLine(config.x1 - dist, config.y1 - dist, eqInit);
 
         let sign = 1;
-        if(config.y0 <= config.y1){
-            sign = -1;
-        }
-        CNV.createCircle({
-            x0: getCoordinates(eqInit, line.end.y + sign * 3),
-            // x0: line.end.x + sign * 3,
-            y0: line.end.y + sign * 3,
-            className: ["pointer"],
-        })
-        // CNV.createLine({
-        //     x0: config.x1 - 5 - dist,
-        //     y0: getCoordinates(equation, config.x1 - 5 - dist),
-        //     x1: config.x1 + 5 - dist,
-        //     y1: getCoordinates(equation, config.x1 + 5 - dist),
-        //     className: ["green"],
+        // if(config.y0 <= config.y1){
+        //     sign = -1;
+        // }
+        // CNV.createCircle({
+        //     x0: getCoordinates(eqInit, line.end.y + sign * 3),
+        //     // x0: line.end.x + sign * 3,
+        //     y0: line.end.y + sign * 3,
+        //     className: ["pointer"],
         // })
+        CNV.createLine({
+            x0: config.x1 - 5 - dist,
+            y0: getCoordinates(equation, config.x1 - 5 - dist),
+            x1: config.x1 + 5 - dist,
+            y1: getCoordinates(equation, config.x1 + 5 - dist),
+            className: ["green"],
+        })
         // this.context.fillStyle = "black";
         // this.context.beginPath();
         // this.context.moveTo(config.x1 - 5 - dist, getCoordinates(equation, config.x1 - 5 - dist));
@@ -589,9 +589,11 @@ const CNV = {
 }
 function getCoordinates(equation, x, y){
     if(x !== undefined){
-        return (x + equation.xTop) / (equation.xBottom) * (equation.yBottom) - equation.yTop;
+        return x * equation.k - equation.b;
+        //return (x + equation.xTop) / (equation.xBottom) * (equation.yBottom) - equation.yTop;
     } else if(y !== undefined){
-        return (y + equation.yTop) / (equation.yBottom) * (equation.xBottom) - equation.xTop;
+        return (y - equation.b) / equation.k
+        //return (y + equation.yTop) / (equation.yBottom) * (equation.xBottom) - equation.xTop;
     }
 }
 function getEquationFor2points(x1, y1, x2, y2){
@@ -601,20 +603,30 @@ function getEquationFor2points(x1, y1, x2, y2){
     let yBottom = (y2 - y1);
 
     return {
+        x1, y1, x2, y2,
         xTop,
         xBottom,
         yTop,
         yBottom,
+        k: (y2 - y1) / (x2 - x1),
+        b: (x1 * (y2 - y1) / (x2 - x1) - y1),
     }
 }
 
 
 function getEquationForLine(x1, y1, equation){
+    const k = -1 / equation.k;
+    const a = Math.sqrt((equation.x1 - equation.x2)**2 +  (equation.y1 - equation.y2) ** 2);
+    console.log("a", a);
     return  {
         xTop: -x1,
         xBottom: -(equation.xTop || 1) / equation.xBottom,
         yTop: -y1,
-        yBottom: (equation.yTop  || 1) / equation.yBottom
+        yBottom: (equation.yTop  || 1) / equation.yBottom,
+        k,
+        //b: -Math.sqrt(x1 **2 +  y1 ** 2), //equation.b,
+        //b: -Math.sqrt((a/ k) ** 2 + a **2),
+        b: -Math.sqrt((a * k) ** 2 + a**2)
     };
 }
 
@@ -622,17 +634,19 @@ let equation;
 let eqInit;
 function smth(){
     const config = {
-        x0: 10,
-        y0: 10,
-        x1: 60,
-        y1: 60,
+        x0: 0,
+        y0: 100,
+        x1: 100,
+        y1: 300,
     }
 
+    const dist = 0;
+
     eqInit = getEquationFor2points(config.x0, config.y0, config.x1, config.y1);
-    equation = getEquationForLine(config.x1 - 7, config.y1 - 7, eqInit);
+    equation = getEquationForLine(config.x1 - dist, config.y1 - dist, eqInit);
 
     console.log("eqInit x = 0, y = ", getCoordinates(eqInit, 0), ", x = 1, y = ", getCoordinates(eqInit, 1));
-    console.log("equation x = 8, y = ", getCoordinates(equation, 8), ", x = 28, y = ", getCoordinates(equation, 28));
+    console.log("equation x = 8, y = ", getCoordinates(equation, 8), ", x = 28, y = ", getCoordinates(equation, 60));
 
     console.log("eqInit", eqInit)
     console.log("equation", equation)
@@ -644,11 +658,15 @@ function smth(){
         y1: getCoordinates(eqInit, config.x1),
     });
 
+
+    console.log(getCoordinates(equation, 0));
+    console.log(getCoordinates(equation, 60));
+
     CNV.createLine({
-        x0: config.x1 - 5 - 7,
-        y0: getCoordinates(equation, config.x1 - 5 - 7),
-        x1: config.x1 + 5 - 7,
-        y1: getCoordinates(equation, config.x1 + 5 - 7),
+        x0: config.x1 - 5 - dist,
+        y0: getCoordinates(equation, config.x1 - 5 - dist),
+        x1: config.x1 + 5 - dist,
+        y1: getCoordinates(equation, config.x1 + 5 - dist),
         className: "green",
     })
 
