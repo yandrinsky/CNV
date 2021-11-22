@@ -8,7 +8,26 @@ class Shape{
     constructor(link, id) {
         this.link = link;
         this.id = id;
+        this.isPointer = false;
     }
+
+    get system(){
+        const __this = this;
+        return {
+            get equation(){
+                if(__this.link.type === "line"){
+                    return getEquationFor2points(
+                        __this.link.start.x,
+                        __this.link.start.y,
+                        __this.link.end.x,
+                        __this.link.end.y,
+                    )
+                }
+            }
+        }
+
+    }
+
     get classList(){
         let link = this.link;
         return {
@@ -41,6 +60,7 @@ class Shape{
         }
     }
 
+
     get update(){
         const link = this.link;
         return {
@@ -69,6 +89,12 @@ class Shape{
                 }
             }
         }
+    }
+
+
+    set pointer(bool){
+        this.isPointer = !!bool;
+        this.link.pointer = this.isPointer
     }
 
     set onmouseover(callback){
@@ -397,11 +423,21 @@ const CNV = {
         if(!(style.visibility === "hidden")){
             this.context.beginPath();
             this.context.moveTo(link.start.x, link.start.y);
-            this.context.lineTo(link.end.x, link.end.y);
+            if(!link.pointer){
+                this.context.lineTo(link.end.x, link.end.y);
+                this.context.lineWidth = style.lineWidth;
+                this.context.strokeStyle = style.color; //config.color;
+                this.context.stroke();
+            }else {
+                const shape = this.getElementByUniqueId(link.id);
+                const equation = shape.system.equation;
+                const endPosition = moveTo(equation, -5);
+                this.context.lineTo(endPosition.x, endPosition.y);
+                this.context.lineWidth = style.lineWidth;
+                this.context.strokeStyle = style.color; //config.color;
+                this.context.stroke();
+            }
 
-            this.context.lineWidth = style.lineWidth;
-            this.context.strokeStyle = style.color; //config.color;
-            this.context.stroke();
         }
     },
 
@@ -421,6 +457,54 @@ const CNV = {
         this.context.fillText(config.text, config.x, config.y);
     },
 
+    smth(){
+        const config = {
+            x0: 300,
+            y0: 10,
+            x1: 150,
+            y1: 150,
+        }
+
+        eqInit = getEquationFor2points(config.x0, config.y0, config.x1, config.y1);
+        let linePosition = moveTo(eqInit, -15);
+
+        equation = getEquationForLine(linePosition.x, linePosition.y, eqInit);
+
+
+        CNV.createLine({
+            x0: config.x0,
+            y0: getCoordinates(eqInit, config.x0),
+            x1: config.x1,
+            y1: getCoordinates(eqInit, config.x1),
+        });
+
+        CNV.createCircle({
+            x0: linePosition.x,
+            y0: linePosition.y,
+            radius: 5,
+            className: ["smallCircle"]
+        })
+
+        let len = 10;
+        const perp = CNV.createLine({
+            x0: linePosition.x - len,
+            y0: getCoordinates(equation, linePosition.x - len),
+            x1: linePosition.x + len,
+            y1: getCoordinates(equation, linePosition.x + len),
+        })
+
+        // console.log("prep equat", perp.system.equation);
+
+        let startPoint = moveTo(perp.system.equation, -10, linePosition.x);
+        let endPoint = moveTo(perp.system.equation, 10, linePosition.x);
+
+        //console.log(equation, startPoint, endPoint)
+        perp.update.startPosition.x = startPoint.x;
+        perp.update.startPosition.y = startPoint.y;
+        perp.update.endPosition.x = endPoint.x;
+        perp.update.endPosition.y = endPoint.y;
+    },
+
     pointer(line){
         const config = {
             x0: line.start.x,
@@ -428,33 +512,23 @@ const CNV = {
             x1: line.end.x,
             y1: line.end.y,
         }
-        const dist = 0;
-        let eqInit = getEquationFor2points(config.x0, config.y0, config.x1, config.y1);
-        let equation = getEquationForLine(config.x1 - dist, config.y1 - dist, eqInit);
+        eqInit = getEquationFor2points(config.x0, config.y0, config.x1, config.y1);
+        let linePosition = moveTo(eqInit, -10);
+        equation = getEquationForLine(linePosition.x, linePosition.y, eqInit);
+        let len = 50;
+        equation.x1 = linePosition.x - len;
+        equation.y1 = getCoordinates(equation, linePosition.x - len);
+        equation.x2 = linePosition.x + len;
+        equation.y2 = getCoordinates(equation, linePosition.x + len);
 
-        let sign = 1;
-        // if(config.y0 <= config.y1){
-        //     sign = -1;
-        // }
-        // CNV.createCircle({
-        //     x0: getCoordinates(eqInit, line.end.y + sign * 3),
-        //     // x0: line.end.x + sign * 3,
-        //     y0: line.end.y + sign * 3,
-        //     className: ["pointer"],
-        // })
-        CNV.createLine({
-            x0: config.x1 - 5 - dist,
-            y0: getCoordinates(equation, config.x1 - 5 - dist),
-            x1: config.x1 + 5 - dist,
-            y1: getCoordinates(equation, config.x1 + 5 - dist),
-            className: ["green"],
-        })
-        // this.context.fillStyle = "black";
-        // this.context.beginPath();
-        // this.context.moveTo(config.x1 - 5 - dist, getCoordinates(equation, config.x1 - 5 - dist));
-        // this.context.lineTo(config.x1 + 5 - dist, getCoordinates(equation, config.x1 + 5 - dist));
-        // this.context.lineTo(config.x1,config.y1);
-        // this.context.fill();
+        let startPoint = moveTo(equation, -5, linePosition.x);
+        let endPoint = moveTo(equation, 5, linePosition.x);
+        this.context.fillStyle = "black";
+        this.context.beginPath();
+        this.context.moveTo(startPoint.x, startPoint.y);
+        this.context.lineTo(endPoint.x, endPoint.y);
+        this.context.lineTo(config.x1,config.y1);
+        this.context.fill();
     },
 
     nearLine(config, callbackSuccess = [], callbackFail = []){
@@ -558,6 +632,14 @@ const CNV = {
         }
     },
 
+    __renderPointers(){
+        this.querySelectorAll("line").forEach(shape => {
+            if(shape.isPointer){
+                this.pointer(shape.link);
+            }
+        })
+    },
+
     render(){
         if(this.state.shouldRenderUpdates){
             this.__clearCanvas();
@@ -566,6 +648,9 @@ const CNV = {
                 if(shape.type === "line") this.line(shape);
                 else if(shape.type === "circle") this.circle(shape);
             }
+
+            this.__renderPointers();
+
         }
     },
 
@@ -616,8 +701,7 @@ function getEquationFor2points(x1, y1, x2, y2){
 
 function getEquationForLine(x1, y1, equation){
     const k = -1 / equation.k;
-    const a = Math.sqrt((equation.x1 - equation.x2)**2 +  (equation.y1 - equation.y2) ** 2);
-    console.log("a", a);
+    const a = Math.sqrt((equation.x1 - x1)**2 +  (equation.y1 - y1) ** 2);
     return  {
         xTop: -x1,
         xBottom: -(equation.xTop || 1) / equation.xBottom,
@@ -631,45 +715,25 @@ function getEquationForLine(x1, y1, equation){
 
 }
 
-let equation;
-let eqInit;
-function smth(){
-    const config = {
-        x0: 250,
-        y0: 250,
-        x1: 50,
-        y1: 50,
+function moveTo(equation, move, x){
+    let lenA = Math.sqrt((equation.x2 - equation.x1) ** 2 + (equation.y2 - equation.y1) ** 2);
+    let lenX = Math.abs(equation.x2 - equation.x1);
+    let lenY = Math.abs(equation.y2 - equation.y1);
+    //Чтобы узнать знак сдвига. То есть убывает или возрастает прямая, от этого всё зависит
+    //move = move * (equation.x2 - equation.x1 < 0 ? -1 : 1);
+    const alfa = (equation.x2 - equation.x1) < 0 ? -1 : 1;
+    let lenA2;
+
+    if(x === undefined){
+        lenA2 = lenA + move;
+    } else if(x !== undefined){
+        lenA2 = Math.sqrt((x - equation.x1) ** 2 + (getCoordinates(equation, x) - equation.y1) ** 2) + move
     }
 
-    const dist = 0;
-
-    eqInit = getEquationFor2points(config.x0, config.y0, config.x1, config.y1);
-    equation = getEquationForLine(config.x1 - dist, config.y1 - dist, eqInit);
-
-    console.log("eqInit x = 0, y = ", getCoordinates(eqInit, 0), ", x = 1, y = ", getCoordinates(eqInit, 1));
-    console.log("equation x = 8, y = ", getCoordinates(equation, 8), ", x = 28, y = ", getCoordinates(equation, 60));
-
-    console.log("eqInit", eqInit)
-    console.log("equation", equation)
-
-    CNV.createLine({
-        x0: config.x0,
-        y0: getCoordinates(eqInit, config.x0),
-        x1: config.x1,
-        y1: getCoordinates(eqInit, config.x1),
-    });
-
-
-    console.log(getCoordinates(equation, 0));
-    console.log(getCoordinates(equation, 60));
-
-    CNV.createLine({
-        x0: config.x1 - 5 - dist,
-        y0: getCoordinates(equation, config.x1 - 5 - dist),
-        x1: config.x1 + 5 - dist,
-        y1: getCoordinates(equation, config.x1 + 5 - dist),
-        className: "green",
-    })
-
+    let k = lenA2 / lenA;
+    let newX =  Math.abs(k * Math.abs(equation.x2 - equation.x1) + alfa * equation.x1);
+    return {
+        x: newX,
+        y: getCoordinates(equation, newX),
+    }
 }
-

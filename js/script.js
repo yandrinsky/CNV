@@ -112,19 +112,25 @@ function setStickToTailHandler(currentData){
             data.startCircle.onmouseenter = e => {
                 e.target.classList.add("startCircleActive");
                 e.target.classList.remove("hidden");
-                CNV.querySelectorAll(".endCircle").forEach(item => {
-                    item.classList.add("hidden");
+                CNV.preventRender(() => {
+                    CNV.querySelectorAll(".endCircle").forEach(item => {
+                        item.classList.add("hidden");
+                    })
                 })
+                CNV.render();
             }
             data.startCircle.onmouseleave = e => {
                 e.target.classList.remove("red");
                 e.target.classList.add("hidden");
-                for(let key in store.state.lines){
-                    let item = store.state.lines[key];
-                    if(item.children.length > 0){
-                        item.endCircle.classList.remove("hidden");
+                CNV.preventRender(() => {
+                    for(let key in store.state.lines){
+                        let item = store.state.lines[key];
+                        if(item.children.length > 0){
+                            item.endCircle.classList.remove("hidden");
+                        }
                     }
-                }
+                })
+                CNV.render();
             }
             setTimeout(()=> {
                 data.startCircle.onclick = e => {
@@ -259,6 +265,8 @@ function createLine(e){
         className: ["endCircle", "hidden"],
 
     })
+
+    line.pointer = true;
 
     let data = {
         line,
@@ -461,4 +469,4 @@ saveBtn.onclick = e => {
 }
 
 
-smth();
+//smth();
