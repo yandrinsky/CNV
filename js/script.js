@@ -319,6 +319,14 @@ analyzeBtn.onclick = e => {
     analyze();
 }
 function save(){
+    //Убираем синие линии, чтобы сохранились стили без них
+    CNV.preventRender(()=>{
+        CNV.querySelectorAll(".finishLine").forEach((item) => {
+            item.classList.remove("finishLine");
+            item.classList.add("__PLACE_FOR_FINISH_LINE")
+        })
+    })
+
     const prepData = {...store.state, lines: {}};
     for(let key in store.state.lines){
         let data = store.state.lines[key];
@@ -345,6 +353,14 @@ function save(){
         CNV: CNV.save(),
     });
     localStorage.setItem("__saved", saved);
+
+    //Восстанавливаем синие линии, чтобы продолжить разработку
+    CNV.preventRender(()=>{
+        CNV.querySelectorAll(".__PLACE_FOR_FINISH_LINE").forEach((item) => {
+            item.classList.remove("__PLACE_FOR_FINISH_LINE");
+            item.classList.add("finishLine")
+        })
+    })
     return saved;
 }
 
@@ -393,6 +409,12 @@ function analyze(){
     }
     function step(target, power){
         target.power = power;
+
+        //ЗАменить на нужное поведение
+        if(target.already) return;
+
+        target.already = true;
+
         let fullPower = 0;
 
         for(let i = 0; i < target.parents.length; i++){
@@ -427,11 +449,11 @@ function analyze(){
             //     fontSize: "14",
             //     color: "green",
             // });
-            console.log("finishZone", fullPower || target.power);
         }
         target.children.forEach(item => {
             step(item, power / target.children.length)
         })
+        target.already = false;
     }
     try{
         step(startLines[0], 1);
@@ -439,9 +461,9 @@ function analyze(){
         for(let key in results){
             CNV.text(results[key])
         }
-        // results.forEach(result => CNV.text(result));
         for(let key in store.state.lines){
             store.state.lines[key].power = undefined;
+            store.state.lines[key].already = undefined;
         }
     } catch (e){
         console.error("Граф замкнут. Анализ невозможен", e);

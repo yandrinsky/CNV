@@ -661,13 +661,14 @@ const CNV = {
     },
 
     save(){
-        return JSON.stringify(this.state)
+        return JSON.stringify(this.state);
     },
 
     recover(data){
         this.state = JSON.parse(data);
         for(let key in this.state.shapes) {
             this.state.shapes[key] = new Shape(this.state.__shapes[key], key);
+            this.state.shapes[key].pointer = this.state.__shapes[key].pointer;
         }
         this.render();
     }
