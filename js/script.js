@@ -112,17 +112,16 @@ function setStickToTailHandler(currentData){
             data.startCircle.onmouseenter = e => {
                 e.target.classList.add("startCircleActive");
                 e.target.classList.remove("hidden");
-                CNV.preventRender(() => {
+                CNV.combineRender(() => {
                     CNV.querySelectorAll(".endCircle").forEach(item => {
                         item.classList.add("hidden");
                     })
                 })
-                CNV.render();
             }
             data.startCircle.onmouseleave = e => {
                 e.target.classList.remove("red");
                 e.target.classList.add("hidden");
-                CNV.preventRender(() => {
+                CNV.combineRender(() => {
                     for(let key in store.state.lines){
                         let item = store.state.lines[key];
                         if(item.children.length > 0){
@@ -130,12 +129,18 @@ function setStickToTailHandler(currentData){
                         }
                     }
                 })
-                CNV.render();
             }
             setTimeout(()=> {
                 data.startCircle.onclick = e => {
-                    currentData.line.update.endPosition.x = currentData.endCircle.link.start.x;
-                    currentData.line.update.endPosition.y = currentData.endCircle.link.start.y;
+                    console.log("here!!");
+                    currentData.line.update.endPosition.x = data.startCircle.link.start.x;
+                    currentData.line.update.endPosition.y = data.startCircle.link.start.y;
+                    currentData.endCircle.update.startPosition.x = data.startCircle.link.start.x;
+                    currentData.endCircle.update.startPosition.y = data.startCircle.link.start.y;
+
+
+                    currentData.endCircle.classList.add("hidden");
+
                     data.parents.push(currentData);
                     addChildren(currentData, data);
                     for(let key in store.state.lines){
@@ -166,8 +171,11 @@ function endCircleClick(data, e){
     if(data.children.length < 2){
         //после того, как начали вести линию сбрасываем у всех круглешков событие нажатия
         resetAllEndCircleClick();
-        //создаём новуб линию
-        const newData = createLine(e);
+        //создаём новуб линию и указываем ей коорлинаты начала как у круга, по которому кликнули
+        const newData = createLine(e, {
+            x0: data.endCircle.link.start.x,
+            y0: data.endCircle.link.start.y,
+        });
         newData.parents.push(data) ;
         addChildren(data, newData);
 
@@ -197,11 +205,11 @@ function lineMouseLeave(data, e){
     }
 }
 
-function endCircleMouseEnter(data, e){
+function endCircleMouseEnter(e){
     e.target.classList.add("endCircleActive");
 }
 
-function endCircleMouseLeave(data, e){
+function endCircleMouseLeave(e){
     e.target.classList.remove("endCircleActive");
 }
 
@@ -246,12 +254,12 @@ function drawingLine(data, finishCallback = () => {}){
     setStickToTailHandler(data);
 }
 
-function createLine(e){
+function createLine(e, option = {}){
     let line = CNV.createLine({
-        x0: e.clientX,
-        y0: e.clientY,
-        x1: e.clientX,
-        y1: e.clientY,
+        x0: option.x0 || e.clientX,
+        y0: option.y0 || e.clientY,
+        x1: option.x0 || e.clientX,
+        y1: option.y0 || e.clientY,
         className: "red",
     })
     let startCircle = CNV.createCircle({
@@ -284,8 +292,8 @@ function createLine(e){
 
     line.onmouseenter = e => lineMouseEnter(data, e);
     line.onmouseleave = e => lineMouseLeave(data, e);
-    endCircle.onmouseenter = e => endCircleMouseEnter(data, e);
-    endCircle.onmouseleave = e => endCircleMouseLeave(data, e);
+    endCircle.onmouseenter = e => endCircleMouseEnter(e);
+    endCircle.onmouseleave = e => endCircleMouseLeave(e);
 
     store.state.lines[line.id] = data;
     return data;
@@ -382,8 +390,8 @@ function recover(data){
 
         item.line.onmouseenter = e => lineMouseEnter(item, e);
         item.line.onmouseleave = e => lineMouseLeave(item, e);
-        item.endCircle.onmouseenter = e => endCircleMouseEnter(item, e);
-        item.endCircle.onmouseleave = e => endCircleMouseLeave(item, e);
+        item.endCircle.onmouseenter = e => endCircleMouseEnter(e);
+        item.endCircle.onmouseleave = e => endCircleMouseLeave(e);
         item.endCircle.onclick = e => endCircleClick(item, e);
     }
     if(Object.keys(script.lines).length > 0){
@@ -393,7 +401,9 @@ function recover(data){
 }
 
 function analyze(){
-    CNV.querySelectorAll(".finishLine").forEach(item => item.classList.remove("finishLine"));
+    CNV.combineRender(()=> {
+        CNV.querySelectorAll(".finishLine").forEach(item => item.classList.remove("finishLine"));
+    })
     let startLines = [];
     let results = {};
 
@@ -407,13 +417,14 @@ function analyze(){
         console.log(startLines)
         return;
     }
-    function step(target, power){
+
+    function step(target, power, lastTarget){
         target.power = power;
 
-        //ЗАменить на нужное поведение
-        if(target.already) return;
+        console.log("power", power);
+        //Если этот элемент является циклом и мы уже о нём знаем - игнорируем.
+        if(target.cycle) return;
 
-        target.already = true;
 
         let fullPower = 0;
 
@@ -422,36 +433,68 @@ function analyze(){
             if(item.power) {
                 fullPower += item.power / item.children.length;
             }
-            // } else {
-            //     console.log("returned")
-            //     return;
-            // }
         }
 
         if(fullPower){
             target.power = fullPower;
         }
 
+        //ЗАменить на нужное поведение
+        if(target.already && power !== fullPower) {  //
+            lastTarget.cycle = true;
+            fullPower = fullPower - power;
 
+            let kx = 1 / power;
+            let x = fullPower / (kx - 1)
+            fullPower += x;
+            target.power = fullPower;
+
+            console.log("x, kx, fullPower is", x, kx, fullPower);
+            // return;
+        }
+
+        target.already = true;
+
+        function formNumber(power){
+            // console.log("power, Frac", power, new Fraction(power).toString());
+            // return new Fraction(power).toString();
+
+            const gcd = (a, b) => {
+                if (!b) {
+                    return a;
+                }
+
+                return gcd(b, a % b);
+            }
+
+            let n = 1 / power;
+            if(String(n).includes(".")){
+                let lenFloat = String(n).length - String(n).indexOf('.') - 1;
+                let numerator = n * 10**lenFloat;
+                let denominator = 10**lenFloat;
+                console.log("num, deno", numerator, denominator)
+                console.log("PPpower", power)
+                let myGcd = gcd(numerator, denominator);
+                numerator /= myGcd;
+                denominator /= myGcd;
+                return denominator + "/" + numerator;
+            } else {
+                return 1 + "/" + 1 / power;
+            }
+        }
+        // text: 1 + "/" + 1 / (fullPower || target.power),
         if(target.children.length === 0){
             CNV.preventRender(() => target.line.classList.add("finishLine"));
             results[target.ids.line] = {
-                text: 1 + "/" + 1 / (fullPower || target.power),
+                text: formNumber(fullPower || target.power),
                 x: target.endCircle.link.start.x + 10,
                 y: target.endCircle.link.start.y - 10,
                 fontSize: "14",
                 color: "green",
             }
-            // results.push({
-            //     text: 1 + "/" + 1 / (fullPower || target.power),
-            //     x: target.endCircle.link.start.x + 10,
-            //     y: target.endCircle.link.start.y - 10,
-            //     fontSize: "14",
-            //     color: "green",
-            // });
         }
         target.children.forEach(item => {
-            step(item, power / target.children.length)
+            step(item, fullPower / target.children.length, target)
         })
         target.already = false;
     }
@@ -464,6 +507,7 @@ function analyze(){
         for(let key in store.state.lines){
             store.state.lines[key].power = undefined;
             store.state.lines[key].already = undefined;
+            store.state.lines[key].cycle = undefined;
         }
     } catch (e){
         console.error("Граф замкнут. Анализ невозможен", e);
@@ -491,4 +535,96 @@ saveBtn.onclick = e => {
 }
 
 
-//smth();
+const shiftDownHandler = (e) => {
+    if(e.key === "Shift"){
+        window.removeEventListener("keydown", shiftDownHandler);
+        window.addEventListener("keyup", shiftUpHandler);
+        console.log("This is shift");
+
+        for(let key in store.state.lines){
+            let obj = store.state.lines[key];
+            let item = obj.endCircle;
+            item.onclick = undefined;
+
+            function onMouseMove3(event, obj) {
+                //setStickToTailHandler(obj);
+                const item = obj.endCircle;
+                CNV.combineRender(() => {
+                    item.update.startPosition.x = event.clientX;
+                    item.update.startPosition.y = event.clientY;
+
+                    obj.line.update.endPosition.x = item.link.start.x;
+                    obj.line.update.endPosition.y = item.link.start.y;
+
+                    obj.children.forEach(obj => {
+                        obj.line.update.startPosition.x = item.link.start.x;
+                        obj.line.update.startPosition.y = item.link.start.y;
+                        obj.startCircle.update.startPosition.x = item.link.start.x;
+                        obj.startCircle.update.startPosition.y = item.link.start.y;
+                    })
+                })
+            }
+
+
+            function mouseLeave(e){
+                canvas.style.cursor = "default";
+                document.onmousemove = undefined;
+                //resetStickToTailHandler();
+
+                canvas.onmousedown = undefined;
+                canvas.onmouseup = undefined;
+            }
+
+            item.onmouseenter = (e) => {
+                canvas.style.cursor = "move";
+
+                canvas.onmousedown = e => {
+                    document.onmousemove = (e) => onMouseMove3(e, obj);
+
+                    item.onmouseleave = undefined;
+                }
+
+                canvas.onmouseup = e => {
+                    if(e.button === 0) {
+                        document.onmousemove = undefined;
+                        //resetStickToTailHandler();
+
+                        item.onmouseleave = mouseLeave;
+                    }
+                };
+            }
+
+            item.onmouseleave = mouseLeave;
+        }
+        return () => {
+            document.removeEventListener('mousemove', onMouseMove3);
+            canvas.onmousedown = undefined;
+            canvas.onmouseup = undefined;
+        }
+    }
+}
+
+const shiftUpHandler = (e) => {
+    if(e.key === "Shift"){
+        canvas.style.cursor = "default";
+        window.removeEventListener("keyup", shiftUpHandler);
+        window.addEventListener("keydown", shiftDownHandler);
+        //resetStickToTailHandler();
+
+        canvas.onmousedown = undefined;
+        canvas.onmouseup = undefined;
+        document.onmousemove = undefined;
+
+        for(let key in store.state.lines) {
+            let obj = store.state.lines[key];
+            let item = obj.endCircle;
+            item.onmouseenter = endCircleMouseEnter;
+            item.onmouseleave = endCircleMouseLeave;
+            item.onclick = (e) => endCircleClick(obj, e);
+        }
+    }
+
+}
+
+
+window.addEventListener("keydown", shiftDownHandler);

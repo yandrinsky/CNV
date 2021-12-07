@@ -251,7 +251,6 @@ const CNV = {
     },
 
 
-
     __mouseClick(e){
         let needToRedraw = false;
         for(let i = 0; i < this.state.__mouseClickTargets.length; i++){
@@ -301,7 +300,8 @@ const CNV = {
                         x: e.x,
                         y: e.y,
                         which: e.which,
-                        target: this.state.shapes[link.id]
+                        target: this.state.shapes[link.id],
+                        shiftKey: e.shiftKey,
                     };
                     if(this.state.click[link.id]){
                         this.state.click[link.id](selfE)
@@ -650,7 +650,6 @@ const CNV = {
             }
 
             this.__renderPointers();
-
         }
     },
 
@@ -658,6 +657,13 @@ const CNV = {
         this.state.shouldRenderUpdates = false;
         callback();
         this.state.shouldRenderUpdates = true;
+    },
+
+    combineRender(callback){
+        this.state.shouldRenderUpdates = false;
+        callback();
+        this.state.shouldRenderUpdates = true;
+        CNV.render();
     },
 
     save(){
@@ -738,3 +744,24 @@ function moveTo(equation, move, x){
         y: getCoordinates(equation, newX),
     }
 }
+
+function onMouseMove3(event, obj) {
+    //setStickToTailHandler(obj);
+    const item = obj.endCircle;
+    CNV.combineRender(() => {
+        item.update.startPosition.x = event.clientX;
+        item.update.startPosition.y = event.clientY;
+
+        obj.line.update.endPosition.x = item.link.start.x;
+        obj.line.update.endPosition.y = item.link.start.y;
+
+        obj.children.forEach(obj => {
+            obj.line.update.startPosition.x = item.link.start.x;
+            obj.line.update.startPosition.y = item.link.start.y;
+            obj.startCircle.update.startPosition.x = item.link.start.x;
+            obj.startCircle.update.startPosition.y = item.link.start.y;
+        })
+    })
+}
+
+

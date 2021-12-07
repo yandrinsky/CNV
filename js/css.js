@@ -30,6 +30,9 @@ const css = {
     hidden:{
         visibility: "hidden",
     },
+    ignore: {
+
+    },
     smallCircle: {
         radius: 3,
         color: "yellow",
