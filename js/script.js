@@ -36,6 +36,7 @@ const store = {
 }
 
 function setDelMode(){
+    CNV.settings.draggableCanvas = false;
     store.state.mode = "del";
     resetAllEndCircleClick();
     canvas.style.cursor = "crosshair";
@@ -72,7 +73,7 @@ function setDelMode(){
 }
 
 function setDrawingMode(){
-
+    CNV.settings.draggableCanvas = true;
     if(Object.keys(store.state.lines).length === 0){
         console.log("full dell")
         firstDraw();
@@ -414,6 +415,7 @@ function recover(data){
         canvas.onclick = undefined;
     }
     store.state = script;
+    CNV.settings.draggableCanvas = true;
 }
 
 
@@ -442,7 +444,7 @@ function formNumber(power){
             isCycle = false;
         }
     }
-    console.log("cycle Fraction", isCycle, power)
+    //console.log("cycle Fraction", isCycle, power)
     let n;
     if(isCycle){
        n = 1 / power;
@@ -454,8 +456,8 @@ function formNumber(power){
         let lenFloat = String(n).length - String(n).indexOf('.') - 1;
         let numerator = n * 10**lenFloat;
         let denominator = 10**lenFloat;
-        console.log("num, deno", numerator, denominator)
-        console.log("PPpower", power)
+        // console.log("num, deno", numerator, denominator)
+        // console.log("PPpower", power)
         let myGcd = gcd(numerator, denominator);
         numerator /= myGcd;
         denominator /= myGcd;
@@ -470,6 +472,96 @@ function formNumber(power){
     }
 }
 
+
+
+
+//power = {num, det}
+class Fraction{
+    constructor(num, det = 1) {
+        let GCD = this.gcd(num, det);
+        this.num = num / GCD;
+        this.det = det / GCD;
+    }
+
+    gcd(n, m){
+        return m === 0 ? n : this.gcd(m, n % m);
+    }
+
+    nok(n, m) {
+        return n * m / this.gcd(n, m);
+    }
+
+    getNum(){
+        return this.num;
+    }
+    getDet(){
+        return this.det;
+    }
+    setNum(num){
+        const GCD = this.gcd(num, this.det);
+        this.num = num / GCD;
+        this.det /= GCD;
+        return this;
+    }
+    setDet(det){
+        const GCD = this.gcd(det, this.det);
+        this.det = det / GCD;
+        this.num /= GCD;
+        return this;
+    }
+
+    plus(num, det = 1){
+        let NOK = this.nok(det, this.det);
+        let NUM = this.num * NOK / this.det + num * NOK / det;
+        let GCD = this.gcd(NOK, NUM);
+        NOK /= GCD;
+        NUM /= GCD;
+        this.num = NUM;
+        this.det = NOK;
+        return this;
+    }
+    minus(num, det = 1){
+        let NOK = this.nok(det, this.det);
+        let NUM = this.num * NOK / this.det - num * NOK / det;
+        let GCD = this.gcd(NOK, NUM);
+        NOK /= GCD;
+        NUM /= GCD;
+        this.num = NUM;
+        this.det = NOK;
+        return this;
+    }
+    multiply(num, det = 1){
+        let GCD = this.gcd(this.num * num, this.det * det);
+        this.num = this.num * num / GCD;
+        this.det = this.det * det / GCD;
+        return this;
+    }
+    divide(num, det = 1){
+        let GCD = this.gcd(this.num * det, this.det * num);
+        this.num = this.num * det / GCD;
+        this.det = this.det * num / GCD;
+        return this;
+    }
+    getStr(){
+        if(this.det === 1){
+            return `${this.num}`;
+        } else if(this.num === 0){
+            return `0`;
+        } else {
+            return `${this.num}/${this.det}`;
+        }
+    }
+    clone(){
+        return new Fraction(this.num, this.det);
+    }
+}
+
+// let p = new Fraction(0);
+// let p1 = new Fraction(1, 2);
+// console.log("p1 det", p1.getDet());
+// p.plus(p1.getNum(), p1.getDet());
+// console.log(p.getStr());
+
 function analyze(){
     CNV.combineRender(()=> {
         CNV.querySelectorAll(".finishLine").forEach(item => item.classList.remove("finishLine"));
@@ -477,6 +569,7 @@ function analyze(){
 
     let startLines = [];
     let results = {};
+    let controlSum = new Fraction(0);
 
     for(let key in store.state.lines){
         if(store.state.lines[key].parents.length === 0){
@@ -490,6 +583,7 @@ function analyze(){
     }
 
     function step(target, power, lastTarget){
+        console.log(power.getStr());
         target.power = power;
 
 
@@ -498,33 +592,53 @@ function analyze(){
         if(target.cycle) return;
 
 
-        let fullPower = 0;
+        let fullPower = new Fraction(0);
 
         for(let i = 0; i < target.parents.length; i++){
             let item = target.parents[i];
             if(item.power) {
-                fullPower += item.power / item.children.length;
+                fullPower.plus(item.power.getNum(), item.power.getDet() * item.children.length);
             }
         }
 
-        if(fullPower){
+        if(fullPower.getNum() !== 0){
             target.power = fullPower;
         }
-
-        console.log("power", target.power );
 
         //ЗАменить на нужное поведение
-        if(target.already && power !== fullPower) {
+
+
+        if(target.already && power.getStr() !== fullPower.getStr()) {
             lastTarget.cycle = true;
-            fullPower = fullPower - power;
+            console.log("beforeFp", fullPower.getStr());
+            fullPower.minus(power.getNum(), power.getDet());
+            console.log("fp here", fullPower.getStr());
+            console.log("tp here", target.power.getStr());
+            console.log("inner power", power.getStr());
 
-            let kx = 1 / power;
-            let x = fullPower / (kx - 1)
-            fullPower += x;
-            target.power = fullPower;
 
-            console.log("x, kx, fullPower is", x, kx, fullPower);
+            let kx = target.power.clone().divide(power.getNum(), power.getDet());
+            console.log("kx here", kx.getStr());
+            kx.minus(1);
+            let x = fullPower.clone().divide(kx.getNum(), kx.getDet());
+            console.log("x here", x.getStr());
+            target.power.plus(x.getNum(), x.getDet());
+            console.log("fullPower here", fullPower.getStr());
+
+            console.log("x, kx, fullPower is", x.getStr(), kx.getStr(), fullPower.getStr());
         }
+
+        // if(target.already && power !== fullPower) {
+        //     lastTarget.cycle = true;
+        //     fullPower = fullPower - power;
+        //
+        //     let kx = 1 / power;
+        //     let x = fullPower / (kx - 1)
+        //     fullPower += x;
+        //     target.power = fullPower;
+        //
+        //     console.log("x, kx, fullPower is", x, kx, fullPower);
+        // }
 
         target.already = true;
 
@@ -532,23 +646,29 @@ function analyze(){
         if(target.children.length === 0){
             CNV.preventRender(() => target.line.classList.add("finishLine"));
             results[target.ids.line] = {
-                text: formNumber(fullPower || target.power),
+                text: target.power.getStr(),
                 x: target.endCircle.link.start.x + 10 + CNV.state.shift.x,
                 y: target.endCircle.link.start.y - 10 + CNV.state.shift.y,
                 fontSize: "14",
                 color: "green",
+                data: {num: target.power.getNum(), det: target.power.getDet()}
             }
         }
+
+        // target.children.forEach(item => {
+        //     step(item, fullPower / target.children.length, target)
+        // })
         target.children.forEach(item => {
-            step(item, fullPower / target.children.length, target)
+            step(item, new Fraction(target.power.getNum(), target.power.getDet() * target.children.length), target);
         })
         target.already = false;
-        target.line.classList.remove("orange");
     }
     try{
-        step(startLines[0], 1);
+        step(startLines[0], new Fraction(1));
+        // step(startLines[0], 1);
         CNV.render();
         for(let key in results){
+            controlSum.plus(results[key].data.num, results[key].data.det);
             CNV.text(results[key])
         }
         for(let key in store.state.lines){
@@ -556,11 +676,107 @@ function analyze(){
             store.state.lines[key].already = undefined;
             store.state.lines[key].cycle = undefined;
         }
+
+        if(controlSum.getStr() !== "1"){
+            alert("Критическая ошибка анализа пути: сумма выходов равна: " + controlSum.getStr());
+        }
     } catch (e){
         console.error("Граф замкнут. Анализ невозможен", e);
     }
 
 }
+
+// function analyze(){
+//     CNV.combineRender(()=> {
+//         CNV.querySelectorAll(".finishLine").forEach(item => item.classList.remove("finishLine"));
+//     })
+//
+//     let startLines = [];
+//     let results = {};
+//
+//     for(let key in store.state.lines){
+//         if(store.state.lines[key].parents.length === 0){
+//             startLines.push(store.state.lines[key])
+//         }
+//     }
+//     if(startLines.length > 1){
+//         alert("Путь имеет разрывы. Анализ невозможен");
+//         console.log(startLines)
+//         return;
+//     }
+//
+//     function step(target, power, lastTarget){
+//         target.power = power;
+//
+//
+//         target.line.classList.add("orange");
+//         //Если этот элемент является циклом и мы уже о нём знаем - игнорируем.
+//         if(target.cycle) return;
+//
+//
+//         let fullPower = 0;
+//
+//         for(let i = 0; i < target.parents.length; i++){
+//             let item = target.parents[i];
+//             if(item.power) {
+//                 fullPower += item.power / item.children.length;
+//             }
+//         }
+//
+//         if(fullPower){
+//             target.power = fullPower;
+//         }
+//
+//         console.log("power", target.power );
+//
+//         //ЗАменить на нужное поведение
+//         if(target.already && power !== fullPower) {
+//             lastTarget.cycle = true;
+//             fullPower = fullPower - power;
+//
+//             let kx = 1 / power;
+//             let x = fullPower / (kx - 1)
+//             fullPower += x;
+//             target.power = fullPower;
+//
+//             console.log("x, kx, fullPower is", x, kx, fullPower);
+//         }
+//
+//         target.already = true;
+//
+//
+//         if(target.children.length === 0){
+//             CNV.preventRender(() => target.line.classList.add("finishLine"));
+//             results[target.ids.line] = {
+//                 text: formNumber(fullPower || target.power),
+//                 x: target.endCircle.link.start.x + 10 + CNV.state.shift.x,
+//                 y: target.endCircle.link.start.y - 10 + CNV.state.shift.y,
+//                 fontSize: "14",
+//                 color: "green",
+//             }
+//         }
+//         target.children.forEach(item => {
+//             step(item, fullPower / target.children.length, target)
+//         })
+//         target.already = false;
+//         target.line.classList.remove("orange");
+//     }
+//     try{
+//         step(startLines[0], 1);
+//         CNV.render();
+//         for(let key in results){
+//             CNV.text(results[key])
+//         }
+//         for(let key in store.state.lines){
+//             store.state.lines[key].power = undefined;
+//             store.state.lines[key].already = undefined;
+//             store.state.lines[key].cycle = undefined;
+//         }
+//     } catch (e){
+//         console.error("Граф замкнут. Анализ невозможен", e);
+//     }
+//
+// }
 
 saveBtn.onclick = e => {
     saveBtn.classList.remove("saveOk");

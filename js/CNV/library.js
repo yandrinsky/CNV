@@ -782,8 +782,10 @@ function dragCanvas(){
     }
 
     function onMouseUp(e){
-        canvas.style.cursor = "default"
-        canvas.removeEventListener("mousemove", onMouseMove);
+        if(CNV.state.draggableCanvas){
+            canvas.style.cursor = "default"
+            canvas.removeEventListener("mousemove", onMouseMove);
+        }
     }
 
     canvas.addEventListener("mousedown", onMouseDown);
