@@ -5,8 +5,8 @@ const analyzeBtn = document.querySelector("#analyze");
 const modeField = document.querySelector("#mode");
 const savedCodeField = document.querySelector(".saved_code");
 const saveBtn = document.querySelector("#save");
-canvas.width = 700;
-canvas.height = 700;
+canvas.width = window.innerWidth - 5;
+canvas.height = window.innerHeight - 100;
 let context = canvas.getContext("2d");
 
 
@@ -14,6 +14,7 @@ let context = canvas.getContext("2d");
 CNV.setContext(context);
 CNV.setCanvas(canvas);
 CNV.setCSS(css);
+CNV.settings.draggableCanvas = false;
 
 const store = {
     state: {
@@ -166,6 +167,7 @@ function addChildren(parent, children){
 
 //событие нажатия на круглешок линии - чтобы повести новую линию
 function endCircleClick(data, e){
+    CNV.settings.draggableCanvas = false;
     CNV.querySelectorAll(".finishLine").forEach(el => el.classList.remove("finishLine"));
     //вести можно только 2 линии, не больше
     if(data.children.length < 2){
@@ -186,10 +188,23 @@ function endCircleClick(data, e){
             setAllEndCircleClick();
             newData.line.onmouseenter = e => lineMouseEnter(newData, e);
             newData.line.onmouseleave = e => lineMouseLeave(newData, e);
+            setTimeout(()=> {
+                CNV.settings.draggableCanvas = true;
+            }, 100)
         });
     }
 }
+function a(){
+    CNV.state.shift.x = 100;
+    CNV.state.shift.y = 100;
+    CNV.render();
+}
 
+function b(){
+    CNV.querySelectorAll(".hidden").forEach(it => {
+        it.classList.remove("hidden"); it.classList.add("startCircleActive")
+    })
+}
 
 function lineMouseEnter(data, e){
     e.target.classList.add("black");
@@ -242,10 +257,10 @@ function drawingLine(data, finishCallback = () => {}){
     }
 
     function drawing(e){
-        data.line.update.endPosition.x = e.clientX;
-        data.line.update.endPosition.y = e.clientY;
-        data.endCircle.update.startPosition.x = e.clientX;
-        data.endCircle.update.startPosition.y = e.clientY;
+        data.line.update.endPosition.x = e.clientX - CNV.state.shift.x;
+        data.line.update.endPosition.y = e.clientY - CNV.state.shift.y;
+        data.endCircle.update.startPosition.x = e.clientX - CNV.state.shift.x;
+        data.endCircle.update.startPosition.y = e.clientY - CNV.state.shift.y;
     }
 
 
@@ -263,13 +278,13 @@ function createLine(e, option = {}){
         className: "red",
     })
     let startCircle = CNV.createCircle({
-        x0: e.clientX,
-        y0: e.clientY,
+        x0: e.clientX - CNV.state.shift.x,
+        y0: e.clientY - CNV.state.shift.y,
         className: ["red", "hidden"],
     })
     let endCircle = CNV.createCircle({
-        x0: e.clientX,
-        y0: e.clientY,
+        x0: e.clientX - CNV.state.shift.x,
+        y0: e.clientY - CNV.state.shift.x,
         className: ["endCircle", "hidden"],
 
     })
@@ -307,6 +322,7 @@ function firstDraw() {
         canvas.onclick = undefined;
         drawingLine(data, () => {
             canvas.onclick = undefined;
+            CNV.settings.draggableCanvas = true;
         })
 
     }
@@ -326,6 +342,7 @@ recoverBtn.onclick = e => {
 analyzeBtn.onclick = e => {
     analyze();
 }
+
 function save(){
     //Убираем синие линии, чтобы сохранились стили без них
     CNV.preventRender(()=>{
@@ -371,7 +388,6 @@ function save(){
     })
     return saved;
 }
-
 function recover(data){
     const disk = JSON.parse(data || localStorage.getItem("__saved"));
     CNV.recover(disk.CNV);
@@ -400,10 +416,65 @@ function recover(data){
     store.state = script;
 }
 
+
+function formNumber(power){
+    // console.log("power, Frac", power, new Fraction(power).toString());
+    // return new Fraction(power).toString();
+
+    const gcd = (a, b) => {
+        if (!b) {
+            return a;
+        }
+
+        return gcd(b, a % b);
+    }
+    let isCycle = true;
+    if(String(power).includes(".")){
+        const fractionalPart = String(power).split(".")[1];
+        if(fractionalPart.length === 16){
+            // for(let i = 1; i < fractionalPart.length - 2; i++){
+            //     if(fractionalPart[0] !== fractionalPart[i]){
+            //         isCycle = false;
+            //         break;
+            //     }
+            // }
+        } else {
+            isCycle = false;
+        }
+    }
+    console.log("cycle Fraction", isCycle, power)
+    let n;
+    if(isCycle){
+       n = 1 / power;
+    } else {
+        n = power;
+    }
+
+    if(String(n).includes(".")){
+        let lenFloat = String(n).length - String(n).indexOf('.') - 1;
+        let numerator = n * 10**lenFloat;
+        let denominator = 10**lenFloat;
+        console.log("num, deno", numerator, denominator)
+        console.log("PPpower", power)
+        let myGcd = gcd(numerator, denominator);
+        numerator /= myGcd;
+        denominator /= myGcd;
+        if(isCycle){
+            return denominator + "/" + numerator;
+        } else {
+            return numerator + "/" + denominator;
+        }
+
+    } else {
+        return 1 + "/" + 1 / power;
+    }
+}
+
 function analyze(){
     CNV.combineRender(()=> {
         CNV.querySelectorAll(".finishLine").forEach(item => item.classList.remove("finishLine"));
     })
+
     let startLines = [];
     let results = {};
 
@@ -413,7 +484,7 @@ function analyze(){
         }
     }
     if(startLines.length > 1){
-        console.error("Граф имеет разрывы. Анализ невозможен");
+        alert("Путь имеет разрывы. Анализ невозможен");
         console.log(startLines)
         return;
     }
@@ -421,7 +492,8 @@ function analyze(){
     function step(target, power, lastTarget){
         target.power = power;
 
-        console.log("power", power);
+
+        target.line.classList.add("orange");
         //Если этот элемент является циклом и мы уже о нём знаем - игнорируем.
         if(target.cycle) return;
 
@@ -439,8 +511,10 @@ function analyze(){
             target.power = fullPower;
         }
 
+        console.log("power", target.power );
+
         //ЗАменить на нужное поведение
-        if(target.already && power !== fullPower) {  //
+        if(target.already && power !== fullPower) {
             lastTarget.cycle = true;
             fullPower = fullPower - power;
 
@@ -450,45 +524,17 @@ function analyze(){
             target.power = fullPower;
 
             console.log("x, kx, fullPower is", x, kx, fullPower);
-            // return;
         }
 
         target.already = true;
 
-        function formNumber(power){
-            // console.log("power, Frac", power, new Fraction(power).toString());
-            // return new Fraction(power).toString();
 
-            const gcd = (a, b) => {
-                if (!b) {
-                    return a;
-                }
-
-                return gcd(b, a % b);
-            }
-
-            let n = 1 / power;
-            if(String(n).includes(".")){
-                let lenFloat = String(n).length - String(n).indexOf('.') - 1;
-                let numerator = n * 10**lenFloat;
-                let denominator = 10**lenFloat;
-                console.log("num, deno", numerator, denominator)
-                console.log("PPpower", power)
-                let myGcd = gcd(numerator, denominator);
-                numerator /= myGcd;
-                denominator /= myGcd;
-                return denominator + "/" + numerator;
-            } else {
-                return 1 + "/" + 1 / power;
-            }
-        }
-        // text: 1 + "/" + 1 / (fullPower || target.power),
         if(target.children.length === 0){
             CNV.preventRender(() => target.line.classList.add("finishLine"));
             results[target.ids.line] = {
                 text: formNumber(fullPower || target.power),
-                x: target.endCircle.link.start.x + 10,
-                y: target.endCircle.link.start.y - 10,
+                x: target.endCircle.link.start.x + 10 + CNV.state.shift.x,
+                y: target.endCircle.link.start.y - 10 + CNV.state.shift.y,
                 fontSize: "14",
                 color: "green",
             }
@@ -497,6 +543,7 @@ function analyze(){
             step(item, fullPower / target.children.length, target)
         })
         target.already = false;
+        target.line.classList.remove("orange");
     }
     try{
         step(startLines[0], 1);
@@ -537,6 +584,8 @@ saveBtn.onclick = e => {
 
 const shiftDownHandler = (e) => {
     if(e.key === "Shift"){
+        CNV.settings.draggableCanvas = false;
+
         window.removeEventListener("keydown", shiftDownHandler);
         window.addEventListener("keyup", shiftUpHandler);
         console.log("This is shift");
@@ -550,13 +599,17 @@ const shiftDownHandler = (e) => {
                 //setStickToTailHandler(obj);
                 const item = obj.endCircle;
                 CNV.combineRender(() => {
-                    item.update.startPosition.x = event.clientX;
-                    item.update.startPosition.y = event.clientY;
+                    item.update.startPosition.x = event.clientX - CNV.state.shift.x;
+                    item.update.startPosition.y = event.clientY - CNV.state.shift.y;
 
                     obj.line.update.endPosition.x = item.link.start.x;
                     obj.line.update.endPosition.y = item.link.start.y;
 
                     obj.children.forEach(obj => {
+                        // obj.line.update.startPosition.x = item.link.start.x  - CNV.state.shift.x;
+                        // obj.line.update.startPosition.y = item.link.start.y - CNV.state.shift.y;
+                        // obj.startCircle.update.startPosition.x = item.link.start.x  - CNV.state.shift.x;
+                        // obj.startCircle.update.startPosition.y = item.link.start.y - CNV.state.shift.y;
                         obj.line.update.startPosition.x = item.link.start.x;
                         obj.line.update.startPosition.y = item.link.start.y;
                         obj.startCircle.update.startPosition.x = item.link.start.x;
@@ -606,6 +659,8 @@ const shiftDownHandler = (e) => {
 
 const shiftUpHandler = (e) => {
     if(e.key === "Shift"){
+        CNV.settings.draggableCanvas = true;
+
         canvas.style.cursor = "default";
         window.removeEventListener("keyup", shiftUpHandler);
         window.addEventListener("keydown", shiftDownHandler);

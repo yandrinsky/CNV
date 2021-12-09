@@ -161,6 +161,9 @@ const CNV = {
         __mouseMoveTargets: [],
         __mouseClickTargets: [],
         shouldRenderUpdates: true,
+        shift: {x: 0, y: 0},
+        shift: {x: 0, y: 0},
+        draggableCanvas: false,
     },
     context: undefined,
     canvas: undefined,
@@ -179,6 +182,12 @@ const CNV = {
 
     setCSS(css){
         this.css = css;
+    },
+
+    settings: {
+        set draggableCanvas(flag){
+            CNV.state.draggableCanvas = !!flag;
+        }
     },
 
     __mouseMove(e){
@@ -224,10 +233,10 @@ const CNV = {
                         distance: 5,
                         userX: e.clientX,
                         userY: e.clientY,
-                        x1: link.start.x,
-                        y1: link.start.y,
-                        x2: link.end?.x || link.start.x,
-                        y2: link.end?.y || link.start.y,
+                        x1: link.start.x + this.state.shift.x,
+                        y1: link.start.y + this.state.shift.y,
+                        x2: link.end?.x + this.state.shift.x || link.start.x + this.state.shift.x,
+                        y2: link.end?.y + this.state.shift.y || link.start.y + this.state.shift.y,
                     }, successCallback.bind(this, link, e),
                     failCallback.bind(this, link, e)
                 )
@@ -236,8 +245,8 @@ const CNV = {
                         distance: 5,
                         userX: e.clientX,
                         userY: e.clientY,
-                        x0: link.start.x,
-                        y0: link.start.y,
+                        x0: link.start.x + this.state.shift.x,
+                        y0: link.start.y + this.state.shift.y,
                     }, successCallback.bind(this, link, e),
                     failCallback.bind(this, link, e)
                 )
@@ -260,10 +269,10 @@ const CNV = {
                     distance: 5,
                     userX: e.clientX,
                     userY: e.clientY,
-                    x1: link.start.x,
-                    y1: link.start.y,
-                    x2: link.end.x,
-                    y2: link.end.y,
+                    x1: link.start.x + this.state.shift.x,
+                    y1: link.start.y + this.state.shift.y,
+                    x2: link.end.x + this.state.shift.x,
+                    y2: link.end.y + this.state.shift.y,
                     e: e,
                 }, (e)=> {
                     let selfE = {...e, target: this.state.shapes[link.id]};
@@ -278,8 +287,8 @@ const CNV = {
                     distance: 5,
                     userX: e.clientX,
                     userY: e.clientY,
-                    x0: link.start.x,
-                    y0: link.start.y,
+                    x0: link.start.x + this.state.shift.x,
+                    y0: link.start.y + this.state.shift.y,
                     e: e,
                 }, (e)=> {
                     let selfE = {
@@ -422,17 +431,17 @@ const CNV = {
         const style = cssEngine(this.css, link.classList, link.type);
         if(!(style.visibility === "hidden")){
             this.context.beginPath();
-            this.context.moveTo(link.start.x, link.start.y);
+            this.context.moveTo(link.start.x + this.state.shift.x, link.start.y + this.state.shift.y);
             if(!link.pointer){
-                this.context.lineTo(link.end.x, link.end.y);
+                this.context.lineTo(link.end.x + this.state.shift.x, link.end.y + this.state.shift.y);
                 this.context.lineWidth = style.lineWidth;
                 this.context.strokeStyle = style.color; //config.color;
                 this.context.stroke();
-            }else {
+            }else{
                 const shape = this.getElementByUniqueId(link.id);
                 const equation = shape.system.equation;
                 const endPosition = moveTo(equation, -5);
-                this.context.lineTo(endPosition.x, endPosition.y);
+                this.context.lineTo(endPosition.x + this.state.shift.x, endPosition.y + this.state.shift.y);
                 this.context.lineWidth = style.lineWidth;
                 this.context.strokeStyle = style.color; //config.color;
                 this.context.stroke();
@@ -446,7 +455,7 @@ const CNV = {
         if(!(style.visibility === "hidden")){
             this.context.beginPath();
             this.context.fillStyle = style.color;
-            this.context.arc(link.start.x, link.start.y, style.radius, style.startAngle, style.endAngle);
+            this.context.arc(link.start.x + this.state.shift.x, link.start.y + this.state.shift.y, style.radius, style.startAngle, style.endAngle);
             this.context.fill();
         }
     },
@@ -507,14 +516,18 @@ const CNV = {
 
     pointer(line){
         const config = {
-            x0: line.start.x,
-            y0: line.start.y,
-            x1: line.end.x,
-            y1: line.end.y,
+            x0: line.start.x + this.state.shift.x,
+            y0: line.start.y + this.state.shift.y,
+            x1: line.end.x + this.state.shift.x,
+            y1: line.end.y + this.state.shift.y,
         }
-        eqInit = getEquationFor2points(config.x0, config.y0, config.x1, config.y1);
+
+        //Чтобы срелочки после выхода за границы экрана не творили дичь
+        if(config.x1 < 3) return;
+
+        let eqInit = getEquationFor2points(config.x0, config.y0, config.x1, config.y1);
         let linePosition = moveTo(eqInit, -10);
-        equation = getEquationForLine(linePosition.x, linePosition.y, eqInit);
+        let equation = getEquationForLine(linePosition.x, linePosition.y, eqInit);
         let len = 50;
         equation.x1 = linePosition.x - len;
         equation.y1 = getCoordinates(equation, linePosition.x - len);
@@ -609,11 +622,15 @@ const CNV = {
         if(callbackSuccess){
             if(callbackSuccess instanceof Function){
                 callbackSuccess = [callbackSuccess];
+            } else {
+                callbackSuccess = [()=>{}]
             }
         }
         if(callbackFail){
             if(callbackFail instanceof Function){
                 callbackFail = [callbackFail];
+            } else {
+                callbackFail = [()=> {}];
             }
         }
 
@@ -744,24 +761,47 @@ function moveTo(equation, move, x){
         y: getCoordinates(equation, newX),
     }
 }
+function dragCanvas(){
+    function onMouseDown (e){
+        if(CNV.state.draggableCanvas){
+            for(let i = 0; i < CNV.state.__mouseClickTargets.length; i++){
+                let link = CNV.state.__shapes[CNV.state.__mouseClickTargets[i]];
+                let res = CNV.nearDot({
+                    distance: 5,
+                    userX: e.clientX,
+                    userY: e.clientY,
+                    x0: link.start.x + CNV.state.shift.x,
+                    y0: link.start.y + CNV.state.shift.y,
+                    e: e,
+                })
+                if(res) return;
+            }
+            canvas.style.cursor = "grab"
+            canvas.addEventListener("mousemove", onMouseMove);
+        }
+    }
 
-function onMouseMove3(event, obj) {
-    //setStickToTailHandler(obj);
-    const item = obj.endCircle;
-    CNV.combineRender(() => {
-        item.update.startPosition.x = event.clientX;
-        item.update.startPosition.y = event.clientY;
+    function onMouseUp(e){
+        canvas.style.cursor = "default"
+        canvas.removeEventListener("mousemove", onMouseMove);
+    }
 
-        obj.line.update.endPosition.x = item.link.start.x;
-        obj.line.update.endPosition.y = item.link.start.y;
+    canvas.addEventListener("mousedown", onMouseDown);
+    canvas.addEventListener("mouseup", onMouseUp);
 
-        obj.children.forEach(obj => {
-            obj.line.update.startPosition.x = item.link.start.x;
-            obj.line.update.startPosition.y = item.link.start.y;
-            obj.startCircle.update.startPosition.x = item.link.start.x;
-            obj.startCircle.update.startPosition.y = item.link.start.y;
-        })
-    })
+    function onMouseMove(e) {
+        canvas.style.cursor = "grabbing"
+        if(CNV.state.draggableCanvas){
+            CNV.state.shift.x += e.movementX;
+            CNV.state.shift.y += e.movementY;
+            CNV.render();
+        }
+    }
 }
 
+dragCanvas();
+
+// canvas.onmousemove = e => {
+//     console.log(e)
+// }
 

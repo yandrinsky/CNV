@@ -36,5 +36,8 @@ const css = {
     smallCircle: {
         radius: 3,
         color: "yellow",
+    },
+    orange: {
+        color: "#FF4E39FF",
     }
 }
