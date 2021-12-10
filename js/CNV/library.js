@@ -25,9 +25,7 @@ class Shape{
                 }
             }
         }
-
     }
-
     get classList(){
         let link = this.link;
         return {
@@ -800,10 +798,4 @@ function dragCanvas(){
         }
     }
 }
-
 dragCanvas();
-
-// canvas.onmousemove = e => {
-//     console.log(e)
-// }
-

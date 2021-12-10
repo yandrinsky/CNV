@@ -39,5 +39,33 @@ const css = {
     },
     orange: {
         color: "#FF4E39FF",
-    }
+    },
+
+    a1: {
+        color: "blue",
+    },
+    a2: {
+        color: "green",
+    },
+    a3: {
+        color: "#CD853F",
+    },
+    a4: {
+        color: "#8A2BE2",
+    },
+    a5: {
+        color: "#00CED1",
+    },
+    a6: {
+        color: "#DAA520",
+    },
+    a7: {
+        color: "#98FB98",
+    },
+    a8: {
+        color: "#00FF7F",
+    },
+    a9: {
+        color: "#EE82EE",
+    },
 }

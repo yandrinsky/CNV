@@ -418,63 +418,6 @@ function recover(data){
     CNV.settings.draggableCanvas = true;
 }
 
-
-function formNumber(power){
-    // console.log("power, Frac", power, new Fraction(power).toString());
-    // return new Fraction(power).toString();
-
-    const gcd = (a, b) => {
-        if (!b) {
-            return a;
-        }
-
-        return gcd(b, a % b);
-    }
-    let isCycle = true;
-    if(String(power).includes(".")){
-        const fractionalPart = String(power).split(".")[1];
-        if(fractionalPart.length === 16){
-            // for(let i = 1; i < fractionalPart.length - 2; i++){
-            //     if(fractionalPart[0] !== fractionalPart[i]){
-            //         isCycle = false;
-            //         break;
-            //     }
-            // }
-        } else {
-            isCycle = false;
-        }
-    }
-    //console.log("cycle Fraction", isCycle, power)
-    let n;
-    if(isCycle){
-       n = 1 / power;
-    } else {
-        n = power;
-    }
-
-    if(String(n).includes(".")){
-        let lenFloat = String(n).length - String(n).indexOf('.') - 1;
-        let numerator = n * 10**lenFloat;
-        let denominator = 10**lenFloat;
-        // console.log("num, deno", numerator, denominator)
-        // console.log("PPpower", power)
-        let myGcd = gcd(numerator, denominator);
-        numerator /= myGcd;
-        denominator /= myGcd;
-        if(isCycle){
-            return denominator + "/" + numerator;
-        } else {
-            return numerator + "/" + denominator;
-        }
-
-    } else {
-        return 1 + "/" + 1 / power;
-    }
-}
-
-
-
-
 //power = {num, det}
 class Fraction{
     constructor(num, det = 1) {
@@ -484,6 +427,7 @@ class Fraction{
     }
 
     gcd(n, m){
+        console.log("gcd", n, m);
         return m === 0 ? n : this.gcd(m, n % m);
     }
 
@@ -562,6 +506,108 @@ class Fraction{
 // p.plus(p1.getNum(), p1.getDet());
 // console.log(p.getStr());
 
+function findCycles(start){
+    const cycles = []; //[[line, line, line], [line, line, line], [line, line, line]];
+    const curPath = [];
+    function check(target, lastTarget){
+        curPath.push(target);
+
+        if(target.__CHECKED){
+            lastTarget.__CYCLEEND = true;
+            const index = curPath.indexOf(target);
+            cycles.push(curPath.slice(index, curPath.length - 1));
+
+            //Не убираем checked, потому что у нас a1, a2, ...., a1 - мы на a1 и в конце, уберём, когда дойдём до начала
+            curPath.pop();
+            return;
+        }
+        target.__CHECKED = true;
+        target.children.forEach(item => {
+            check(item, target);
+        })
+
+        //После завершения вызова детей убираем из пути элемент
+        curPath.pop();
+        target.__CHECKED = false;
+    }
+
+    check(start);
+    return cycles;
+}
+function CG(){
+    let keys = Object.keys(store.state.lines);
+    let line1 = store.state.lines[keys[0]];
+    let line2 = store.state.lines[keys[keys.length - 1]];
+    console.log("canGo", canGo(line1, line2));
+}
+
+
+
+function canGo(target, incoming){
+    // console.log("target", target);
+    // console.log("incoming", incoming);
+
+    const toFix = []; //{was, link}
+
+    function step(curTarget, lastTarget){;
+        let res;
+        let fullPower = new Fraction(0);
+
+        //Считаем полную мощность
+        for(let i = 0; i < curTarget.parents.length; i++){
+            let item = curTarget.parents[i];
+            if(!item.power){
+                return false;
+            } else{
+                fullPower.plus(item.power.getNum(), item.power.getDet() * item.children.length);
+            }
+        }
+
+        toFix.push({
+            was: curTarget.power === undefined ? undefined : [curTarget.power.getNum(), curTarget.power.getDet()],
+            link: curTarget,
+        });
+
+        curTarget.power = fullPower;
+
+
+        if(curTarget === incoming){
+            console.log("found!!!");
+            return true;
+        }
+        for (let i = 0; i < curTarget.children.length; i++) {
+            let item = curTarget.children[i];
+            //item !== lastTarget чтобы не попасть на элемент, по которому уже проходили, то есть не пробешать целую ветку снова
+            if(item !== lastTarget){
+                if(step(item, curTarget)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    let isPossible = false;
+    function root(target){
+        for (let i = 0; i < target.parents.length; i++) {
+            let item = target.parents[i];
+            if(item.power && item !== incoming){
+                if(step(item, target)){
+                    isPossible = true;
+                    return;
+                }
+            }
+            return root(item);
+        }
+    }
+    root(target);
+
+    toFix.forEach(item => {
+        item.link.power = item.was === undefined ? undefined : new Fraction(item.was[0], item.was[1]);
+    })
+
+    return isPossible;
+}
+
 function analyze(){
     CNV.combineRender(()=> {
         CNV.querySelectorAll(".finishLine").forEach(item => item.classList.remove("finishLine"));
@@ -582,6 +628,23 @@ function analyze(){
         return;
     }
 
+    const cycles = findCycles(startLines[0]);
+    console.log(cycles);
+    // console.log("cycles", cycles);
+    let colors = ["a1", "a2","a3","a4","a5","a6","a7","a8", "a9"];
+    colors.forEach(color => {
+        CNV.querySelectorAll("." + color).forEach(item => {
+            item.classList.remove(color);
+        })
+    })
+    cycles.forEach((cycle, index) => {
+        cycle.forEach(target => {
+            target.line.classList.add("a" + (index + 1));
+        })
+    })
+
+
+
     function step(target, power, lastTarget){
         console.log(power.getStr());
         target.power = power;
@@ -596,6 +659,9 @@ function analyze(){
 
         for(let i = 0; i < target.parents.length; i++){
             let item = target.parents[i];
+            if(!item.power){
+                console.log("canGo", canGo(target, item));
+            }
             if(item.power) {
                 fullPower.plus(item.power.getNum(), item.power.getDet() * item.children.length);
             }
@@ -654,10 +720,6 @@ function analyze(){
                 data: {num: target.power.getNum(), det: target.power.getDet()}
             }
         }
-
-        // target.children.forEach(item => {
-        //     step(item, fullPower / target.children.length, target)
-        // })
         target.children.forEach(item => {
             step(item, new Fraction(target.power.getNum(), target.power.getDet() * target.children.length), target);
         })
@@ -681,6 +743,11 @@ function analyze(){
             alert("Критическая ошибка анализа пути: сумма выходов равна: " + controlSum.getStr());
         }
     } catch (e){
+        for(let key in store.state.lines){
+            store.state.lines[key].power = undefined;
+            store.state.lines[key].already = undefined;
+            store.state.lines[key].cycle = undefined;
+        }
         console.error("Граф замкнут. Анализ невозможен", e);
     }
 
@@ -894,8 +961,6 @@ const shiftUpHandler = (e) => {
             item.onclick = (e) => endCircleClick(obj, e);
         }
     }
-
 }
-
 
 window.addEventListener("keydown", shiftDownHandler);
