@@ -279,13 +279,13 @@ function createLine(e, option = {}){
         className: "red",
     })
     let startCircle = CNV.createCircle({
-        x0: e.clientX - CNV.state.shift.x,
-        y0: e.clientY - CNV.state.shift.y,
+        x0: option.x0 || e.clientX,
+        y0: option.y0 || e.clientY,
         className: ["red", "hidden"],
     })
     let endCircle = CNV.createCircle({
-        x0: e.clientX - CNV.state.shift.x,
-        y0: e.clientY - CNV.state.shift.x,
+        x0: option.x0 || e.clientX,
+        y0: option.y0 || e.clientY,
         className: ["endCircle", "hidden"],
 
     })
@@ -427,7 +427,6 @@ class Fraction{
     }
 
     gcd(n, m){
-        console.log("gcd", n, m);
         return m === 0 ? n : this.gcd(m, n % m);
     }
 
@@ -500,11 +499,6 @@ class Fraction{
     }
 }
 
-// let p = new Fraction(0);
-// let p1 = new Fraction(1, 2);
-// console.log("p1 det", p1.getDet());
-// p.plus(p1.getNum(), p1.getDet());
-// console.log(p.getStr());
 
 function findCycles(start){
     const cycles = []; //[[line, line, line], [line, line, line], [line, line, line]];
@@ -552,6 +546,9 @@ function canGo(target, incoming){
     function step(curTarget, lastTarget){;
         let res;
         let fullPower = new Fraction(0);
+
+        //Чтобы предотвратить зацикливаине. Этот флаг даёт функция findCycles;
+        if(curTarget.__CYCLEEND) return false;
 
         //Считаем полную мощность
         for(let i = 0; i < curTarget.parents.length; i++){
@@ -660,7 +657,10 @@ function analyze(){
         for(let i = 0; i < target.parents.length; i++){
             let item = target.parents[i];
             if(!item.power){
-                console.log("canGo", canGo(target, item));
+                if(canGo(target, item)){
+                    return;
+                }
+                //console.log("canGo", canGo(target, item));
             }
             if(item.power) {
                 fullPower.plus(item.power.getNum(), item.power.getDet() * item.children.length);
