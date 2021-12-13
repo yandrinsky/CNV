@@ -509,7 +509,7 @@ function findCycles(start){
         if(target.__CHECKED){
             lastTarget.__CYCLEEND = true;
             const index = curPath.indexOf(target);
-            cycles.push(curPath.slice(index, curPath.length - 1));
+            cycles.push(curPath.slice(index, curPath.length));
 
             //Не убираем checked, потому что у нас a1, a2, ...., a1 - мы на a1 и в конце, уберём, когда дойдём до начала
             curPath.pop();
@@ -605,6 +605,24 @@ function canGo(target, incoming){
     return isPossible;
 }
 
+function showCycles(start){
+    const cycles = findCycles(start);
+    let colors = ["a1", "a2","a3","a4","a5","a6","a7","a8", "a9"];
+    colors.forEach(color => {
+        CNV.querySelectorAll("." + color).forEach(item => {
+            item.classList.remove(color);
+        })
+    })
+    cycles.forEach((cycle, index) => {
+        cycle.forEach(target => {
+            target.line.classList.add("a" + (index + 1));
+        })
+    })
+}
+
+
+
+
 function analyze(){
     CNV.combineRender(()=> {
         CNV.querySelectorAll(".finishLine").forEach(item => item.classList.remove("finishLine"));
@@ -613,6 +631,8 @@ function analyze(){
     let startLines = [];
     let results = {};
     let controlSum = new Fraction(0);
+    let path = undefined;
+    let isPathMode = false;
 
     for(let key in store.state.lines){
         if(store.state.lines[key].parents.length === 0){
@@ -627,40 +647,44 @@ function analyze(){
 
     const cycles = findCycles(startLines[0]);
     console.log(cycles);
-    // console.log("cycles", cycles);
-    let colors = ["a1", "a2","a3","a4","a5","a6","a7","a8", "a9"];
-    colors.forEach(color => {
-        CNV.querySelectorAll("." + color).forEach(item => {
-            item.classList.remove(color);
-        })
-    })
-    cycles.forEach((cycle, index) => {
-        cycle.forEach(target => {
-            target.line.classList.add("a" + (index + 1));
-        })
-    })
 
+    //showCycles(startLines[0]);
 
+    function follow(path, power){
+        path.forEach(pathStep => {
+            step(pathStep);
+        })
+    }
 
     function step(target, power, lastTarget){
+        let canGOres;
+
         console.log(power.getStr());
         target.power = power;
 
 
-        target.line.classList.add("orange");
+        //target.line.classList.add("orange");
         //Если этот элемент является циклом и мы уже о нём знаем - игнорируем.
         if(target.cycle) return;
 
 
         let fullPower = new Fraction(0);
 
+
+        //Считаем полную мощность
         for(let i = 0; i < target.parents.length; i++){
             let item = target.parents[i];
             if(!item.power){
-                if(canGo(target, item)){
+                canGOres = canGo(target, item);
+                if(canGOres){
                     return;
+                }else{
+                    cycles.forEach(cycle=> {
+                        if(cycle[0] === target && cycle[cycle.length - 2] === item){
+                            path = cycle;
+                        }
+                    })
                 }
-                //console.log("canGo", canGo(target, item));
             }
             if(item.power) {
                 fullPower.plus(item.power.getNum(), item.power.getDet() * item.children.length);
@@ -671,17 +695,10 @@ function analyze(){
             target.power = fullPower;
         }
 
-        //ЗАменить на нужное поведение
-
-
+        //Уравнение арнольда
         if(target.already && power.getStr() !== fullPower.getStr()) {
             lastTarget.cycle = true;
-            console.log("beforeFp", fullPower.getStr());
             fullPower.minus(power.getNum(), power.getDet());
-            console.log("fp here", fullPower.getStr());
-            console.log("tp here", target.power.getStr());
-            console.log("inner power", power.getStr());
-
 
             let kx = target.power.clone().divide(power.getNum(), power.getDet());
             console.log("kx here", kx.getStr());
@@ -693,18 +710,6 @@ function analyze(){
 
             console.log("x, kx, fullPower is", x.getStr(), kx.getStr(), fullPower.getStr());
         }
-
-        // if(target.already && power !== fullPower) {
-        //     lastTarget.cycle = true;
-        //     fullPower = fullPower - power;
-        //
-        //     let kx = 1 / power;
-        //     let x = fullPower / (kx - 1)
-        //     fullPower += x;
-        //     target.power = fullPower;
-        //
-        //     console.log("x, kx, fullPower is", x, kx, fullPower);
-        // }
 
         target.already = true;
 
@@ -720,9 +725,21 @@ function analyze(){
                 data: {num: target.power.getNum(), det: target.power.getDet()}
             }
         }
-        target.children.forEach(item => {
-            step(item, new Fraction(target.power.getNum(), target.power.getDet() * target.children.length), target);
-        })
+
+        if(canGOres === false && path){
+            //follow(path, target.power);
+            console.warn("change path");
+            step(path[1], new Fraction(target.power.getNum(), target.power.getDet() * target.children.length), target);
+        } else {
+            target.children.forEach(item => {
+                step(item, new Fraction(target.power.getNum(), target.power.getDet() * target.children.length), target);
+            })
+        }
+
+        // target.children.forEach(item => {
+        //     step(item, new Fraction(target.power.getNum(), target.power.getDet() * target.children.length), target);
+        // })
+
         target.already = false;
     }
     try{
