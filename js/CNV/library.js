@@ -464,54 +464,6 @@ const CNV = {
         this.context.fillText(config.text, config.x, config.y);
     },
 
-    smth(){
-        const config = {
-            x0: 300,
-            y0: 10,
-            x1: 150,
-            y1: 150,
-        }
-
-        eqInit = getEquationFor2points(config.x0, config.y0, config.x1, config.y1);
-        let linePosition = moveTo(eqInit, -15);
-
-        equation = getEquationForLine(linePosition.x, linePosition.y, eqInit);
-
-
-        CNV.createLine({
-            x0: config.x0,
-            y0: getCoordinates(eqInit, config.x0),
-            x1: config.x1,
-            y1: getCoordinates(eqInit, config.x1),
-        });
-
-        CNV.createCircle({
-            x0: linePosition.x,
-            y0: linePosition.y,
-            radius: 5,
-            className: ["smallCircle"]
-        })
-
-        let len = 10;
-        const perp = CNV.createLine({
-            x0: linePosition.x - len,
-            y0: getCoordinates(equation, linePosition.x - len),
-            x1: linePosition.x + len,
-            y1: getCoordinates(equation, linePosition.x + len),
-        })
-
-        // console.log("prep equat", perp.system.equation);
-
-        let startPoint = moveTo(perp.system.equation, -10, linePosition.x);
-        let endPoint = moveTo(perp.system.equation, 10, linePosition.x);
-
-        //console.log(equation, startPoint, endPoint)
-        perp.update.startPosition.x = startPoint.x;
-        perp.update.startPosition.y = startPoint.y;
-        perp.update.endPosition.x = endPoint.x;
-        perp.update.endPosition.y = endPoint.y;
-    },
-
     pointer(line){
         const config = {
             x0: line.start.x + this.state.shift.x,
@@ -658,11 +610,24 @@ const CNV = {
     render(){
         if(this.state.shouldRenderUpdates){
             this.__clearCanvas();
-            for(let id in this.state.__shapes){
-                let shape = this.state.__shapes[id];
-                if(shape.type === "line") this.line(shape);
-                else if(shape.type === "circle") this.circle(shape);
-            }
+
+            const preRender = cssIndex(this.css, this.state.__shapes);
+
+            preRender.keys.forEach(key => {
+                let shapes = preRender.shapes[key];
+                shapes.forEach(shape => {
+                    if(shape.type === "line") this.line(shape);
+                    else if(shape.type === "circle") this.circle(shape);
+                })
+            })
+
+
+
+            // for(let id in this.state.__shapes){
+            //     let shape = this.state.__shapes[id];
+            //     if(shape.type === "line") this.line(shape);
+            //     else if(shape.type === "circle") this.circle(shape);
+            // }
 
             this.__renderPointers();
         }

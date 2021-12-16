@@ -538,12 +538,14 @@ function CG(){
 
 
 function canGo(target, incoming){
+    console.warn("start canGo")
     // console.log("target", target);
     // console.log("incoming", incoming);
 
     const toFix = []; //{was, link}
 
-    function step(curTarget, lastTarget){;
+    function step(curTarget, lastTarget){
+        curTarget.__CANGO__CHECKED = true;
         let res;
         let fullPower = new Fraction(0);
 
@@ -583,9 +585,13 @@ function canGo(target, incoming){
         }
         return false;
     }
-    let isPossible = false;
+
     function root(target){
-        for (let i = 0; i < target.parents.length; i++) {
+        if(target.line.classList.contains("a7")) target.line.classList.add("a3");
+        target.line.classList.add("a7")
+
+        //Старая версия
+        for(let i = 0; i < target.parents.length; i++) {
             let item = target.parents[i];
             if(item.power && item !== incoming){
                 if(step(item, target)){
@@ -595,13 +601,43 @@ function canGo(target, incoming){
             }
             return root(item);
         }
+
+
+
+        //Новая версия
+
+
+        // if(target === incoming){
+        //     console.log("FOUND!");
+        //     isPossible = true;
+        //     return;
+        // }
+        //
+        // if(!target.__CANGO__CHECKED){
+        //     for(let i = 0; i < target.parents.length; i++) {
+        //         let item = target.parents[i];
+        //         if(item.power && item !== incoming){
+        //             if(step(item, target)){
+        //                 isPossible = true;
+        //                 return;
+        //             }
+        //         }
+        //         root(item);
+        //     }
+        // }
+
     }
+
+    let isPossible = false;
+
+
     root(target);
 
     toFix.forEach(item => {
         item.link.power = item.was === undefined ? undefined : new Fraction(item.was[0], item.was[1]);
     })
 
+    console.warn("end canGo", isPossible)
     return isPossible;
 }
 
@@ -656,10 +692,13 @@ function analyze(){
         })
     }
 
+
+    let count = 0;
     function step(target, power, lastTarget){
         let canGOres;
 
-        console.log(power.getStr());
+        console.log("incoming power", power.getStr(), power);
+        console.log("lastTarget power", lastTarget?.power.getStr(), lastTarget?.power);
         target.power = power;
 
 
@@ -669,6 +708,21 @@ function analyze(){
 
 
         let fullPower = new Fraction(0);
+
+        //Выделение пути обхода
+
+        // setTimeout(()=>{
+        //     for (let i = 1; i < 10; i++) {
+        //         if(!target.line.classList.contains("a" + i)){
+        //             target.line.classList.add("a" + i);
+        //             break;
+        //         }
+        //     }
+        // }, 1000 * count);
+
+
+
+        count += 1;
 
 
         //Считаем полную мощность
@@ -692,11 +746,16 @@ function analyze(){
         }
 
         if(fullPower.getNum() !== 0){
+
             target.power = fullPower;
         }
 
+        console.log("counted power (fullPower)", target.power.getStr(), target.power);
+
         //Уравнение арнольда
         if(target.already && power.getStr() !== fullPower.getStr()) {
+            console.log("!!!АРНОЛЬД!!!");
+            console.log("In Arnold power incoming", "fullpower", power.getStr(), fullPower.getStr());
             lastTarget.cycle = true;
             fullPower.minus(power.getNum(), power.getDet());
 
@@ -710,6 +769,8 @@ function analyze(){
 
             console.log("x, kx, fullPower is", x.getStr(), kx.getStr(), fullPower.getStr());
         }
+
+        console.log("myPower after Arnold", target.power.getStr());
 
         target.already = true;
 
@@ -727,18 +788,41 @@ function analyze(){
         }
 
         if(canGOres === false && path){
+            let transmittingPower= new Fraction(target.power.getNum(), target.power.getDet() * target.children.length)
             //follow(path, target.power);
-            console.warn("change path");
-            step(path[1], new Fraction(target.power.getNum(), target.power.getDet() * target.children.length), target);
+            console.warn("change path", "transmitting power", transmittingPower.getStr(), "target.children.length", target.children.length);
+            console.log(path);
+            CNV.querySelectorAll(".a2").forEach((item)=> {
+                item.classList.remove("a5");
+            })
+            CNV.querySelectorAll(".a1").forEach((item)=> {
+                item.classList.remove("a1");
+            })
+
+            path.forEach((item, index)=>{
+                console.log(index);
+                if(index === 1){
+                    item.line.classList.add("a5");
+                }else {
+                    item.line.classList.add("a1");
+                }
+            })
+            step(path[1], transmittingPower, target);
         } else {
             target.children.forEach(item => {
-                step(item, new Fraction(target.power.getNum(), target.power.getDet() * target.children.length), target);
+                let transmittingPower= new Fraction(target.power.getNum(), target.power.getDet() * target.children.length)
+                console.log("transmitting power", transmittingPower.getStr());
+                step(item, transmittingPower, target);
             })
         }
 
         // target.children.forEach(item => {
         //     step(item, new Fraction(target.power.getNum(), target.power.getDet() * target.children.length), target);
         // })
+
+        setTimeout(()=>{
+            target.line.classList.remove("a5");
+        }, 1000 * (count - 1) + 500);
 
         target.already = false;
     }
@@ -769,98 +853,6 @@ function analyze(){
     }
 
 }
-
-// function analyze(){
-//     CNV.combineRender(()=> {
-//         CNV.querySelectorAll(".finishLine").forEach(item => item.classList.remove("finishLine"));
-//     })
-//
-//     let startLines = [];
-//     let results = {};
-//
-//     for(let key in store.state.lines){
-//         if(store.state.lines[key].parents.length === 0){
-//             startLines.push(store.state.lines[key])
-//         }
-//     }
-//     if(startLines.length > 1){
-//         alert("Путь имеет разрывы. Анализ невозможен");
-//         console.log(startLines)
-//         return;
-//     }
-//
-//     function step(target, power, lastTarget){
-//         target.power = power;
-//
-//
-//         target.line.classList.add("orange");
-//         //Если этот элемент является циклом и мы уже о нём знаем - игнорируем.
-//         if(target.cycle) return;
-//
-//
-//         let fullPower = 0;
-//
-//         for(let i = 0; i < target.parents.length; i++){
-//             let item = target.parents[i];
-//             if(item.power) {
-//                 fullPower += item.power / item.children.length;
-//             }
-//         }
-//
-//         if(fullPower){
-//             target.power = fullPower;
-//         }
-//
-//         console.log("power", target.power );
-//
-//         //ЗАменить на нужное поведение
-//         if(target.already && power !== fullPower) {
-//             lastTarget.cycle = true;
-//             fullPower = fullPower - power;
-//
-//             let kx = 1 / power;
-//             let x = fullPower / (kx - 1)
-//             fullPower += x;
-//             target.power = fullPower;
-//
-//             console.log("x, kx, fullPower is", x, kx, fullPower);
-//         }
-//
-//         target.already = true;
-//
-//
-//         if(target.children.length === 0){
-//             CNV.preventRender(() => target.line.classList.add("finishLine"));
-//             results[target.ids.line] = {
-//                 text: formNumber(fullPower || target.power),
-//                 x: target.endCircle.link.start.x + 10 + CNV.state.shift.x,
-//                 y: target.endCircle.link.start.y - 10 + CNV.state.shift.y,
-//                 fontSize: "14",
-//                 color: "green",
-//             }
-//         }
-//         target.children.forEach(item => {
-//             step(item, fullPower / target.children.length, target)
-//         })
-//         target.already = false;
-//         target.line.classList.remove("orange");
-//     }
-//     try{
-//         step(startLines[0], 1);
-//         CNV.render();
-//         for(let key in results){
-//             CNV.text(results[key])
-//         }
-//         for(let key in store.state.lines){
-//             store.state.lines[key].power = undefined;
-//             store.state.lines[key].already = undefined;
-//             store.state.lines[key].cycle = undefined;
-//         }
-//     } catch (e){
-//         console.error("Граф замкнут. Анализ невозможен", e);
-//     }
-//
-// }
 
 saveBtn.onclick = e => {
     saveBtn.classList.remove("saveOk");
@@ -905,16 +897,33 @@ const shiftDownHandler = (e) => {
                     obj.line.update.endPosition.x = item.link.start.x;
                     obj.line.update.endPosition.y = item.link.start.y;
 
-                    obj.children.forEach(obj => {
+                    obj.children.forEach(children => {
                         // obj.line.update.startPosition.x = item.link.start.x  - CNV.state.shift.x;
                         // obj.line.update.startPosition.y = item.link.start.y - CNV.state.shift.y;
                         // obj.startCircle.update.startPosition.x = item.link.start.x  - CNV.state.shift.x;
                         // obj.startCircle.update.startPosition.y = item.link.start.y - CNV.state.shift.y;
-                        obj.line.update.startPosition.x = item.link.start.x;
-                        obj.line.update.startPosition.y = item.link.start.y;
-                        obj.startCircle.update.startPosition.x = item.link.start.x;
-                        obj.startCircle.update.startPosition.y = item.link.start.y;
+                        children.line.update.startPosition.x = item.link.start.x;
+                        children.line.update.startPosition.y = item.link.start.y;
+                        children.startCircle.update.startPosition.x = item.link.start.x;
+                        children.startCircle.update.startPosition.y = item.link.start.y;
+
+                        children.parents.forEach(parent => {
+                            if(parent !== obj){
+                                parent.line.update.endPosition.x = item.link.start.x;
+                                parent.line.update.endPosition.y = item.link.start.y;
+                                parent.endCircle.update.startPosition.x = event.clientX - CNV.state.shift.x;
+                                parent.endCircle.update.startPosition.y = event.clientY - CNV.state.shift.y;
+                            }
+                        })
+
                     })
+
+                    // obj.parents.forEach(parent => {
+                    //     parent.line.update.endPosition.x = item.link.start.x;
+                    //     parent.line.update.endPosition.y = item.link.start.y;
+                    //     parent.startCircle.update.startPosition.x = item.link.start.x;
+                    //     parent.startCircle.update.startPosition.y = item.link.start.y;
+                    // })
                 })
             }
 

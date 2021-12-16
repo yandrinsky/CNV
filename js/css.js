@@ -17,6 +17,7 @@ const css = {
     endCircle:{
         color: "red",
         radius: 8,
+        zIndex: 1,
     },
     endCircleActive:{
         color: "black",
@@ -42,7 +43,7 @@ const css = {
     },
 
     a1: {
-        color: "blue",
+        color: "#EE82EE",
     },
     a2: {
         color: "green",
@@ -66,6 +67,6 @@ const css = {
         color: "#00FF7F",
     },
     a9: {
-        color: "#EE82EE",
+        color: "brown",
     },
 }

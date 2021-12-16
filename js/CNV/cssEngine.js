@@ -18,3 +18,28 @@ function cssEngine(css, classes, type){
     })
     return custom;
 }
+
+function cssIndex(css, shapes){
+    const final = {};
+    for(let id in shapes){
+        let shape = shapes[id];
+        let index;
+        shape.classList.forEach(CLS => {
+            if(css[CLS].zIndex){
+                index = css[CLS].zIndex;
+            }
+        })
+        if(index === undefined) index = 0;
+
+        if(final.hasOwnProperty(index)){
+            final[index].push(shape);
+        } else {
+            final[index] = [shape];
+        }
+    }
+    let keys = Object.keys(final).sort((a, b)=> a - b);
+    return {
+        shapes: final,
+        keys,
+    }
+}
