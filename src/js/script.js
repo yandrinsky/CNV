@@ -1,3 +1,8 @@
+import "../css/style.css"
+import css from "./css";
+import CNV from "./CNV/library";
+import uniqueId from "./CNV/uniqueId";
+
 const canvas = document.querySelector("#canvas");
 const delLineBtn = document.querySelector("#delLine");
 const recoverBtn = document.querySelector("#recover");

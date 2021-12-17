@@ -70,3 +70,5 @@ const css = {
         color: "brown",
     },
 }
+
+export default css;

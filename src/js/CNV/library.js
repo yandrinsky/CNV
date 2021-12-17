@@ -1,8 +1,5 @@
-function uniqueId(){
-    let id = String(Math.random())
-    id.replace(".", "");
-    return id;
-}
+import {cssEngine, cssIndex} from "./cssEngine";
+import uniqueId from "./uniqueId";
 
 class Shape{
     constructor(link, id) {
@@ -160,7 +157,6 @@ const CNV = {
         __mouseClickTargets: [],
         shouldRenderUpdates: true,
         shift: {x: 0, y: 0},
-        shift: {x: 0, y: 0},
         draggableCanvas: false,
     },
     context: undefined,
@@ -172,6 +168,7 @@ const CNV = {
         this.canvas = canvas;
         canvas.addEventListener("mousemove", this.__mouseMove.bind(this));
         canvas.addEventListener("click", this.__mouseClick.bind(this));
+        dragCanvas();
     },
 
     setContext(context){
@@ -326,14 +323,14 @@ const CNV = {
     },
 
     __mouseMoveHandler(){
-        canvas.addEventListener("mousemove", )
+        CNV.canvas.addEventListener("mousemove", )
     },
 
     __clearCanvas(){
-        context.beginPath();
-        context.moveTo(0, 0);
-        context.fillStyle = "white";
-        context.fillRect(0, 0, canvas.width, canvas.height);
+        CNV.context.beginPath();
+        CNV.context.moveTo(0, 0);
+        CNV.context.fillStyle = "white";
+        CNV.context.fillRect(0, 0, canvas.width, canvas.height);
     },
 
     querySelector(selector){
@@ -739,23 +736,23 @@ function dragCanvas(){
                 })
                 if(res) return;
             }
-            canvas.style.cursor = "grab"
-            canvas.addEventListener("mousemove", onMouseMove);
+            CNV.canvas.style.cursor = "grab"
+            CNV.canvas.addEventListener("mousemove", onMouseMove);
         }
     }
 
     function onMouseUp(e){
         if(CNV.state.draggableCanvas){
-            canvas.style.cursor = "default"
-            canvas.removeEventListener("mousemove", onMouseMove);
+            CNV.canvas.style.cursor = "default"
+            CNV.canvas.removeEventListener("mousemove", onMouseMove);
         }
     }
 
-    canvas.addEventListener("mousedown", onMouseDown);
-    canvas.addEventListener("mouseup", onMouseUp);
+    CNV.canvas.addEventListener("mousedown", onMouseDown);
+    CNV.canvas.addEventListener("mouseup", onMouseUp);
 
     function onMouseMove(e) {
-        canvas.style.cursor = "grabbing"
+        CNV.canvas.style.cursor = "grabbing"
         if(CNV.state.draggableCanvas){
             CNV.state.shift.x += e.movementX;
             CNV.state.shift.y += e.movementY;
@@ -763,4 +760,6 @@ function dragCanvas(){
         }
     }
 }
-dragCanvas();
+
+
+export default CNV;
