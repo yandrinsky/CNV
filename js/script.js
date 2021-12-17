@@ -302,7 +302,8 @@ function createLine(e, option = {}){
             line: line.id,
             endCircle: endCircle.id,
             startCircle: startCircle.id,
-        }
+        },
+        id: uniqueId(),
     }
 
 
@@ -539,15 +540,26 @@ function CG(){
 
 function canGo(target, incoming){
     console.warn("start canGo")
+    console.log("step")
     // console.log("target", target);
     // console.log("incoming", incoming);
 
     const toFix = []; //{was, link}
+    const toFix2 = {}; //{was, link}
 
     function step(curTarget, lastTarget){
+
+        // if(target.line.classList.contains("a7")) target.line.classList.add("a3");
+        // target.line.classList.add("a7")
+
         curTarget.__CANGO__CHECKED = true;
         let res;
         let fullPower = new Fraction(0);
+
+        if(curTarget === incoming){
+            console.log("PREFOUND");
+        }
+
 
         //Чтобы предотвратить зацикливаине. Этот флаг даёт функция findCycles;
         if(curTarget.__CYCLEEND) return false;
@@ -561,7 +573,17 @@ function canGo(target, incoming){
                 fullPower.plus(item.power.getNum(), item.power.getDet() * item.children.length);
             }
         }
-
+        //
+        if(!toFix2.hasOwnProperty(curTarget.id)){
+            toFix2[curTarget.id] = {
+                was: curTarget.power === undefined ? undefined : [curTarget.power.getNum(), curTarget.power.getDet()],
+                link: curTarget,
+            }
+        }
+        // toFix2[curTarget.id] = {
+        //     was: curTarget.power === undefined ? undefined : [curTarget.power.getNum(), curTarget.power.getDet()],
+        //     link: curTarget,
+        // }
         toFix.push({
             was: curTarget.power === undefined ? undefined : [curTarget.power.getNum(), curTarget.power.getDet()],
             link: curTarget,
@@ -587,20 +609,17 @@ function canGo(target, incoming){
     }
 
     function root(target){
-        if(target.line.classList.contains("a7")) target.line.classList.add("a3");
-        target.line.classList.add("a7")
-
         //Старая версия
-        for(let i = 0; i < target.parents.length; i++) {
-            let item = target.parents[i];
-            if(item.power && item !== incoming){
-                if(step(item, target)){
-                    isPossible = true;
-                    return;
-                }
-            }
-            return root(item);
-        }
+        // for(let i = 0; i < target.parents.length; i++) {
+        //     let item = target.parents[i];
+        //     if(item.power && item !== incoming){
+        //         if(step(item, target)){
+        //             isPossible = true;
+        //             return;
+        //         }
+        //     }
+        //     return root(item);
+        // }
 
 
 
@@ -613,19 +632,22 @@ function canGo(target, incoming){
         //     return;
         // }
         //
-        // if(!target.__CANGO__CHECKED){
-        //     for(let i = 0; i < target.parents.length; i++) {
-        //         let item = target.parents[i];
-        //         if(item.power && item !== incoming){
-        //             if(step(item, target)){
-        //                 isPossible = true;
-        //                 return;
-        //             }
-        //         }
-        //         root(item);
-        //     }
-        // }
+        /*if(!target.__CANGO__CHECKED)*/
 
+        for(let i = 0; i < target.parents.length; i++) {
+            let item = target.parents[i];
+            if(item === incoming) console.log("root PREFOUND", item.power)
+            //item.power && item !== incoming
+            if(item.power && item !== incoming){
+                if(step(item, target)){
+                    isPossible = true;
+                    console.log("IS POSSIBLE")
+                    return;
+                }
+            }
+            if(!item.__CYCLEEND) root(item)
+
+        }
     }
 
     let isPossible = false;
@@ -633,9 +655,9 @@ function canGo(target, incoming){
 
     root(target);
 
-    toFix.forEach(item => {
-        item.link.power = item.was === undefined ? undefined : new Fraction(item.was[0], item.was[1]);
-    })
+    for(let key in toFix2){
+        toFix2[key].link.power = toFix2[key].was === undefined ? undefined : new Fraction(toFix2[key].was[0], toFix2[key].was[1]);
+    }
 
     console.warn("end canGo", isPossible)
     return isPossible;
@@ -792,21 +814,21 @@ function analyze(){
             //follow(path, target.power);
             console.warn("change path", "transmitting power", transmittingPower.getStr(), "target.children.length", target.children.length);
             console.log(path);
-            CNV.querySelectorAll(".a2").forEach((item)=> {
-                item.classList.remove("a5");
-            })
-            CNV.querySelectorAll(".a1").forEach((item)=> {
-                item.classList.remove("a1");
-            })
-
-            path.forEach((item, index)=>{
-                console.log(index);
-                if(index === 1){
-                    item.line.classList.add("a5");
-                }else {
-                    item.line.classList.add("a1");
-                }
-            })
+            // CNV.querySelectorAll(".a2").forEach((item)=> {
+            //     item.classList.remove("a5");
+            // })
+            // CNV.querySelectorAll(".a1").forEach((item)=> {
+            //     item.classList.remove("a1");
+            // })
+            //
+            // path.forEach((item, index)=>{
+            //     console.log(index);
+            //     if(index === 1){
+            //         item.line.classList.add("a5");
+            //     }else {
+            //         item.line.classList.add("a1");
+            //     }
+            // })
             step(path[1], transmittingPower, target);
         } else {
             target.children.forEach(item => {
