@@ -1,4 +1,4 @@
-import CNV from "./library";
+import CNV from "../library";
 import {getEquationFor2points} from "./geometry/geometry"
 class Shape{
     constructor(link, id) {

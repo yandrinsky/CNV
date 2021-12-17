@@ -20,6 +20,7 @@ CNV.setContext(context);
 CNV.setCanvas(canvas);
 CNV.setCSS(css);
 CNV.settings.draggableCanvas = false;
+CNV.start();
 
 const store = {
     state: {

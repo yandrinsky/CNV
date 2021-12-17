@@ -60,4 +60,109 @@ function moveTo(equation, move, x){
     }
 }
 
-export {getCoordinates, getEquationFor2points, getEquationForLine, moveTo};
+function nearLine(config, callbackSuccess = [], callbackFail = []){
+    !config.distance ? config.distance = 1 : config
+
+    if(callbackSuccess){
+        if(callbackSuccess instanceof Function){
+            callbackSuccess = [callbackSuccess];
+        }
+    }
+
+    if(callbackFail){
+        if(callbackFail instanceof Function){
+            callbackFail = [callbackFail];
+        }
+    }
+
+    const {userX, userY, x1, y1, y2, x2} = config;
+    const x0 = userX;
+    const y0 = userY;
+
+    let res = isNearLineCalc({
+        x0,
+        y0,
+        x1,
+        y1,
+        x2,
+        y2,
+    })
+
+    if (res) {
+        callbackSuccess.forEach((callback)=>{
+            callback(config.e);
+        })
+    } else {
+        callbackFail.forEach((callback)=>{
+            callback(config.e);
+        })
+    }
+    return res;
+}
+
+function isNearLineCalc(config){
+    function dist (x1,y1,x2,y2){
+        return Math.sqrt((x2-x1)**2 + (y2-y1)**2);
+    }
+    const {x0,y0, x1, y1, x2, y2} = config;
+    let r1 = dist(x0, y0, x1, y1);
+    let r2 = dist(x0, y0, x2, y2);
+    let r12 = dist(x1, y1, x2, y2);
+
+
+    if(r1 < dist(r2, r12,0,0) && r2 < dist(r1,r12,0,0)){
+        let a = y2 - y1;
+        let b = x1 - x2;
+        let c = -x1 * (y2 - y1) + y1 * (x2 - x1);
+        let t = dist (a,b,0,0);
+        if (c>0){
+            a = -a;
+            b = -b;
+            c = -c;
+        }
+        let r0 =(a * x0 + b * y0 + c) / t;
+        // console.log('Расстояние от точки до отрезка=',r0);
+        if(r0 > -5 && r0 < 5){
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+
+}
+
+function nearDot(config, callbackSuccess = [], callbackFail = []){
+    !config.distance ? config.distance = 1 : config
+    if(callbackSuccess){
+        if(callbackSuccess instanceof Function){
+            callbackSuccess = [callbackSuccess];
+        } else {
+            callbackSuccess = [()=>{}]
+        }
+    }
+    if(callbackFail){
+        if(callbackFail instanceof Function){
+            callbackFail = [callbackFail];
+        } else {
+            callbackFail = [()=> {}];
+        }
+    }
+
+    const {userX, userY, x0, y0} = config;
+
+    if((userX < x0 + 10 && userX > x0 - 10) && (userY < y0 + 10 && userY > y0 - 10)) {
+        callbackSuccess.forEach((callback)=>{
+            callback(config.e);
+        })
+        return true;
+    } else {
+        callbackFail.forEach((callback)=>{
+            callback(config.e);
+        })
+        return false
+    }
+}
+
+export {getCoordinates, getEquationFor2points, getEquationForLine, moveTo, nearLine, nearDot};
