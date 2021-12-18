@@ -7,7 +7,7 @@ module.exports = {
     context: path.resolve(__dirname, 'src'),
     mode: "production",
     entry: {
-        main: './js/script.js',
+        main: './js/index.js',
     },
     output: {
         path: path.resolve(__dirname, './dist'),

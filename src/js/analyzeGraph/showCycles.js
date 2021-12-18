@@ -1,4 +1,5 @@
 import CNV from "../CNV/library";
+import findCycles from "./fincCycles";
 
 function showCycles(start){
     const cycles = findCycles(start);
