@@ -1,4 +1,9 @@
 import Fraction from "../Fraction";
+import CNV from "../CNV/library";
+
+
+let count = 0;
+
 
 function canGo(target, incoming){
     console.warn("start canGo")
@@ -6,15 +11,15 @@ function canGo(target, incoming){
     // console.log("target", target);
     // console.log("incoming", incoming);
 
-    const toFix = []; //{was, link}
     const toFix2 = {}; //{was, link}
 
     function step(curTarget, lastTarget){
+        //let power = lastTarget.power ? new Fraction(lastTarget.power.getNum(), lastTarget.power.getDet() * lastTarget.children.length) : curTarget.power;
+        let power = lastTarget ? new Fraction(lastTarget.power.getNum(), lastTarget.power.getDet() * lastTarget.children.length) : new Fraction(1)
 
         // if(target.line.classList.contains("a7")) target.line.classList.add("a3");
         // target.line.classList.add("a7")
 
-        curTarget.__CANGO__CHECKED = true;
         let res;
         let fullPower = new Fraction(0);
 
@@ -42,17 +47,30 @@ function canGo(target, incoming){
                 link: curTarget,
             }
         }
-        // toFix2[curTarget.id] = {
-        //     was: curTarget.power === undefined ? undefined : [curTarget.power.getNum(), curTarget.power.getDet()],
-        //     link: curTarget,
-        // }
-        toFix.push({
-            was: curTarget.power === undefined ? undefined : [curTarget.power.getNum(), curTarget.power.getDet()],
-            link: curTarget,
-        });
 
         curTarget.power = fullPower;
 
+        if(curTarget.__CANGO__CHECKED && power.getStr() !== fullPower.getStr()) {
+            //Логи дебага
+            console.log("CANGO !!!АРНОЛЬД!!!");
+            console.log("curTarget.power before ARNOLD CANGO", curTarget.power.getStr());
+            //console.log("In Arnold power incoming", "fullpower", power.getStr(), fullPower.getStr());
+            lastTarget.__CYCLEEND = true;
+            fullPower.minus(power.getNum(), power.getDet());
+            let kx = curTarget.power.clone().divide(power.getNum(), power.getDet());
+            //console.log("kx here", kx.getStr());
+            kx.minus(1);
+            let x = fullPower.clone().divide(kx.getNum(), kx.getDet());
+            //console.log("x here", x.getStr());
+            curTarget.power.plus(x.getNum(), x.getDet());
+            console.log("curTarget.power after ARNOLD CANGO", curTarget.power.getStr());
+            //console.log("fullPower here", fullPower.getStr());
+
+            //console.log("x, kx, fullPower is", x.getStr(), kx.getStr(), fullPower.getStr());
+        }
+
+
+        curTarget.__CANGO__CHECKED = true;
 
         if(curTarget === incoming){
             console.log("found!!!");
@@ -71,6 +89,22 @@ function canGo(target, incoming){
     }
 
     function root(target){
+
+        for(let i = 0; i < target.parents.length; i++) {
+            let item = target.parents[i];
+            //if(item === incoming) console.log("root PREFOUND", item.power)
+            //item.power && item !== incoming
+            if(item.power && item !== incoming){
+                if(step(item, target)){
+                    isPossible = true;
+                    console.log("IS POSSIBLE")
+                    return;
+                }
+            }
+            if(!item.__CYCLEEND) root(item)
+
+        }
+
         //Старая версия
         // for(let i = 0; i < target.parents.length; i++) {
         //     let item = target.parents[i];
@@ -95,21 +129,6 @@ function canGo(target, incoming){
         // }
         //
         /*if(!target.__CANGO__CHECKED)*/
-
-        for(let i = 0; i < target.parents.length; i++) {
-            let item = target.parents[i];
-            if(item === incoming) console.log("root PREFOUND", item.power)
-            //item.power && item !== incoming
-            if(item.power && item !== incoming){
-                if(step(item, target)){
-                    isPossible = true;
-                    console.log("IS POSSIBLE")
-                    return;
-                }
-            }
-            if(!item.__CYCLEEND) root(item)
-
-        }
     }
 
     let isPossible = false;

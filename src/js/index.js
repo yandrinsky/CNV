@@ -21,8 +21,11 @@ const analyzeBtn = document.querySelector("#analyze");
 const modeField = document.querySelector("#mode");
 const savedCodeField = document.querySelector(".saved_code");
 const saveBtn = document.querySelector("#save");
+
 canvas.width = window.innerWidth - 5;
 canvas.height = window.innerHeight - 100;
+
+
 let context = canvas.getContext("2d");
 
 //Инициализация библиотеки CNV
@@ -41,7 +44,7 @@ function setDelMode(){
     store.state.mode = "del";
     resetAllEndCircleClick();
     canvas.style.cursor = "crosshair";
-    modeField.innerHTML = "Mode: deleting";
+    modeField.innerHTML = "Режим: удаление";
 
     for(let key in store.state.lines){
         store.state.lines[key].line.onclick = e => {
@@ -61,7 +64,7 @@ function setDrawingMode(){
     store.state.mode = "draw";
     setAllEndCircleClick();
     canvas.style.cursor = "default";
-    modeField.innerHTML = "Mode: drawing";
+    modeField.innerHTML = "Режим: рисование";
 
     for(let key in store.state.lines){
         store.state.lines[key].line.onclick = e => undefined;
@@ -118,3 +121,8 @@ saveBtn.onclick = e => {
 }
 
 window.addEventListener("keydown", shiftDownHandler);
+window.onresize = (e) => {
+    canvas.width = window.innerWidth - 5;
+    canvas.height = window.innerHeight - 100;
+    CNV.render();
+}

@@ -2,6 +2,7 @@ import CNV from "./CNV/library";
 import store from "./Store";
 import {addEdge, createEdge} from "./graphHandlers";
 import drawingLine from "./drawingLine";
+import {branches} from "./SETTINGS";
 
 function resetAllEndCircleClick(){
     Object.keys(store.state.lines).forEach(key => {
@@ -41,8 +42,9 @@ function endCircleMouseLeave(e){
 function endCircleClick(data, e){
     CNV.settings.draggableCanvas = false;
     CNV.querySelectorAll(".finishLine").forEach(el => el.classList.remove("finishLine"));
+
     //вести можно только 2 линии, не больше
-    if(data.children.length < 2){
+    if(data.children.length < branches){
         //после того, как начали вести линию сбрасываем у всех круглешков событие нажатия
         resetAllEndCircleClick();
         //создаём новуб линию и указываем ей коорлинаты начала как у круга, по которому кликнули

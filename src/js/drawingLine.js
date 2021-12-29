@@ -22,7 +22,6 @@ function drawingLine(data, finishCallback = () => {}){
         data.endCircle.update.startPosition.x = e.clientX - CNV.state.shift.x;
         data.endCircle.update.startPosition.y = e.clientY - CNV.state.shift.y;
     }
-
     store.canvas.addEventListener("mousemove", drawing);
     store.canvas.addEventListener("click", stopDrawing);
     setStickToTailHandler(data);

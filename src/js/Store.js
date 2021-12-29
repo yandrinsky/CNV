@@ -5,19 +5,22 @@ export default {
         deletingIndex: undefined, //индекс текущего удаляемого элемента (обновляется при наведении)
         isDragging: false,
         lines: {},  //id: {line, startCircle, endCircle, children: [], parents: [], ids: {line, startCircle, endCircle}}
+
+    },
+    system: {
         canvas: undefined,
         context: undefined,
     },
     setCanvas(canvas){
-        this.state.canvas = canvas;
+        this.system.canvas = canvas;
     },
     setContext(context){
-        this.state.context = context;
+        this.system.context = context;
     },
     get canvas(){
-        return this.state.canvas;
+        return this.system.canvas;
     },
     get context(){
-        return this.state.context;
+        return this.system.context;
     }
 }

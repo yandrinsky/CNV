@@ -42,8 +42,10 @@ function analyze(lines){
     function step(target, power, lastTarget){
         let canGOres;
 
-        console.log("incoming power", power.getStr(), power);
-        console.log("lastTarget power", lastTarget?.power.getStr(), lastTarget?.power);
+        //Логи дебага
+        //console.log("incoming power", power.getStr(), power);
+        //console.log("lastTarget power", lastTarget?.power.getStr(), lastTarget?.power);
+
         target.power = power;
 
 
@@ -95,27 +97,29 @@ function analyze(lines){
             target.power = fullPower;
         }
 
-        console.log("counted power (fullPower)", target.power.getStr(), target.power);
+        //Логи дебага
+        //console.log("counted power (fullPower)", target.power.getStr(), target.power);
 
         //Уравнение арнольда
         if(target.already && power.getStr() !== fullPower.getStr()) {
-            console.log("!!!АРНОЛЬД!!!");
-            console.log("In Arnold power incoming", "fullpower", power.getStr(), fullPower.getStr());
+            //Логи дебага
+            //console.log("!!!АРНОЛЬД!!!");
+            //console.log("In Arnold power incoming", "fullpower", power.getStr(), fullPower.getStr());
             lastTarget.cycle = true;
             fullPower.minus(power.getNum(), power.getDet());
 
             let kx = target.power.clone().divide(power.getNum(), power.getDet());
-            console.log("kx here", kx.getStr());
+            //console.log("kx here", kx.getStr());
             kx.minus(1);
             let x = fullPower.clone().divide(kx.getNum(), kx.getDet());
-            console.log("x here", x.getStr());
+            //console.log("x here", x.getStr());
             target.power.plus(x.getNum(), x.getDet());
-            console.log("fullPower here", fullPower.getStr());
+            //console.log("fullPower here", fullPower.getStr());
 
-            console.log("x, kx, fullPower is", x.getStr(), kx.getStr(), fullPower.getStr());
+            //console.log("x, kx, fullPower is", x.getStr(), kx.getStr(), fullPower.getStr());
         }
 
-        console.log("myPower after Arnold", target.power.getStr());
+        //console.log("myPower after Arnold", target.power.getStr());
 
         target.already = true;
 
@@ -135,8 +139,9 @@ function analyze(lines){
         if(canGOres === false && path){
             let transmittingPower= new Fraction(target.power.getNum(), target.power.getDet() * target.children.length)
             //follow(path, target.power);
-            console.warn("change path", "transmitting power", transmittingPower.getStr(), "target.children.length", target.children.length);
-            console.log(path);
+            //Логи дебага
+            //console.warn("change path", "transmitting power", transmittingPower.getStr(), "target.children.length", target.children.length);
+            //console.log(path);
             // CNV.querySelectorAll(".a2").forEach((item)=> {
             //     item.classList.remove("a5");
             // })
@@ -156,7 +161,8 @@ function analyze(lines){
         } else {
             target.children.forEach(item => {
                 let transmittingPower= new Fraction(target.power.getNum(), target.power.getDet() * target.children.length)
-                console.log("transmitting power", transmittingPower.getStr());
+                //
+                //console.log("transmitting power", transmittingPower.getStr());
                 step(item, transmittingPower, target);
             })
         }
