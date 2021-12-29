@@ -2,6 +2,7 @@ import CNV from "../CNV/library";
 import Fraction from "../Fraction";
 import findCycles from "./fincCycles";
 import canGo from "./canGo";
+import Store from "../Store";
 
 //props: lines,
 function analyze(lines){
@@ -26,8 +27,9 @@ function analyze(lines){
         return;
     }
 
-    const cycles = findCycles(startLines[0]);
-    console.log(cycles);
+    Store.state.cycles = findCycles(startLines[0]);
+    const cycles = Store.state.cycles;
+    console.log(Store.getState().cycles);
 
     //showCycles(startLines[0]);
 
@@ -77,6 +79,7 @@ function analyze(lines){
             let item = target.parents[i];
             if(!item.power){
                 canGOres = canGo(target, item);
+                console.warn("canGoRes", canGOres);
                 if(canGOres){
                     return;
                 }else{

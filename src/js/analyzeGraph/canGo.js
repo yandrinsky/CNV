@@ -1,5 +1,6 @@
 import Fraction from "../Fraction";
 import CNV from "../CNV/library";
+import Store from "../Store";
 
 
 let count = 0;
@@ -144,4 +145,46 @@ function canGo(target, incoming){
     return isPossible;
 }
 
-export default canGo;
+function canGo2(target, incoming){
+    let mainRes = false;
+    function step(){
+
+    }
+
+    function root(target){
+        if(!mainRes){
+            for(let i = 0; i < target.parents.length; i++) {//Не так! Тут сразу родители, а нужно на детей.
+                let item = target.parents[i];
+                if(item.power){
+                    if(step(item, target)){
+                        mainRes = true;
+                        console.log("IS POSSIBLE")
+                        return;
+                    }
+                }
+                if(!item.__CYCLEEND) root(item)
+            }
+            target.__CANGO__CHECKED = true;
+            return mainRes;
+        } else {
+            return mainRes;
+        }
+    }
+
+    return mainRes;
+}
+
+function canGo3(target, incoming){
+    const state = Store.getState();
+    for(let i = 0; i < state.cycles.length; i++){
+        const cycle = state.cycles[i];
+        if(cycle[0] === target && cycle[cycle.length - 2] === incoming){
+            return false;
+        }
+    }
+    return true;
+    // state.cycles.forEach(cycle => {
+    //
+    // })
+}
+export default canGo3;

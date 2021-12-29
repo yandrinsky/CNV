@@ -17,6 +17,9 @@ export default {
     setContext(context){
         this.system.context = context;
     },
+    getState(){
+        return this.state;
+    },
     get canvas(){
         return this.system.canvas;
     },
