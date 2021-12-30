@@ -1,10 +1,12 @@
 import {nearLine, nearDot} from "../geometry/geometry";
+import selfEvent from "./selfEvent";
 
 function mouseMoveEngine(e){
     let needToRedraw = false;
 
     const successCallback = (link, e) => {
-        let selfE = {...e, target: this.state.shapes[link.id]};
+        let selfE = selfEvent(e, this.state.shapes[link.id]);
+        //let selfE = {...e, target: this.state.shapes[link.id]};
         if(this.state.mouseover[link.id]){
             this.state.mouseover[link.id](selfE)
             needToRedraw = true
@@ -22,7 +24,7 @@ function mouseMoveEngine(e){
     }
 
     const failCallback = (link, e) => {
-        let selfE = {...e, target: this.state.shapes[link.id]};
+        let selfE = selfEvent(e, this.state.shapes[link.id]);
         if(this.state.mouseleave[link.id]){
             // console.log("here", link.events.mouseenter)
             if(link.events.mouseenter){

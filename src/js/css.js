@@ -7,6 +7,8 @@ const css = {
         color: "red",
         lineWidth: 3,
     },
+
+
     black: {
         color: "black",
     },
@@ -22,8 +24,15 @@ const css = {
     endCircleActive:{
         color: "black",
     },
+    stickyCircle:{
+        radius: 5,
+        color: "blue"
+    },
     finishLine:{
         color: "blue",
+    },
+    stickyLine: {
+        color: "gray",
     },
     startCircleActive: {
         color: "gray",

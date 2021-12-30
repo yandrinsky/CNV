@@ -6,21 +6,10 @@ import dragCanvas from "./Engine/dragCanvas";
 
 import Shape from "./Engine/Shape";
 import render from "./Engine/render/render";
+import Store from "./Store";
 
 const CNV = {
-    state: {
-        __shapes: {}, //id: {type: "line", start: {x, y}, end: {x, y}, classList: [], id},
-        shapes: {}, //"id: ShapeInstance"
-        mouseover: {},
-        mouseleave: {},
-        mouseenter: {},
-        click: {},
-        __mouseMoveTargets: [],
-        __mouseClickTargets: [],
-        shouldRenderUpdates: true,
-        shift: {x: 0, y: 0},
-        draggableCanvas: false,
-    },
+    state: Store.getState(),
     context: undefined,
     canvas: undefined,
     css: undefined,
@@ -146,15 +135,18 @@ const CNV = {
     },
 
     save(){
-        return JSON.stringify(this.state);
+        return JSON.stringify(Store.getState());
     },
 
     recover(data){
-        this.state = JSON.parse(data);
-        for(let key in this.state.shapes) {
-            this.state.shapes[key] = new Shape(this.state.__shapes[key], key);
-            this.state.shapes[key].pointer = this.state.__shapes[key].pointer;
+        const state = JSON.parse(data);
+        //this.state = JSON.parse(data);
+        for(let key in state.shapes) {
+            state.shapes[key] = new Shape(state.__shapes[key], key);
+            state.shapes[key].pointer = state.__shapes[key].pointer;
         }
+        Store.setState(state);
+        this.state = Store.getState();
         this.render();
     }
 }

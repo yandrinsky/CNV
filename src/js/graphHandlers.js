@@ -6,7 +6,12 @@ import {endCircleMouseEnter, endCircleMouseLeave, lineMouseEnter, lineMouseLeave
 //функция для добавбления ребёнка к родителю
 function addEdge(parent, children){
     parent.children.push(children);
-    parent.endCircle.classList.remove("hidden");
+    if(!parent.__NOT_CIRCLE){
+        parent.endCircle.classList.remove("hidden");
+    } else {
+        parent.endCircle.classList.remove("hidden");
+        parent.endCircle.classList.add("stickyCircle");
+    }
 }
 
 

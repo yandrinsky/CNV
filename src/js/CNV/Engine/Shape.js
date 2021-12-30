@@ -1,5 +1,5 @@
 import CNV from "../library";
-import {getEquationFor2points} from "./geometry/geometry"
+import {getCoordinates, getEquationFor2points} from "./geometry/geometry"
 class Shape{
     constructor(link, id) {
         this.link = link;
@@ -19,6 +19,12 @@ class Shape{
                         __this.link.end.y,
                     )
                 }
+            },
+            getCoordinatesX(y){
+                return getCoordinates(this.equation, undefined, y);
+            },
+            getCoordinatesY(x){
+                return getCoordinates(this.equation, x, undefined);
             }
         }
     }

@@ -43,6 +43,9 @@ function endCircleClick(data, e){
     CNV.settings.draggableCanvas = false;
     CNV.querySelectorAll(".finishLine").forEach(el => el.classList.remove("finishLine"));
 
+    //Против бага, что после нажатия линия остаётся чёрной
+    data.line.classList.remove("black");
+
     //вести можно только 2 линии, не больше
     if(data.children.length < branches){
         //после того, как начали вести линию сбрасываем у всех круглешков событие нажатия
@@ -71,63 +74,47 @@ function endCircleClick(data, e){
 function resetStickToTailHandler(){
     for(let key in store.state.lines){
         let data = store.state.lines[key];
-        data.startCircle.onmouseenter = e => undefined;
-        data.startCircle.onmouseleave = e => undefined
-        data.startCircle.classList.add("hidden");
-        data.startCircle.classList.remove("startCircleActive");
-        data.startCircle.onclick = e => undefined;
+        data.line.onmouseenter = e => lineMouseEnter(data, e);
+        data.line.onmouseleave = e => lineMouseLeave(data, e);
+        //data.startCircle.classList.add("hidden");
+        //data.startCircle.classList.remove("startCircleActive");
+        data.line.onclick = e => undefined;
     }
 }
 
 function setStickToTailHandler(currentData){
-    currentData.startCircle.onmouseenter = undefined;
-    currentData.startCircle.onmouseleave = undefined;
-    currentData.startCircle.onclick = undefined;
-    currentData.endCircle.classList.add("hidden");
+    currentData.line.onmouseenter = undefined;
+    currentData.line.onmouseleave = undefined;
+    currentData.line.onclick = undefined;
 
     for(let key in store.state.lines){
         let data = store.state.lines[key];
 
         if(data.ids.line !== currentData.ids.line){
-            data.startCircle.onmouseenter = e => {
-                e.target.classList.add("startCircleActive");
-                e.target.classList.remove("hidden");
-                CNV.combineRender(() => {
-                    CNV.querySelectorAll(".endCircle").forEach(item => {
-                        item.classList.add("hidden");
-                    })
-                })
+            data.line.onmouseenter = e => {
+                e.target.classList.add("stickyLine");
             }
-            data.startCircle.onmouseleave = e => {
-                e.target.classList.remove("red");
-                e.target.classList.add("hidden");
-                CNV.combineRender(() => {
-                    for(let key in store.state.lines){
-                        let item = store.state.lines[key];
-                        if(item.children.length > 0){
-                            item.endCircle.classList.remove("hidden");
-                        }
-                    }
-                })
+            data.line.onmouseleave = e => {
+                e.target.classList.remove("stickyLine");
             }
             setTimeout(()=> {
-                data.startCircle.onclick = e => {
-                    currentData.line.update.endPosition.x = data.startCircle.link.start.x;
-                    currentData.line.update.endPosition.y = data.startCircle.link.start.y;
-                    currentData.endCircle.update.startPosition.x = data.startCircle.link.start.x;
-                    currentData.endCircle.update.startPosition.y = data.startCircle.link.start.y;
-
-
+                data.line.onclick = e => {
+                    data.line.classList.remove("stickyLine");
+                    currentData.line.update.endPosition.x = e.x;
+                    currentData.line.update.endPosition.y = data.line.system.getCoordinatesY(e.x);
+                    currentData.endCircle.update.startPosition.x = e.x;
+                    currentData.endCircle.update.startPosition.y = data.line.system.getCoordinatesY(e.x);
                     currentData.endCircle.classList.add("hidden");
+                    currentData.__NOT_CIRCLE = true;
 
                     data.parents.push(currentData);
                     addEdge(currentData, data);
-                    for(let key in store.state.lines){
-                        let item = store.state.lines[key];
-                        if(item.children.length > 0){
-                            item.endCircle.classList.remove("hidden");
-                        }
-                    }
+                    // for(let key in store.state.lines){
+                    //     let item = store.state.lines[key];
+                    //     if(item.children.length > 0 && !item.__NOT_CIRCLE){
+                    //         item.endCircle.classList.remove("hidden");
+                    //     }
+                    // }
                 }
             }, 10);
         }
