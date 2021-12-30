@@ -24,6 +24,17 @@ const shiftDownHandler = (e) => {
                     obj.line.update.endPosition.x = item.link.start.x;
                     obj.line.update.endPosition.y = item.link.start.y;
 
+
+                    obj.parents.forEach(parent => {
+                        if(parent.__NOT_CIRCLE){
+                            const newCoordinates = obj.line.system.moveTo(obj.line.system.length / 2, obj.line.system.coordinates.x1);
+                            parent.line.update.endPosition.x = newCoordinates.x;
+                            parent.line.update.endPosition.y = newCoordinates.y;
+                            parent.endCircle.update.startPosition.x = newCoordinates.x;
+                            parent.endCircle.update.startPosition.y = newCoordinates.y;
+                        }
+                    })
+
                     obj.children.forEach(children => {
                         children.line.update.startPosition.x = item.link.start.x;
                         children.line.update.startPosition.y = item.link.start.y;
@@ -32,10 +43,11 @@ const shiftDownHandler = (e) => {
 
                         children.parents.forEach(parent => {
                             if(parent !== obj){
-                                parent.line.update.endPosition.x = item.link.start.x;
-                                parent.line.update.endPosition.y = item.link.start.y;
-                                parent.endCircle.update.startPosition.x = event.clientX - CNV.state.shift.x;
-                                parent.endCircle.update.startPosition.y = event.clientY - CNV.state.shift.y;
+                                const newCoordinates = children.line.system.moveTo(children.line.system.length / 2, children.line.system.coordinates.x1);
+                                parent.line.update.endPosition.x = newCoordinates.x;
+                                parent.line.update.endPosition.y = newCoordinates.y;
+                                parent.endCircle.update.startPosition.x = newCoordinates.x;
+                                parent.endCircle.update.startPosition.y = newCoordinates.y;
                             }
                         })
                     })

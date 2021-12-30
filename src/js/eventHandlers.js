@@ -87,37 +87,76 @@ function setStickToTailHandler(currentData){
     currentData.line.onmouseleave = undefined;
     currentData.line.onclick = undefined;
 
+    currentData.startCircle.onmouseenter = undefined;
+    currentData.startCircle.onmouseleave = undefined;
+    currentData.startCircle.onclick = undefined;
+
     for(let key in store.state.lines){
         let data = store.state.lines[key];
 
-        if(data.ids.line !== currentData.ids.line){
-            data.line.onmouseenter = e => {
-                e.target.classList.add("stickyLine");
-            }
-            data.line.onmouseleave = e => {
-                e.target.classList.remove("stickyLine");
-            }
-            setTimeout(()=> {
-                data.line.onclick = e => {
-                    data.line.classList.remove("stickyLine");
-                    currentData.line.update.endPosition.x = e.x;
-                    currentData.line.update.endPosition.y = data.line.system.getCoordinatesY(e.x);
-                    currentData.endCircle.update.startPosition.x = e.x;
-                    currentData.endCircle.update.startPosition.y = data.line.system.getCoordinatesY(e.x);
-                    currentData.endCircle.classList.add("hidden");
-                    currentData.__NOT_CIRCLE = true;
 
-                    data.parents.push(currentData);
-                    addEdge(currentData, data);
-                    // for(let key in store.state.lines){
-                    //     let item = store.state.lines[key];
-                    //     if(item.children.length > 0 && !item.__NOT_CIRCLE){
-                    //         item.endCircle.classList.remove("hidden");
-                    //     }
-                    // }
+        if(data.ids.line !== currentData.ids.line){
+            if(data.parents.length > 0){
+                data.line.onmouseenter = e => {
+                    e.target.classList.add("stickyLine");
                 }
-            }, 10);
+                data.line.onmouseleave = e => {
+                    e.target.classList.remove("stickyLine");
+                }
+                setTimeout(()=> {
+                    data.line.onclick = e => {
+                        data.line.classList.remove("stickyLine");
+                        const coords = data.line.system.moveTo(data.line.system.length / 2, data.line.system.coordinates.x1);
+                        currentData.line.update.endPosition.x = coords.x;
+                        currentData.line.update.endPosition.y = coords.y;
+                        currentData.endCircle.update.startPosition.x = coords.x;
+                        currentData.endCircle.update.startPosition.y = coords.y;
+                        currentData.endCircle.classList.add("hidden");
+                        currentData.__NOT_CIRCLE = true;
+
+                        data.parents.push(currentData);
+                        addEdge(currentData, data)
+                        // for(let key in store.state.lines){
+                        //     let item = store.state.lines[key];
+                        //     if(item.children.length > 0 && !item.__NOT_CIRCLE){
+                        //         item.endCircle.classList.remove("hidden");
+                        //     }
+                        // }
+                    }
+                }, 10);
+            } else {
+                data.startCircle.onmouseenter = e => {
+                    e.target.classList.add("startCircleActive");
+                    e.target.classList.remove("hidden");
+                }
+                data.startCircle.onmouseleave = e => {
+                    e.target.classList.remove("startCircleActive");
+                    e.target.classList.add("hidden");
+                }
+                setTimeout(()=> {
+                    data.line.onclick = e => {
+                        data.line.classList.remove("stickyLine");
+                        const coords = data.line.system.coordinates;
+                        currentData.line.update.endPosition.x = coords.x1;
+                        currentData.line.update.endPosition.y = coords.y1;
+                        currentData.endCircle.update.startPosition.x = coords.x1;
+                        currentData.endCircle.update.startPosition.y = coords.y1;
+                        currentData.endCircle.classList.remove("hidden");
+
+                        //data.startCircle.classList.add("hidden");
+                        data.parents.push(currentData);
+                        addEdge(currentData, data)
+                        // for(let key in store.state.lines){
+                        //     let item = store.state.lines[key];
+                        //     if(item.children.length > 0 && !item.__NOT_CIRCLE){
+                        //         item.endCircle.classList.remove("hidden");
+                        //     }
+                        // }
+                    }
+                }, 10);
+            }
         }
+
     }
 }
 

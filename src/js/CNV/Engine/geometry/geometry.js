@@ -1,3 +1,7 @@
+function length(equation){
+    return Math.sqrt((equation.x2 - equation.x1) ** 2 + (equation.y2 - equation.y1) ** 2);
+}
+
 function getCoordinates(equation, x, y){
     if(x !== undefined){
         return x * equation.k - equation.b;
@@ -165,4 +169,4 @@ function nearDot(config, callbackSuccess = [], callbackFail = []){
     }
 }
 
-export {getCoordinates, getEquationFor2points, getEquationForLine, moveTo, nearLine, nearDot};
+export {getCoordinates, getEquationFor2points, getEquationForLine, moveTo, nearLine, nearDot, length};

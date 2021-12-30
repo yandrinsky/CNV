@@ -1,5 +1,5 @@
 import CNV from "../library";
-import {getCoordinates, getEquationFor2points} from "./geometry/geometry"
+import {getCoordinates, getEquationFor2points, length, moveTo} from "./geometry/geometry"
 class Shape{
     constructor(link, id) {
         this.link = link;
@@ -20,12 +20,26 @@ class Shape{
                     )
                 }
             },
+            get coordinates(){
+                let x1 = __this.link.start.x;
+                let y1 = __this.link.start.y;
+                let x2 = __this.link.end?.x;
+                let y2 = __this.link.end?.y;
+                return {x1, y1, x2, y2};
+            },
             getCoordinatesX(y){
                 return getCoordinates(this.equation, undefined, y);
             },
             getCoordinatesY(x){
                 return getCoordinates(this.equation, x, undefined);
-            }
+            },
+            moveTo(move, x){
+                return moveTo(this.equation, move, x);
+            },
+            get length(){
+                return length(this.equation);
+            },
+
         }
     }
     get classList(){
