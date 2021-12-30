@@ -3,56 +3,10 @@ import Fraction from "../Fraction";
 import findCycles from "./fincCycles";
 import canGo from "./canGo";
 import Store from "../Store";
+import cyclesOptimize from "./cyclesOptimize";
 
-function cyclesOptimize(start){
-    const cycles = findCycles(start);
-    const res = [];
-    let len = cycles.length;
-    //проходим по циклам
-    for (let i = 0; i < len; i++) {
-        let start = cycles[i][0].ids.line;
-        let end = cycles[i][cycles[i].length - 1].ids.line;
-        res.push({
-            start,
-            end,
-            cycles: [cycles[i]],
-        })
-        //если начало и конец циклов совпадают, группируем циклы
-        for (let j = i + 1; j < len; j++) {
-            if(cycles[j][0].ids.line === start && cycles[j][cycles[j].length - 1].ids.line === end){
-                res[res.length - 1].cycles.push(...cycles.splice(j, 1));
-                len -= 1;
-                j -= 1;
-            }
-        }
-    }
-    let len2 = res.length;
-    for (let i = 0; i < len2; i++) {
 
-        if(res[i].cycles.length === 1){   //Удаляем ячейки с единсвенным циклом
-            res.splice(i, 1);
-            len2 -= 1;
-        } else { //Иначе проставляем всем цилам предпоследней линии цикла флаг cycle, чтобы предотвратить Арнольда
-            res[i].cycles.forEach(cycle => {
-                cycle[cycle.length - 2].cycle = true;
-                cycle[cycle.length - 2].__BREAK = true;
-            })
-        }
-    }
 
-    res.forEach(cycleGroup => {
-        console.log(cycleGroup);
-        let lastCycle = cycleGroup.cycles[cycleGroup.cycles.length - 1];
-        lastCycle[lastCycle.length - 2].cycle = false;
-        lastCycle[lastCycle.length - 2].__BREAK = false;
-        lastCycle[lastCycle.length - 2].__GET_POWER_FOR = [];
-        cycleGroup.cycles.slice(0, cycleGroup.cycles.length - 1).forEach(cycle => {
-            console.log("Call");
-            lastCycle[lastCycle.length - 2].__GET_POWER_FOR.push(cycle[cycle.length - 2]);
-        })
-    })
-    return res;
-}
 
 //props: lines,
 function analyze(lines){
@@ -64,9 +18,9 @@ function analyze(lines){
     let results = {};
     let controlSum = new Fraction(0);
     let path = undefined;
-    let isPathMode = false;
+;
 
-    for(let key in lines){
+    for(let key in lines){ //Считаем количество точек входа
         if(lines[key].parents.length === 0){
             startLines.push(lines[key])
         }
@@ -77,13 +31,13 @@ function analyze(lines){
         return;
     }
 
-    Store.state.cycles = findCycles(startLines[0]);
+    Store.state.cycles = findCycles(startLines[0]); //находим циклы
     const cycles = Store.state.cycles;
 
-    console.log("optimize", cyclesOptimize(startLines[0]));
+    cyclesOptimize(startLines[0]) //Оптимизируем циклы (подробнее в файле)
 
 
-    //showCycles(startLines[0]);
+    //showCycles(startLines[0]); //Показываем циклы цветами - по желанию
 
     let count = 0;
     function step(target, power, lastTarget){
@@ -101,7 +55,7 @@ function analyze(lines){
 
         let fullPower = new Fraction(0);
 
-        //Выделение пути обхода
+        //Выделение пути обхода - раскоменти и увидишь, как шёл обход по графу
 
         // setTimeout(()=>{
         //     for (let i = 1; i < 10; i++) {
@@ -120,26 +74,25 @@ function analyze(lines){
         //Считаем полную мощность
         for(let i = 0; i < target.parents.length; i++){
             let item = target.parents[i];
-            if(!item.power){
+            if(!item.power){ //Если у входной грани нет мощности, проверяем, возможно ли в него попасть из этой грани
                 canGOres = canGo(target, item);
-                console.warn("canGoRes", canGOres);
-                if(canGOres){
+                if(canGOres){ //Если да, то сворачиваем лавочку и идём другим путём
                     return;
-                }else{
+                }else{ // Если нет, значит мы наткнулись на цикл и нам нужно его обойти как можно скорее
                     cycles.forEach(cycle=> {
                         if(cycle[0] === target && cycle[cycle.length - 2] === item){
-                            path = cycle;
+                            path = cycle; //Находим нужный нам цикл и сохраняем его
                         }
                     })
                 }
             }
             //Флаг break нужен для того, чтобы обратывать множественные Арнольды. Ставится в функции optimizeCycles
-            if(item.power && !item.__BREAK) {
+            if(item.power && !item.__BREAK) { //Если мощность была, складываем её
                 fullPower.plus(item.power.getNum(), item.power.getDet() * item.children.length);
             }
         }
 
-        if(target.__GET_POWER_FOR){
+        if(target.__GET_POWER_FOR){ //Если есть этот массив, значит заберём все мощности из элементов массива (подробнее в файле)
             target.__GET_POWER_FOR.forEach(item => {
                 console.log("ITEM FROM __GET_POWER_FOR", item, item.power.getStr());
                 fullPower.plus(item.power.getNum(), item.power.getDet() * item.children.length);
@@ -147,9 +100,7 @@ function analyze(lines){
             console.log("FULL POWER after __GET_POWER_FOR", fullPower.getStr());
         }
 
-
         if(fullPower.getNum() !== 0){
-
             target.power = fullPower;
         }
 
@@ -159,31 +110,29 @@ function analyze(lines){
         //Уравнение арнольда
         if(target.already && power.getStr() !== fullPower.getStr()) {
             //Логи дебага
-            console.log("!!!АРНОЛЬД!!!");
-            console.log("Full P", fullPower.getStr());
-            console.log("power", power.getStr());
+            // console.log("!!!АРНОЛЬД!!!");
+            // console.log("Full P", fullPower.getStr());
+            // console.log("power", power.getStr());
             //console.log("In Arnold power incoming", "fullpower", power.getStr(), fullPower.getStr());
-            lastTarget.cycle = true;
+
+            lastTarget.cycle = true; //Сразу ставим флаг взодящей грани в значение true, чтобы больше по нему не проходить
+            //Вычитаем из общей мощности переданную от входящей грани, потому что сейчас будет арнольд, а не простое сложение
             fullPower.minus(power.getNum(), power.getDet());
             console.log("Full P after minus", fullPower.getStr());
-            let kx = target.power.clone().divide(power.getNum(), power.getDet());
-            //console.log("kx here", kx.getStr());
-            kx.minus(1);
-            let x = fullPower.clone().divide(kx.getNum(), kx.getDet());
-            //console.log("x here", x.getStr());
-            target.power.plus(x.getNum(), x.getDet());
-            //console.log("fullPower here", fullPower.getStr());
+            let kx = target.power.clone().divide(power.getNum(), power.getDet()); //Вычисляем коэф перед икс)
+            kx.minus(1); //Не помню зачем, но надо
+            let x = fullPower.clone().divide(kx.getNum(), kx.getDet()); //Вычисляем сам икс
+            target.power.plus(x.getNum(), x.getDet()); //Меняем мощность у текущей грани, арнольд готов
 
+            //console.log("fullPower here", fullPower.getStr());
             //console.log("x, kx, fullPower is", x.getStr(), kx.getStr(), fullPower.getStr());
             console.log("myPower after Arnold", target.power.getStr());
         }
 
+        target.already = true; //Ставим флаг, что мы прошли эту грань
 
 
-        target.already = true;
-
-
-        if(target.children.length === 0){
+        if(target.children.length === 0){ //Если детей нет, значит это выход и нужно записать результат
             CNV.preventRender(() => target.line.classList.add("finishLine"));
             results[target.ids.line] = {
                 text: target.power.getStr(),
@@ -195,56 +144,31 @@ function analyze(lines){
             }
         }
 
-        if(canGOres === false && path){
+        //Функционал работает плохо, потому что мы не идём по пути, а просто начинаем идти его сторону. Но это работает,
+        //на простых примерах. Нужно дописать нормально.
+        if(canGOres === false && path){ //Вариант, если в нас входит цикл. Значит нужно пойти в его сторону. Вот мы и идём
             let transmittingPower= new Fraction(target.power.getNum(), target.power.getDet() * target.children.length)
-            //follow(path, target.power);
-            //Логи дебага
-            //console.warn("change path", "transmitting power", transmittingPower.getStr(), "target.children.length", target.children.length);
-            //console.log(path);
-            // CNV.querySelectorAll(".a2").forEach((item)=> {
-            //     item.classList.remove("a5");
-            // })
-            // CNV.querySelectorAll(".a1").forEach((item)=> {
-            //     item.classList.remove("a1");
-            // })
-            //
-            // path.forEach((item, index)=>{
-            //     console.log(index);
-            //     if(index === 1){
-            //         item.line.classList.add("a5");
-            //     }else {
-            //         item.line.classList.add("a1");
-            //     }
-            // })
             step(path[1], transmittingPower, target);
-        } else {
+        } else { //Иначе просто идём по всем нашим детям
             target.children.forEach(item => {
                 let transmittingPower= new Fraction(target.power.getNum(), target.power.getDet() * target.children.length)
-                //
-                //console.log("transmitting power", transmittingPower.getStr());
                 step(item, transmittingPower, target);
             })
         }
 
-        // target.children.forEach(item => {
-        //     step(item, new Fraction(target.power.getNum(), target.power.getDet() * target.children.length), target);
-        // })
-
-        // setTimeout(()=>{
-        //     target.line.classList.remove("a5");
-        // }, 1000 * (count - 1) + 500);
-
-        target.already = false;
+        target.already = false; //Как только по всем детям прошлись, уходим назад и убираем флаг
     }
+
     try{
+        //Запускаем анализ входной точки (грани, у которой нет родителя)
         step(startLines[0], new Fraction(1));
-        // step(startLines[0], 1);
-        CNV.render();
-        for(let key in results){
+        CNV.render(); //Отрисовываем изменения, проишедшие во время анализа графа
+        for(let key in results){ //Отрисовываем значения у выходов графа
             controlSum.plus(results[key].data.num, results[key].data.det);
             CNV.text(results[key])
         }
         for(let key in lines){
+            //Чистим за собой после окончания работы
             lines[key].power = undefined;
             lines[key].already = undefined;
             lines[key].cycle = undefined;
@@ -257,6 +181,7 @@ function analyze(lines){
         }
     } catch (e){
         for(let key in lines){
+            //Чиститим за стобой даже если что-то пошло не так.
             lines[key].power = undefined;
             lines[key].already = undefined;
             lines[key].cycle = undefined;
