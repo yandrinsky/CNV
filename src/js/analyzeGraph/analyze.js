@@ -4,6 +4,56 @@ import findCycles from "./fincCycles";
 import canGo from "./canGo";
 import Store from "../Store";
 
+function cyclesOptimize(start){
+    const cycles = findCycles(start);
+    const res = [];
+    let len = cycles.length;
+    //проходим по циклам
+    for (let i = 0; i < len; i++) {
+        let start = cycles[i][0].ids.line;
+        let end = cycles[i][cycles[i].length - 1].ids.line;
+        res.push({
+            start,
+            end,
+            cycles: [cycles[i]],
+        })
+        //если начало и конец циклов совпадают, группируем циклы
+        for (let j = i + 1; j < len; j++) {
+            if(cycles[j][0].ids.line === start && cycles[j][cycles[j].length - 1].ids.line === end){
+                res[res.length - 1].cycles.push(...cycles.splice(j, 1));
+                len -= 1;
+                j -= 1;
+            }
+        }
+    }
+    let len2 = res.length;
+    for (let i = 0; i < len2; i++) {
+
+        if(res[i].cycles.length === 1){   //Удаляем ячейки с единсвенным циклом
+            res.splice(i, 1);
+            len2 -= 1;
+        } else { //Иначе проставляем всем цилам предпоследней линии цикла флаг cycle, чтобы предотвратить Арнольда
+            res[i].cycles.forEach(cycle => {
+                cycle[cycle.length - 2].cycle = true;
+                cycle[cycle.length - 2].__BREAK = true;
+            })
+        }
+    }
+
+    res.forEach(cycleGroup => {
+        console.log(cycleGroup);
+        let lastCycle = cycleGroup.cycles[cycleGroup.cycles.length - 1];
+        lastCycle[lastCycle.length - 2].cycle = false;
+        lastCycle[lastCycle.length - 2].__BREAK = false;
+        lastCycle[lastCycle.length - 2].__GET_POWER_FOR = [];
+        cycleGroup.cycles.slice(0, cycleGroup.cycles.length - 1).forEach(cycle => {
+            console.log("Call");
+            lastCycle[lastCycle.length - 2].__GET_POWER_FOR.push(cycle[cycle.length - 2]);
+        })
+    })
+    return res;
+}
+
 //props: lines,
 function analyze(lines){
     CNV.combineRender(()=> {
@@ -29,16 +79,11 @@ function analyze(lines){
 
     Store.state.cycles = findCycles(startLines[0]);
     const cycles = Store.state.cycles;
-    console.log(Store.getState().cycles);
+
+    console.log("optimize", cyclesOptimize(startLines[0]));
+
 
     //showCycles(startLines[0]);
-
-    function follow(path, power){
-        path.forEach(pathStep => {
-            step(pathStep);
-        })
-    }
-
 
     let count = 0;
     function step(target, power, lastTarget){
@@ -50,8 +95,6 @@ function analyze(lines){
 
         target.power = power;
 
-
-        //target.line.classList.add("orange");
         //Если этот элемент является циклом и мы уже о нём знаем - игнорируем.
         if(target.cycle) return;
 
@@ -90,10 +133,20 @@ function analyze(lines){
                     })
                 }
             }
-            if(item.power) {
+            //Флаг break нужен для того, чтобы обратывать множественные Арнольды. Ставится в функции optimizeCycles
+            if(item.power && !item.__BREAK) {
                 fullPower.plus(item.power.getNum(), item.power.getDet() * item.children.length);
             }
         }
+
+        if(target.__GET_POWER_FOR){
+            target.__GET_POWER_FOR.forEach(item => {
+                console.log("ITEM FROM __GET_POWER_FOR", item, item.power.getStr());
+                fullPower.plus(item.power.getNum(), item.power.getDet() * item.children.length);
+            })
+            console.log("FULL POWER after __GET_POWER_FOR", fullPower.getStr());
+        }
+
 
         if(fullPower.getNum() !== 0){
 
@@ -106,11 +159,13 @@ function analyze(lines){
         //Уравнение арнольда
         if(target.already && power.getStr() !== fullPower.getStr()) {
             //Логи дебага
-            //console.log("!!!АРНОЛЬД!!!");
+            console.log("!!!АРНОЛЬД!!!");
+            console.log("Full P", fullPower.getStr());
+            console.log("power", power.getStr());
             //console.log("In Arnold power incoming", "fullpower", power.getStr(), fullPower.getStr());
             lastTarget.cycle = true;
             fullPower.minus(power.getNum(), power.getDet());
-
+            console.log("Full P after minus", fullPower.getStr());
             let kx = target.power.clone().divide(power.getNum(), power.getDet());
             //console.log("kx here", kx.getStr());
             kx.minus(1);
@@ -120,9 +175,10 @@ function analyze(lines){
             //console.log("fullPower here", fullPower.getStr());
 
             //console.log("x, kx, fullPower is", x.getStr(), kx.getStr(), fullPower.getStr());
+            console.log("myPower after Arnold", target.power.getStr());
         }
 
-        //console.log("myPower after Arnold", target.power.getStr());
+
 
         target.already = true;
 
@@ -174,9 +230,9 @@ function analyze(lines){
         //     step(item, new Fraction(target.power.getNum(), target.power.getDet() * target.children.length), target);
         // })
 
-        setTimeout(()=>{
-            target.line.classList.remove("a5");
-        }, 1000 * (count - 1) + 500);
+        // setTimeout(()=>{
+        //     target.line.classList.remove("a5");
+        // }, 1000 * (count - 1) + 500);
 
         target.already = false;
     }
@@ -192,6 +248,8 @@ function analyze(lines){
             lines[key].power = undefined;
             lines[key].already = undefined;
             lines[key].cycle = undefined;
+            lines[key].__BREAK = undefined;
+            lines[key].__GET_POWER_FOR = undefined;
         }
 
         if(controlSum.getStr() !== "1"){
@@ -202,6 +260,8 @@ function analyze(lines){
             lines[key].power = undefined;
             lines[key].already = undefined;
             lines[key].cycle = undefined;
+            lines[key].__BREAK = undefined;
+            lines[key].__GET_POWER_FOR = undefined;
         }
         console.error("Граф замкнут. Анализ невозможен", e);
     }

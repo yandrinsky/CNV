@@ -116,12 +116,6 @@ function setStickToTailHandler(currentData){
 
                         data.parents.push(currentData);
                         addEdge(currentData, data)
-                        // for(let key in store.state.lines){
-                        //     let item = store.state.lines[key];
-                        //     if(item.children.length > 0 && !item.__NOT_CIRCLE){
-                        //         item.endCircle.classList.remove("hidden");
-                        //     }
-                        // }
                     }
                 }, 10);
             } else {
@@ -143,15 +137,8 @@ function setStickToTailHandler(currentData){
                         currentData.endCircle.update.startPosition.y = coords.y1;
                         currentData.endCircle.classList.remove("hidden");
 
-                        //data.startCircle.classList.add("hidden");
                         data.parents.push(currentData);
                         addEdge(currentData, data)
-                        // for(let key in store.state.lines){
-                        //     let item = store.state.lines[key];
-                        //     if(item.children.length > 0 && !item.__NOT_CIRCLE){
-                        //         item.endCircle.classList.remove("hidden");
-                        //     }
-                        // }
                     }
                 }, 10);
             }
