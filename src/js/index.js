@@ -13,6 +13,7 @@ import {shiftDownHandler} from "./shiftHandlers";
 
 import store from "./Store";
 import recover from "./storage/recover";
+import zHandlers from "./zHandlers";
 
 const canvas = document.querySelector("#canvas");
 const delLineBtn = document.querySelector("#delLine");
@@ -121,6 +122,7 @@ saveBtn.onclick = e => {
 }
 
 window.addEventListener("keydown", shiftDownHandler);
+zHandlers();
 window.onresize = (e) => {
     canvas.width = window.innerWidth - 5;
     canvas.height = window.innerHeight - 100;

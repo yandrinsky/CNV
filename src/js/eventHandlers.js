@@ -68,6 +68,7 @@ function endCircleClick(data, e){
             setTimeout(()=> {
                 CNV.settings.draggableCanvas = true;
             }, 100)
+
         });
     }
 }

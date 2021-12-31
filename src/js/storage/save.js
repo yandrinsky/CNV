@@ -1,7 +1,7 @@
 import CNV from "../CNV/library";
 import store from "../Store";
 
-function saveData(state, visualData){
+function saveData(state, visualData, needToSave){
     const prepData = {...state, lines: {}};
     for(let key in state.lines){
         let data = state.lines[key];
@@ -27,11 +27,13 @@ function saveData(state, visualData){
         SCRIPT: JSON.stringify(prepData),
         CNV: visualData,
     });
-    localStorage.setItem("__saved", saved);
+    if(needToSave !== false){
+        localStorage.setItem("__saved", saved);
+    }
     return saved;
 }
 
-function save(){
+function save(options){
     //Убираем синие линии, чтобы сохранились стили без них
     CNV.preventRender(()=>{
         CNV.querySelectorAll(".finishLine").forEach((item) => {
@@ -39,7 +41,7 @@ function save(){
             item.classList.add("__PLACE_FOR_FINISH_LINE")
         })
     })
-    const saved = saveData(store.state, CNV.save());
+    const saved = saveData(store.state, CNV.save(), options.dont_save);
     //Восстанавливаем синие линии, чтобы продолжить разработку
     CNV.preventRender(()=>{
         CNV.querySelectorAll(".__PLACE_FOR_FINISH_LINE").forEach((item) => {
