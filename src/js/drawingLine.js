@@ -16,7 +16,7 @@ function drawingLine(data, finishCallback = () => {}){
         finishCallback();
         resetStickToTailHandler();
         //Сохраняем изменения в стек
-        store.addToStack(save({dont_save: true}));
+        //store.addToStack(save({dont_save: true}));
     }
 
     function drawing(e){

@@ -67,6 +67,7 @@ function createEdge(e, option = {}){
         endCircle,
         parents: [],
         children: [],
+        sideIn: [],
         ids: {
             line: line.id,
             endCircle: endCircle.id,

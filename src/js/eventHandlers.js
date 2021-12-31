@@ -116,7 +116,11 @@ function setStickToTailHandler(currentData){
                         currentData.__NOT_CIRCLE = true;
 
                         data.parents.push(currentData);
-                        addEdge(currentData, data)
+                        data.sideIn.push(currentData);
+                        console.log("here");
+                        addEdge(currentData, data);
+                        console.log("parents, ", data.parents);
+                        console.log("sideIn, ", data.sideIn);
                     }
                 }, 10);
             } else {
@@ -140,6 +144,7 @@ function setStickToTailHandler(currentData){
 
                         data.parents.push(currentData);
                         addEdge(currentData, data)
+
                     }
                 }, 10);
             }
