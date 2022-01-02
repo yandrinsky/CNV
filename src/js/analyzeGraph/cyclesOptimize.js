@@ -40,7 +40,6 @@ function cyclesOptimize(start){
     }
 
     res.forEach(cycleGroup => {
-        console.log(cycleGroup);
         let lastCycle = cycleGroup.cycles[cycleGroup.cycles.length - 1];
         lastCycle[lastCycle.length - 2].cycle = false;
         lastCycle[lastCycle.length - 2].__BREAK = false;

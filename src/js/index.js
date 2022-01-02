@@ -122,9 +122,10 @@ saveBtn.onclick = e => {
 }
 
 window.addEventListener("keydown", shiftDownHandler);
-zHandlers();
+
 window.onresize = (e) => {
     canvas.width = window.innerWidth - 5;
     canvas.height = window.innerHeight - 100;
     CNV.render();
 }
+zHandlers();

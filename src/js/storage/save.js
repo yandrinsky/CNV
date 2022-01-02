@@ -15,9 +15,9 @@ function saveData(state, visualData, needToSave){
             parents.push(item.line.id);
         })
         data.sideIn.forEach(item => {
-            console.log("sideIn item", item);
             sideIn.push(item.line.id);
         })
+
         prepData.lines[key] = {
             ...data,
             line: data.line.id,

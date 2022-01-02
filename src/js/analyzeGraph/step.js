@@ -91,7 +91,7 @@ function step(target, power, lastTarget){
         lastTarget.cycle = true; //Сразу ставим флаг взодящей грани в значение true, чтобы больше по нему не проходить
         //Вычитаем из общей мощности переданную от входящей грани, потому что сейчас будет арнольд, а не простое сложение
         fullPower.minus(power.getNum(), power.getDet());
-        console.log("Full P after minus", fullPower.getStr());
+        //console.log("Full P after minus", fullPower.getStr());
         let kx = target.power.clone().divide(power.getNum(), power.getDet()); //Вычисляем коэф перед икс)
         kx.minus(1); //Не помню зачем, но надо
         let x = fullPower.clone().divide(kx.getNum(), kx.getDet()); //Вычисляем сам икс
@@ -99,13 +99,12 @@ function step(target, power, lastTarget){
 
         //console.log("fullPower here", fullPower.getStr());
         //console.log("x, kx, fullPower is", x.getStr(), kx.getStr(), fullPower.getStr());
-        console.log("myPower after Arnold", target.power.getStr());
+        //console.log("myPower after Arnold", target.power.getStr());
     }
 
     target.already = true; //Ставим флаг, что мы прошли эту грань
 
     if(target.children.length === 0){ //Если детей нет, значит это выход и нужно записать результат
-        console.log("children", target.children.length);
         CNV.preventRender(() => target.line.classList.add("finishLine"));
         text({target, output: state.results})
     }
