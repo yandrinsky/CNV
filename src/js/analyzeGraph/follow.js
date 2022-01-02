@@ -25,15 +25,23 @@ function follow(path){
     if(firstPower === undefined){
         firstPower = new Fraction(1);
     }
-
-    path.forEach((line, index) => {
+    for (let i = 0; i < path.length; i++) {
+        let index = i;
+        let line = path[i];
         if(index === 0){
             step(line, firstPower, firstLastTarget);
         } else {
             let parent = path[index - 1];
-            step(line, new Fraction(parent.power.getNum(), parent.power.getDet() * parent.children.length), path[index - 1]);
+            try{
+                let res = step(line, new Fraction(parent.power.getNum(), parent.power.getDet() * parent.children.length), path[index - 1]);
+                if(res === false) break;
+            } catch (e){
+                console.error("Функция follow встретила на пути ветку с мощностью undefined");
+                break;
+            }
+
         }
-    })
+    }
 
     path.forEach(line => {
         line.already = false;

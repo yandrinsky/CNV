@@ -41,15 +41,25 @@ function step(target, power, lastTarget){
         let item = target.parents[i];
         if(!item.power){ //Если у входной грани нет мощности, проверяем, возможно ли в него попасть из этой грани
             canGOres = canGo(target, item);
-            if(canGOres){ //Если да, то сворачиваем лавочку и идём другим путём
-                return;
-            }else{ // Если нет, значит мы наткнулись на цикл и нам нужно его обойти как можно скорее
-                state.cycles.forEach(cycle=> {
-                    if(cycle[0] === target && cycle[cycle.length - 2] === item){
-                        state.path = cycle; //Находим нужный нам цикл и сохраняем его
-                    }
-                })
+            if(state.mode === "analyze"){
+                if(canGOres){ //Если да, то сворачиваем лавочку и идём другим путём
+                    return;
+                }else{ // Если нет, значит мы наткнулись на цикл и нам нужно его обойти как можно скорее
+                    state.cycles.forEach(cycle=> {
+                        if(cycle[0] === target && cycle[cycle.length - 2] === item){
+                            state.path = cycle; //Находим нужный нам цикл и сохраняем его
+                        }
+                    })
+                }
+            } else { //Спортное решение. Выйдет ошибка, если войдёт undefined и это НЕ цикл. А если сложный цикл?..
+                if(canGOres){
+                    console.error("В режиме follow встретилась ветка (подсвечена зелёным) с мощность undefined");
+                    item.line.classList.add("a7");
+                    return false;
+                }
             }
+
+
         }
         //Флаг break нужен для того, чтобы обратывать множественные Арнольды. Ставится в функции optimizeCycles
         if(item.power && !item.__BREAK) { //Если мощность была, складываем её
@@ -107,6 +117,10 @@ function step(target, power, lastTarget){
             //follow(state.path);
             let transmittingPower= new Fraction(target.power.getNum(), target.power.getDet() * target.children.length)
             step(state.path[1], transmittingPower, target);
+            // target.children.forEach(item => {
+            //     let transmittingPower= new Fraction(target.power.getNum(), target.power.getDet() * target.children.length)
+            //     step(item, transmittingPower, target);
+            // })
         } else { //Иначе просто идём по всем нашим детям
             target.children.forEach(item => {
                 let transmittingPower= new Fraction(target.power.getNum(), target.power.getDet() * target.children.length)
