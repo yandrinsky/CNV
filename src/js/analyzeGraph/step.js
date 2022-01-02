@@ -4,7 +4,7 @@ import canGo from "./canGo";
 import CNV from "../CNV/library";
 import follow from "./follow";
 import text from "./text";
-import {show_path} from "../SETTINGS";
+import {SHOW_PATH} from "../SETTINGS";
 
 function step(target, power, lastTarget){
     let canGOres;
@@ -22,7 +22,7 @@ function step(target, power, lastTarget){
     let fullPower = new Fraction(0);
 
     //Выделение пути обхода - раскоменти и увидишь, как шёл обход по графу
-    if(show_path){
+    if(SHOW_PATH){
         setTimeout(()=>{
             for (let i = 1; i < 10; i++) {
                 if(!target.line.classList.contains("a" + i)){
@@ -114,7 +114,7 @@ function step(target, power, lastTarget){
     //на простых примерах. Нужно дописать нормально.
     if(state.mode === "analyze"){
         if(canGOres === false && state.path){ //Вариант, если в нас входит цикл. Значит нужно пойти в его сторону. Вот мы и идём
-            //follow(state.path);
+            // follow(state.path);
             let transmittingPower= new Fraction(target.power.getNum(), target.power.getDet() * target.children.length)
             step(state.path[1], transmittingPower, target);
             // target.children.forEach(item => {

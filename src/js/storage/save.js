@@ -7,11 +7,16 @@ function saveData(state, visualData, needToSave){
         let data = state.lines[key];
         let children = [];
         let parents = [];
+        let sideIn = [];
         data.children.forEach(item => {
             children.push(item.line.id);
         })
         data.parents.forEach(item => {
             parents.push(item.line.id);
+        })
+        data.sideIn.forEach(item => {
+            console.log("sideIn item", item);
+            sideIn.push(item.line.id);
         })
         prepData.lines[key] = {
             ...data,
@@ -20,6 +25,7 @@ function saveData(state, visualData, needToSave){
             startCircle: data.startCircle.id,
             children,
             parents,
+            sideIn,
         }
     }
 

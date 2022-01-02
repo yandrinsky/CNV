@@ -6,6 +6,8 @@ import cyclesOptimize from "./cyclesOptimize";
 import state from "./analyzeState";
 import step from "./step";
 import { primary_bypass } from "./priority";
+import {CONTROL_SUM_WARNING, SHOW_CYCLES} from "../SETTINGS";
+import showCycles from "./showCycles";
 
 
 
@@ -15,7 +17,7 @@ function analyze(lines){
     })
     
     state.results = {};
-    primary_bypass(lines);
+
     let startLines = [];
     let controlSum = new Fraction(0);
 
@@ -36,14 +38,12 @@ function analyze(lines){
 
     cyclesOptimize(startLines[0]) //Оптимизируем циклы (подробнее в файле)
 
-
-    //showCycles(startLines[0]); //Показываем циклы цветами - по желанию
-
-
-
+    if(SHOW_CYCLES){
+        showCycles(startLines[0]); //Показываем циклы цветами - по желанию
+    }
     try{
         //Запускаем анализ входной точки (грани, у которой нет родителя)
-        //step(startLines[0], new Fraction(1));
+        step(startLines[0], new Fraction(1));
         CNV.render(); //Отрисовываем изменения, проишедшие во время анализа графа
         for(let key in state.results){ //Отрисовываем значения у выходов графа
             if(!state.results[key].auxiliary){
@@ -62,7 +62,9 @@ function analyze(lines){
         }
 
         if(controlSum.getStr() !== "1"){
-            //alert("Критическая ошибка анализа пути: сумма выходов равна: " + controlSum.getStr());
+            if(CONTROL_SUM_WARNING){
+                alert("Критическая ошибка анализа пути: сумма выходов равна: " + controlSum.getStr());
+            }
         }
     } catch (e){
         for(let key in lines){

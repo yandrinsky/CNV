@@ -3,7 +3,6 @@ import Store from "./Store";
 
 function ctrlZHandler(){
     window.addEventListener("keydown", e => {
-        console.log(e.shiftKey, e.ctrlKey, e);
         if(e.key === "Z" && e.ctrlKey && e.shiftKey){
             recover(Store.getStackNext());
         }  else if(e.key === "z" && e.ctrlKey){
