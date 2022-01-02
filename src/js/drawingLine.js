@@ -19,6 +19,10 @@ function drawingLine(data, finishCallback = () => {}){
         //store.addToStack(save({dont_save: true}));
     }
 
+    function helloWorld(){
+
+    }
+
     function drawing(e){
         data.line.update.endPosition.x = e.clientX - CNV.state.shift.x;
         data.line.update.endPosition.y = e.clientY - CNV.state.shift.y;

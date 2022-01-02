@@ -5,7 +5,19 @@ import canGo from "./canGo";
 import Store from "../Store";
 import cyclesOptimize from "./cyclesOptimize";
 
-
+function text(options){
+    options.auxiliary = options.aux || options.auxiliary;
+    options.aux = options.auxiliary || options.aux;
+    options.output[options.target.ids.line] = {
+        text: options.auxiliary ? options.text : options.target.power.getStr(),
+        x: options.target.endCircle.link.start.x + 10 + CNV.state.shift.x,
+        y: options.target.endCircle.link.start.y - 10 + CNV.state.shift.y,
+        fontSize: "14",
+        color: "green",
+        data: options.auxiliary ? undefined : {num: options.target.power.getNum(), det: options.target.power.getDet()},
+        auxiliary: options.auxiliary || false,
+    }
+}
 
 
 //props: lines,
@@ -18,7 +30,7 @@ function analyze(lines){
     let results = {};
     let controlSum = new Fraction(0);
     let path = undefined;
-;
+
 
     for(let key in lines){ //Считаем количество точек входа
         if(lines[key].parents.length === 0){
@@ -131,17 +143,17 @@ function analyze(lines){
 
         target.already = true; //Ставим флаг, что мы прошли эту грань
 
-
         if(target.children.length === 0){ //Если детей нет, значит это выход и нужно записать результат
             CNV.preventRender(() => target.line.classList.add("finishLine"));
-            results[target.ids.line] = {
-                text: target.power.getStr(),
-                x: target.endCircle.link.start.x + 10 + CNV.state.shift.x,
-                y: target.endCircle.link.start.y - 10 + CNV.state.shift.y,
-                fontSize: "14",
-                color: "green",
-                data: {num: target.power.getNum(), det: target.power.getDet()}
-            }
+            text({target, output: results})
+            // results[target.ids.line] = {
+            //     text: target.power.getStr(),
+            //     x: target.endCircle.link.start.x + 10 + CNV.state.shift.x,
+            //     y: target.endCircle.link.start.y - 10 + CNV.state.shift.y,
+            //     fontSize: "14",
+            //     color: "green",
+            //     data: {num: target.power.getNum(), det: target.power.getDet()}
+            // }
         }
 
         //Функционал работает плохо, потому что мы не идём по пути, а просто начинаем идти его сторону. Но это работает,
@@ -164,8 +176,11 @@ function analyze(lines){
         step(startLines[0], new Fraction(1));
         CNV.render(); //Отрисовываем изменения, проишедшие во время анализа графа
         for(let key in results){ //Отрисовываем значения у выходов графа
-            controlSum.plus(results[key].data.num, results[key].data.det);
+            if(!results[key].auxiliary){
+                controlSum.plus(results[key].data.num, results[key].data.det);
+            }
             CNV.text(results[key])
+
         }
         for(let key in lines){
             //Чистим за собой после окончания работы
