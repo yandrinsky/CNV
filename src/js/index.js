@@ -106,7 +106,7 @@ analyzeBtn.onclick = e => {
 saveBtn.onclick = e => {
     saveBtn.classList.remove("saveOk");
     const CNVrecoveryData = CNV.save();
-    const SCRIPTrecoveryData = save();
+    const SCRIPTrecoveryData = save({});
     const disk = JSON.stringify({
         CNV: CNVrecoveryData,
         SCRIPT: SCRIPTrecoveryData,
