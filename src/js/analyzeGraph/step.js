@@ -114,13 +114,13 @@ function step(target, power, lastTarget){
     //на простых примерах. Нужно дописать нормально.
     if(state.mode === "analyze"){
         if(canGOres === false && state.path){ //Вариант, если в нас входит цикл. Значит нужно пойти в его сторону. Вот мы и идём
-            //follow(state.path);
-            let transmittingPower= new Fraction(target.power.getNum(), target.power.getDet() * target.children.length)
-            step(state.path[1], transmittingPower, target);
-            // target.children.forEach(item => {
-            //     let transmittingPower= new Fraction(target.power.getNum(), target.power.getDet() * target.children.length)
-            //     step(item, transmittingPower, target);
-            // })
+            follow(state.path);
+            // let transmittingPower= new Fraction(target.power.getNum(), target.power.getDet() * target.children.length)
+            // step(state.path[1], transmittingPower, target);
+            target.children.forEach(item => {
+                let transmittingPower= new Fraction(target.power.getNum(), target.power.getDet() * target.children.length)
+                step(item, transmittingPower, target);
+            })
         } else { //Иначе просто идём по всем нашим детям
             target.children.forEach(item => {
                 let transmittingPower= new Fraction(target.power.getNum(), target.power.getDet() * target.children.length)

@@ -5,15 +5,17 @@ import Store from "../Store";
 import cyclesOptimize from "./cyclesOptimize";
 import state from "./analyzeState";
 import step from "./step";
+import { primary_bypass } from "./priority";
+
 
 
 function analyze(lines){
     CNV.combineRender(()=> {
         CNV.querySelectorAll(".finishLine").forEach(item => item.classList.remove("finishLine"));
     })
-
+    
     state.results = {};
-
+    primary_bypass(lines);
     let startLines = [];
     let controlSum = new Fraction(0);
 
