@@ -3,6 +3,7 @@ import state from "./analyzeState";
 import step from "./step";
 
 function follow(path){
+    let no_error = true;
     console.log("FOLLOW");
     state.mode = "follow";
     let firstPower;
@@ -34,8 +35,12 @@ function follow(path){
             let parent = path[index - 1];
             try{
                 let res = step(line, new Fraction(parent.power.getNum(), parent.power.getDet() * parent.children.length), path[index - 1]);
-                if(res === false) break;
+                if(res === false){
+                    no_error = false;
+                    break;
+                }
             } catch (e){
+                no_error = false;
                 console.error("Функция follow встретила на пути ветку с мощностью undefined");
                 break;
             }
@@ -48,6 +53,7 @@ function follow(path){
     })
 
     state.mode = "analyze";
+    return no_error;
 }
 
 export default follow;
