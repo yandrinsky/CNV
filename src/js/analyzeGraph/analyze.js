@@ -8,6 +8,9 @@ import step from "./step";
 import { primary_bypass } from "./priority";
 import {CONTROL_SUM_WARNING, SHOW_CYCLES} from "../SETTINGS";
 import showCycles from "./showCycles";
+import { forming_paths } from "./formingPaths";
+import follow from "./follow";
+import go from "./go";
 
 
 
@@ -41,8 +44,11 @@ function analyze(lines){
     if(SHOW_CYCLES){
         showCycles(startLines[0]); //Показываем циклы цветами - по желанию
     }
+    let test = [];
     primary_bypass(lines);
+    test = forming_paths(lines);
     try{
+        go(test);
         //Запускаем анализ входной точки (грани, у которой нет родителя)
         //step(startLines[0], new Fraction(1));
         CNV.render(); //Отрисовываем изменения, проишедшие во время анализа графа

@@ -108,7 +108,8 @@ function primary_bypass(lines){
         }
     }
     flag = false;
-    test_1 = lines[start_key].children[0];
+    if (lines[start_key].children[0] != undefined) test_1 = lines[start_key].children[0];
+    else test_1 = lines[start_key];
     while (flag === false){
         while (test_1.children[0] != undefined && (test_1.children[0].branch_index === test_1.branch_index || test_1.children[0].bypass_priority === -1) && test_1.children[0].visited === false){
             test_1 = test_1.children[0];
@@ -129,7 +130,7 @@ function primary_bypass(lines){
             test_1 = test_1.parents[0];
         }
         if (test_1.parents[0] === undefined && count === 0) flag = true;
-        else if (test_1.parents[0] === undefined && (test_1.children[1].visited === true || test_1.children[1] === undefined)) {
+        else if (test_1.parents[0] === undefined && (test_1.children[1] === undefined || test_1.children[1].visited === true )) {
             flag = true;
             console.log("error!");
         }
@@ -142,7 +143,8 @@ function primary_bypass(lines){
         lines[key].visited = false;
     }
     flag = false;
-    test_1 = lines[start_key].children[0];
+    if (lines[start_key].children[0] != undefined) test_1 = lines[start_key].children[0];
+    else test_1 = lines[start_key];
     while (flag === false){
         while (test_1.children[0] != undefined && test_1.children[0].branch_index === test_1.branch_index&& test_1.children[0].visited === false){
             test_1 = test_1.children[0];
@@ -161,7 +163,8 @@ function primary_bypass(lines){
             }
             test_1 = test_1.parents[0];
         }
-        if (test_1.parents[0] === undefined && (test_1.children[1].visited === true || test_1.children[1] === undefined)) {
+
+        if (test_1.parents[0] === undefined && (test_1.children[1] === undefined || test_1.children[1].visited === true)) {
             flag = true;
         }
         if(test_1.children[1] != undefined){
@@ -169,14 +172,14 @@ function primary_bypass(lines){
             test_1.visited = true;
         }
     }
-    for (let key in lines){
-        text({
-            aux: true,
-            text: lines[key].bypass_priority,
-            target: lines[key],
-            output: state.results,
-        })
-    }
+    // for (let key in lines){
+    //     text({
+    //         aux: true,
+    //         text: lines[key].bypass_priority,
+    //         target: lines[key],
+    //         output: state.results,
+    //     })
+    // }
 }
 
 export {primary_bypass}
