@@ -2,6 +2,7 @@ import Fraction from "../Fraction";
 import state from "./analyzeState";
 import step from "./step";
 
+
 function follow(path){
     let no_error = true;
     console.log("FOLLOW");

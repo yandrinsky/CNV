@@ -41,6 +41,7 @@ function analyze(lines){
     if(SHOW_CYCLES){
         showCycles(startLines[0]); //Показываем циклы цветами - по желанию
     }
+    //primary_bypass(lines);
     try{
         //Запускаем анализ входной точки (грани, у которой нет родителя)
         step(startLines[0], new Fraction(1));
@@ -62,6 +63,7 @@ function analyze(lines){
             lines[key].__CYCLEEND = undefined;
             lines[key].__NOT_CIRCLE = undefined;
             lines[key].__CHECKED = undefined;
+            lines[key].__CYCLEPATH = undefined;
             Store.state.cycles = undefined;
         }
 
@@ -81,6 +83,7 @@ function analyze(lines){
             lines[key].__GET_POWER_FOR = undefined;
             lines[key].__NOT_CIRCLE = undefined;
             lines[key].__CHECKED = undefined;
+            lines[key].__CYCLEPATH = undefined;
             Store.state.cycles = undefined;
         }
         console.error("Граф замкнут. Анализ невозможен", e);
