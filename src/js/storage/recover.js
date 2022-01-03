@@ -17,10 +17,14 @@ function recover(data){
         item.line = CNV.getElementByUniqueId(item.line);
         item.endCircle = CNV.getElementByUniqueId(item.endCircle);
         item.startCircle = CNV.getElementByUniqueId(item.startCircle);
+
         item.children = item.children.map(id => {
             return script.lines[id];
         })
         item.parents = item.parents.map(id => {
+            return script.lines[id];
+        })
+        item.sideIn = item.sideIn.map(id => {
             return script.lines[id];
         })
 

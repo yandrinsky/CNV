@@ -2,7 +2,7 @@ import CNV from "./CNV/library";
 import store from "./Store";
 import {addEdge, createEdge} from "./graphHandlers";
 import drawingLine from "./drawingLine";
-import {branches} from "./SETTINGS";
+import {BRANCHES} from "./SETTINGS";
 
 function resetAllEndCircleClick(){
     Object.keys(store.state.lines).forEach(key => {
@@ -47,7 +47,7 @@ function endCircleClick(data, e){
     data.line.classList.remove("black");
 
     //вести можно только 2 линии, не больше
-    if(data.children.length < branches){
+    if(data.children.length < BRANCHES){
         //после того, как начали вести линию сбрасываем у всех круглешков событие нажатия
         resetAllEndCircleClick();
         //создаём новуб линию и указываем ей коорлинаты начала как у круга, по которому кликнули
@@ -117,10 +117,7 @@ function setStickToTailHandler(currentData){
 
                         data.parents.push(currentData);
                         data.sideIn.push(currentData);
-                        console.log("here");
                         addEdge(currentData, data);
-                        console.log("parents, ", data.parents);
-                        console.log("sideIn, ", data.sideIn);
                     }
                 }, 10);
             } else {

@@ -1,5 +1,8 @@
-//Количество линий, которые могут выходить из конца прошлой
-const branches = 2;
-const stack_limit = 7;
-const show_path = false;
-export {branches, stack_limit, show_path};
+
+const BRANCHES = 2; //Количество линий, которые могут выходить из конца прошлой
+const STACK_LIMIT = 7; //максимальное количество сохранений в stack
+const STACK = true; //сохранине в stack изменений
+const SHOW_PATH = false; //показать путь обхода
+const SHOW_CYCLES = false; //показать циклы
+const CONTROL_SUM_WARNING = true; //выводить предупреждение о контрольной сумме
+export {BRANCHES, STACK_LIMIT, SHOW_PATH, CONTROL_SUM_WARNING, STACK, SHOW_CYCLES};

@@ -6,6 +6,8 @@ import cyclesOptimize from "./cyclesOptimize";
 import state from "./analyzeState";
 import step from "./step";
 import { primary_bypass } from "./priority";
+import {CONTROL_SUM_WARNING, SHOW_CYCLES} from "../SETTINGS";
+import showCycles from "./showCycles";
 
 
 
@@ -15,7 +17,7 @@ function analyze(lines){
     })
     
     state.results = {};
-    primary_bypass(lines);
+
     let startLines = [];
     let controlSum = new Fraction(0);
 
@@ -36,11 +38,10 @@ function analyze(lines){
 
     cyclesOptimize(startLines[0]) //Оптимизируем циклы (подробнее в файле)
 
-
-    //showCycles(startLines[0]); //Показываем циклы цветами - по желанию
-
-
-
+    if(SHOW_CYCLES){
+        showCycles(startLines[0]); //Показываем циклы цветами - по желанию
+    }
+    primary_bypass(lines);
     try{
         //Запускаем анализ входной точки (грани, у которой нет родителя)
         //step(startLines[0], new Fraction(1));
@@ -59,19 +60,29 @@ function analyze(lines){
             lines[key].cycle = undefined;
             lines[key].__BREAK = undefined;
             lines[key].__GET_POWER_FOR = undefined;
+            lines[key].__CYCLEEND = undefined;
+            lines[key].__NOT_CIRCLE = undefined;
+            lines[key].__CHECKED = undefined;
+            Store.state.cycles = undefined;
         }
 
         if(controlSum.getStr() !== "1"){
-            //alert("Критическая ошибка анализа пути: сумма выходов равна: " + controlSum.getStr());
+            if(CONTROL_SUM_WARNING){
+                //alert("Критическая ошибка анализа пути: сумма выходов равна: " + controlSum.getStr());
+            }
         }
     } catch (e){
         for(let key in lines){
-            //Чиститим за стобой даже если что-то пошло не так.
+            //Чиститим за собой даже если что-то пошло не так.
             lines[key].power = undefined;
             lines[key].already = undefined;
             lines[key].cycle = undefined;
             lines[key].__BREAK = undefined;
+            lines[key].__CYCLEEND = undefined;
             lines[key].__GET_POWER_FOR = undefined;
+            lines[key].__NOT_CIRCLE = undefined;
+            lines[key].__CHECKED = undefined;
+            Store.state.cycles = undefined;
         }
         console.error("Граф замкнут. Анализ невозможен", e);
     }

@@ -4,7 +4,7 @@ import canGo from "./canGo";
 import CNV from "../CNV/library";
 import follow from "./follow";
 import text from "./text";
-import {show_path} from "../SETTINGS";
+import {SHOW_PATH} from "../SETTINGS";
 
 function step(target, power, lastTarget){
     let canGOres;
@@ -22,7 +22,7 @@ function step(target, power, lastTarget){
     let fullPower = new Fraction(0);
 
     //Выделение пути обхода - раскоменти и увидишь, как шёл обход по графу
-    if(show_path){
+    if(SHOW_PATH){
         setTimeout(()=>{
             for (let i = 1; i < 10; i++) {
                 if(!target.line.classList.contains("a" + i)){
@@ -91,7 +91,7 @@ function step(target, power, lastTarget){
         lastTarget.cycle = true; //Сразу ставим флаг взодящей грани в значение true, чтобы больше по нему не проходить
         //Вычитаем из общей мощности переданную от входящей грани, потому что сейчас будет арнольд, а не простое сложение
         fullPower.minus(power.getNum(), power.getDet());
-        console.log("Full P after minus", fullPower.getStr());
+        //console.log("Full P after minus", fullPower.getStr());
         let kx = target.power.clone().divide(power.getNum(), power.getDet()); //Вычисляем коэф перед икс)
         kx.minus(1); //Не помню зачем, но надо
         let x = fullPower.clone().divide(kx.getNum(), kx.getDet()); //Вычисляем сам икс
@@ -99,13 +99,12 @@ function step(target, power, lastTarget){
 
         //console.log("fullPower here", fullPower.getStr());
         //console.log("x, kx, fullPower is", x.getStr(), kx.getStr(), fullPower.getStr());
-        console.log("myPower after Arnold", target.power.getStr());
+        //console.log("myPower after Arnold", target.power.getStr());
     }
 
     target.already = true; //Ставим флаг, что мы прошли эту грань
 
     if(target.children.length === 0){ //Если детей нет, значит это выход и нужно записать результат
-        console.log("children", target.children.length);
         CNV.preventRender(() => target.line.classList.add("finishLine"));
         text({target, output: state.results})
     }
@@ -114,7 +113,7 @@ function step(target, power, lastTarget){
     //на простых примерах. Нужно дописать нормально.
     if(state.mode === "analyze"){
         if(canGOres === false && state.path){ //Вариант, если в нас входит цикл. Значит нужно пойти в его сторону. Вот мы и идём
-            //follow(state.path);
+            // follow(state.path);
             let transmittingPower= new Fraction(target.power.getNum(), target.power.getDet() * target.children.length)
             step(state.path[1], transmittingPower, target);
             // target.children.forEach(item => {

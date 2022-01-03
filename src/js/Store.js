@@ -1,4 +1,4 @@
-import {stack_limit} from "./SETTINGS";
+import {STACK_LIMIT} from "./SETTINGS";
 
 export default {
     state: {
@@ -10,7 +10,7 @@ export default {
     },
     stack: {
         length: 0,
-        stack_limit: stack_limit,
+        stack_limit: STACK_LIMIT,
         current: -1,
     },
     system: {

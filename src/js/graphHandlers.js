@@ -33,7 +33,12 @@ function removeEdge(key){
     }
     //удаляем у детей в родителях этот элемент
     if(data.children.length > 0){
-        data.children.forEach(item => item.parents.splice(item.parents.indexOf(data), 1))
+        data.children.forEach(item => {
+            item.parents.splice(item.parents.indexOf(data), 1);
+            if(item.sideIn.includes(data)){
+                item.sideIn.splice(item.sideIn.indexOf(data), 1);
+            }
+        })
     }
 
     delete store.state.lines[key];

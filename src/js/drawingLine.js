@@ -2,6 +2,7 @@ import CNV from "./CNV/library";
 import {endCircleClick, resetStickToTailHandler, setStickToTailHandler} from "./eventHandlers";
 import store from "./Store";
 import save from "./storage/save";
+import {STACK} from "./SETTINGS";
 
 function drawingLine(data, finishCallback = () => {}){
     function stopDrawing(e){
@@ -15,12 +16,10 @@ function drawingLine(data, finishCallback = () => {}){
         data.endCircle.onclick = e => endCircleClick(data, e);
         finishCallback();
         resetStickToTailHandler();
-        //Сохраняем изменения в стек
-        //store.addToStack(save({dont_save: true}));
-    }
-
-    function helloWorld(){
-
+        if(STACK){
+            //Сохраняем изменения в стек
+            store.addToStack(save({dont_save: true}));
+        }
     }
 
     function drawing(e){
