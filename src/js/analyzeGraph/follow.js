@@ -33,27 +33,35 @@ function follow(path){
         if(firstPower === undefined){
             firstPower = new Fraction(1);
         }
-        for (let i = 0; i < path.length; i++) {
-            let index = i;
-            let line = path[i];
-            if(index === 0){
-                step(line, firstPower, firstLastTarget);
-            } else {
-                let parent = path[index - 1];
-                try{
-                    let res = step(line, new Fraction(parent.power.getNum(), parent.power.getDet() * parent.children.length), path[index - 1]);
-                    if(res === false){
+
+        if(path.length === 1){
+            if(!step(path[0], firstPower, firstLastTarget)){
+                no_error = false;
+            }
+        } else {
+            for (let i = 0; i < path.length; i++) {
+                let index = i;
+                let line = path[i];
+                if(index === 0){
+                    step(path[0], firstPower, firstLastTarget)
+                } else {
+                    let parent = path[index - 1];
+                    try{
+                        let res = step(line, new Fraction(parent.power.getNum(), parent.power.getDet() * parent.children.length), path[index - 1]);
+                        if(res === false){
+                            no_error = false;
+                            break;
+                        }
+                    } catch (e){
                         no_error = false;
+                        console.error("Функция follow встретила на пути ветку с мощностью undefined");
                         break;
                     }
-                } catch (e){
-                    no_error = false;
-                    console.error("Функция follow встретила на пути ветку с мощностью undefined");
-                    break;
-                }
 
+                }
             }
         }
+
     }
 
 
