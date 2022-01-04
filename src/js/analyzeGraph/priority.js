@@ -172,14 +172,14 @@ function primary_bypass(lines){
             test_1.visited = true;
         }
     }
-    // for (let key in lines){
-    //     text({
-    //         aux: true,
-    //         text: lines[key].bypass_priority,
-    //         target: lines[key],
-    //         output: state.results,
-    //     })
-    // }
+    for (let key in lines){
+        // text({
+        //     aux: true,
+        //     text: lines[key].bypass_priority,
+        //     target: lines[key],
+        //     output: state.results,
+        // })
+    }
 }
 
 export {primary_bypass}
