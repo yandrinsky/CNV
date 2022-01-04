@@ -1,6 +1,7 @@
 import follow from "./follow";
 
 function go(paths){
+    console.log("paths", paths);
     while(paths.length > 0){
         let successCount = 0;
         for (let i = 0; i < paths.length; i++) {
