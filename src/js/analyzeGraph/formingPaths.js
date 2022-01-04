@@ -42,7 +42,28 @@ function branch_bypass(edge, test_path, path_2){
                 if (edge.children[1].other_priorities[ length_2 - 1] === undefined) edge.children[1].other_priorities.push(-100)
                 length_1 = edge.children[0].other_priorities.length;
                 length_2 = edge.children[1].other_priorities.length;
-                if (edge.children[0].other_priorities[ length_1 - 1] < edge.children[1].other_priorities[length_2 - 1]  && edge.children[1].visited === false){
+                console.log((edge.children[1].other_priorities[ length_2 - 1] === -100) && (edge.children[0].other_priorities[length_1 - 1] != -100) && (edge.children[1].bypass_priority > edge.children[0].other_priorities[length_1 - 1]))
+                if ((edge.children[0].other_priorities[ length_1 - 1] < edge.children[1].other_priorities[length_2 - 1]) && edge.children[1].visited === false && edge.children[0].other_priorities[ length_1 - 1] != -100){
+                    edge = edge.children[1];
+                    if (edge.visited_2 === false){
+                        test_path.push(edge);
+                        edge.visited_2 = true
+                    }
+                    path_2.push(edge);
+                    edge.other_priorities[length_2 - 1]
+                    edge.other_priorities.pop();
+                }
+                else if(edge.children[1].visited === false && (edge.children[0].other_priorities[ length_1 - 1] === -100) && (edge.children[1].other_priorities[length_2 - 1] != -100) && (edge.children[0].bypass_priority < edge.children[1].other_priorities[length_2 - 1])){
+                    edge = edge.children[1];
+                    if (edge.visited_2 === false){
+                        test_path.push(edge);
+                        edge.visited_2 = true
+                    }
+                    path_2.push(edge);
+                    edge.other_priorities[length_2 - 1]
+                    edge.other_priorities.pop();
+                }
+                else if(edge.children[1].visited === false && (edge.children[1].other_priorities[ length_2 - 1] === -100) && (edge.children[0].other_priorities[length_1 - 1] != -100) && (edge.children[1].bypass_priority > edge.children[0].other_priorities[length_1 - 1])){
                     edge = edge.children[1];
                     if (edge.visited_2 === false){
                         test_path.push(edge);
@@ -53,7 +74,10 @@ function branch_bypass(edge, test_path, path_2){
                     edge.other_priorities.pop();
                 }
                 else{
-                    if((edge.children[0].other_priorities[ length_1 - 1] <= edge.children[1].bypass_priority || edge.children[0].visited === true) && edge.children[1].visited === false){
+                    //console.log((((edge.children[0].other_priorities[ length_1 - 1] <= edge.children[1].bypass_priority) && (edge.children[1].other_priorities[ length_2 - 1] > edge.children[0].bypass_priority)) || edge.children[0].visited === true) && edge.children[1].visited === false)
+                    // console.log((edge.children[0].other_priorities[ length_1 - 1] <= edge.children[1].bypass_priority) || edge.children[0].visited === true)
+                    // console.log(((edge.children[0].other_priorities[ length_1 - 1] <= edge.children[1].bypass_priority) || edge.children[0].visited === true) && edge.children[1].visited === false)
+                    if((((edge.children[1].bypass_priority > edge.children[0].bypass_priority) && (edge.children[0].other_priorities[ length_1 - 1] === edge.children[1].other_priorities[length_2 - 1]) || (edge.children[0].other_priorities[ length_1 - 1] === edge.children[1].bypass_priority)) || edge.children[0].visited === true) && edge.children[1].visited === false){
                         edge = edge.children[1];
                         if (edge.visited_2 === false){
                             test_path.push(edge);
@@ -87,12 +111,34 @@ function branch_bypass(edge, test_path, path_2){
         if(edge.children[0] != undefined){
             for (let i = 0; i < edge.children[0].sideIn.length; i++){
                 if(edge === edge.children[0].sideIn[i]){
-                    if(edge.__CYCLEEND) test_path.push(edge.children[0]);
+                    if(edge.__CYCLEEND) test_path.push(edge.children[0])
+                    //if(edge.__CYCLEEND) test_path.push(edge.children[0].children[0])
+                    // if(edge.__CYCLEEND) test_path.push(edge)
+                    // if(edge.__CYCLEEND) test_path.push(edge.children[0])
+
+                    else stop = true;
+
                     while((edge.children[1] === undefined || (edge.children[1].visited === true && edge.children[0].visited === true)) && edge.parents[0] != undefined){
                         edge.visited = true;
                         edge = edge.parents[0];
                     }
-                    stop = true;
+                    // if(edge.children[0].__CYCLEPATH){
+                    //     test_path.push(edge.children[0])
+                    //     edge = edge.children[0];
+                    //     while(!edge.__CYCLEEND){
+                    //         console.log("Застрял :(");
+                    //         test_path.push(edge.children[0]);
+                    //         edge = edge.children[0];
+                    //     }
+                    // }
+                    // if(edge.children[1] != undefined && edge.children[1].__CYCLEPATH){
+                    //     test_path.push(edge.children[1])
+                    //     edge = edge.children[1];
+                    //     while(!edge.__CYCLEEND && edge.children[0].__CYCLEPATH){
+                    //         test_path.push(edge.children[0]);
+                    //         edge = edge.children[0];
+                    //     }
+                    // }
                 }
             }
         }
@@ -146,8 +192,12 @@ function forming_paths(lines){
         }
     }
     else all_path.push(obj_path);
-    console.log("Все пути");
-    console.log(all_path.length);
+    // console.log("Все пути");
+    // console.log("Кол-во путей", all_path.length);
+    // console.log("длинна пути 1", all_path[0].path.length);
+    // console.log("длинна пути 2", all_path[1].path.length);
+    // console.log("длинна пути 3", all_path[2].path.length);
+    // console.log("длинна пути 4", all_path[3].path.length);
     return all_path;
     
 }

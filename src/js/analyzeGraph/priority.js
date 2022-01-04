@@ -173,12 +173,12 @@ function primary_bypass(lines){
         }
     }
     for (let key in lines){
-        // text({
-        //     aux: true,
-        //     text: lines[key].bypass_priority,
-        //     target: lines[key],
-        //     output: state.results,
-        // })
+        text({
+            aux: true,
+            text: lines[key].bypass_priority,
+            target: lines[key],
+            output: state.results,
+        })
     }
 }
 

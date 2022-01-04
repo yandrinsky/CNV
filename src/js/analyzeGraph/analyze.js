@@ -48,7 +48,7 @@ function analyze(lines){
     primary_bypass(lines);
     test = forming_paths(lines);
     try{
-        //follow(test[0].path)
+        //for(let i = 0; i < test.length; i++) follow(test[i].path);
         go(test);
         //Запускаем анализ входной точки (грани, у которой нет родителя)
         //step(startLines[0], new Fraction(1));

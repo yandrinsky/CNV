@@ -25,7 +25,7 @@ function cssIndex(css, shapes){
         let shape = shapes[id];
         let index;
         shape.classList.forEach(CLS => {
-            if(css[CLS].zIndex){
+            if(css[CLS]?.zIndex){
                 index = css[CLS].zIndex;
             }
         })
