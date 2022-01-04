@@ -83,10 +83,10 @@ function step(target, power, lastTarget){
     //Уравнение арнольда
     if(target.already && power.getStr() !== fullPower.getStr()) {
         //Логи дебага
-        // console.log("!!!АРНОЛЬД!!!");
-        // console.log("Full P", fullPower.getStr());
-        // console.log("power", power.getStr());
-        //console.log("In Arnold power incoming", "fullpower", power.getStr(), fullPower.getStr());
+        console.log("!!!АРНОЛЬД!!!");
+        console.log("Full P", fullPower.getStr());
+        console.log("power", power.getStr());
+        console.log("In Arnold power incoming", "fullpower", power.getStr(), fullPower.getStr());
 
         lastTarget.cycle = true; //Сразу ставим флаг взодящей грани в значение true, чтобы больше по нему не проходить
         //Вычитаем из общей мощности переданную от входящей грани, потому что сейчас будет арнольд, а не простое сложение
