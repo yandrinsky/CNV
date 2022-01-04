@@ -1,5 +1,6 @@
 import state from "./analyzeState";
 import text from "./text";
+import {SHOW_PRIORITIES} from "../SETTINGS";
 
 let test_1;
 let test_2;
@@ -172,14 +173,18 @@ function primary_bypass(lines){
             test_1.visited = true;
         }
     }
-    for (let key in lines){
-        text({
-            aux: true,
-            text: lines[key].bypass_priority,
-            target: lines[key],
-            output: state.results,
-        })
+
+    if(SHOW_PRIORITIES){
+        for (let key in lines){
+            text({
+                aux: true,
+                text: lines[key].bypass_priority,
+                target: lines[key],
+                output: state.results,
+            })
+        }
     }
+
 }
 
 export {primary_bypass}

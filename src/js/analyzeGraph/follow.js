@@ -17,36 +17,45 @@ function follow(path){
             }
         })
         if(flag){
-            firstLastTarget = parent;
-            firstPower = new Fraction(parent.power.getNum(), parent.power.getDet() * parent.children.length);
-            break;
-        }
-    }
-
-    if(firstPower === undefined){
-        firstPower = new Fraction(1);
-    }
-    for (let i = 0; i < path.length; i++) {
-        let index = i;
-        let line = path[i];
-        if(index === 0){
-            step(line, firstPower, firstLastTarget);
-        } else {
-            let parent = path[index - 1];
-            try{
-                let res = step(line, new Fraction(parent.power.getNum(), parent.power.getDet() * parent.children.length), path[index - 1]);
-                if(res === false){
-                    no_error = false;
-                    break;
-                }
-            } catch (e){
+            if(parent.power){
+                firstLastTarget = parent;
+                firstPower = new Fraction(parent.power.getNum(), parent.power.getDet() * parent.children.length);
+                break;
+            } else {
                 no_error = false;
-                console.error("Функция follow встретила на пути ветку с мощностью undefined");
                 break;
             }
 
         }
     }
+
+    if(no_error){
+        if(firstPower === undefined){
+            firstPower = new Fraction(1);
+        }
+        for (let i = 0; i < path.length; i++) {
+            let index = i;
+            let line = path[i];
+            if(index === 0){
+                step(line, firstPower, firstLastTarget);
+            } else {
+                let parent = path[index - 1];
+                try{
+                    let res = step(line, new Fraction(parent.power.getNum(), parent.power.getDet() * parent.children.length), path[index - 1]);
+                    if(res === false){
+                        no_error = false;
+                        break;
+                    }
+                } catch (e){
+                    no_error = false;
+                    console.error("Функция follow встретила на пути ветку с мощностью undefined");
+                    break;
+                }
+
+            }
+        }
+    }
+
 
     path.forEach(line => {
         line.already = false;
