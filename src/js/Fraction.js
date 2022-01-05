@@ -33,6 +33,10 @@ class Fraction{
     }
 
     plus(num, det = 1){
+        if(num instanceof Fraction){
+            det = num.getDet();
+            num = num.getNum();
+        }
         let NOK = this.nok(det, this.det);
         let NUM = this.num * NOK / this.det + num * NOK / det;
         let GCD = this.gcd(NOK, NUM);
@@ -43,6 +47,10 @@ class Fraction{
         return this;
     }
     minus(num, det = 1){
+        if(num instanceof Fraction){
+            det = num.getDet();
+            num = num.getNum();
+        }
         let NOK = this.nok(det, this.det);
         let NUM = this.num * NOK / this.det - num * NOK / det;
         let GCD = this.gcd(NOK, NUM);
@@ -53,12 +61,20 @@ class Fraction{
         return this;
     }
     multiply(num, det = 1){
+        if(num instanceof Fraction){
+            det = num.getDet();
+            num = num.getNum();
+        }
         let GCD = this.gcd(this.num * num, this.det * det);
         this.num = this.num * num / GCD;
         this.det = this.det * det / GCD;
         return this;
     }
     divide(num, det = 1){
+        if(num instanceof Fraction){
+            det = num.getDet();
+            num = num.getNum();
+        }
         let GCD = this.gcd(this.num * det, this.det * num);
         this.num = this.num * det / GCD;
         this.det = this.det * num / GCD;

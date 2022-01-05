@@ -75,7 +75,7 @@ function analyze(lines){
 
         if(controlSum.getStr() !== "1"){
             if(CONTROL_SUM_WARNING){
-                //alert("Критическая ошибка анализа пути: сумма выходов равна: " + controlSum.getStr());
+                alert("Критическая ошибка анализа пути: сумма выходов равна: " + controlSum.getStr());
             }
         }
     } catch (e){

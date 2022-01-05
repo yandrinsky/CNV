@@ -16,8 +16,9 @@ function cyclesOptimize(start){
         })
         //если начало и конец циклов совпадают, группируем циклы
         for (let j = i + 1; j < len; j++) {
-            if(cycles[j][0].ids.line === start && cycles[j][cycles[j].length - 1].ids.line === end &&
-                cycles[j][cycles[j].length - 2].ids.line !== preend
+            if(cycles[j][0].ids.line === start && cycles[j][cycles[j].length - 1].ids.line === end
+                // && cycles[j][cycles[j].length - 2].ids.line !== preend
+
             ){
                 res[res.length - 1].cycles.push(...cycles.splice(j, 1));
                 len -= 1;

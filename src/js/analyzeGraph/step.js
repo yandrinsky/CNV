@@ -5,13 +5,11 @@ import CNV from "../CNV/library";
 import follow from "./follow";
 import text from "./text";
 import {SHOW_PATH} from "../SETTINGS";
+import arnold from "./arnold";
+
 
 function step(target, power, lastTarget){
     let canGOres;
-
-    //Логи дебага
-    //console.log("incoming power", power.getStr(), power);
-    //console.log("lastTarget power", lastTarget?.power.getStr(), lastTarget?.power);
 
     target.power = power;
 
@@ -78,29 +76,10 @@ function step(target, power, lastTarget){
         target.power = fullPower;
     }
 
-    //Логи дебага
-    //console.log("counted power (fullPower)", target.power.getStr(), target.power);
 
     //Уравнение арнольда
     if(target.already && power.getStr() !== fullPower.getStr()) {
-        //Логи дебага
-        console.log("!!!АРНОЛЬД!!!");
-        console.log("Full P", fullPower.getStr());
-        console.log("power", power.getStr());
-        console.log("In Arnold power incoming", "fullpower", power.getStr(), fullPower.getStr());
-
-        lastTarget.cycle = true; //Сразу ставим флаг взодящей грани в значение true, чтобы больше по нему не проходить
-        //Вычитаем из общей мощности переданную от входящей грани, потому что сейчас будет арнольд, а не простое сложение
-        fullPower.minus(power.getNum(), power.getDet());
-        //console.log("Full P after minus", fullPower.getStr());
-        let kx = target.power.clone().divide(power.getNum(), power.getDet()); //Вычисляем коэф перед икс)
-        kx.minus(1); //Не помню зачем, но надо
-        let x = fullPower.clone().divide(kx.getNum(), kx.getDet()); //Вычисляем сам икс
-        target.power.plus(x.getNum(), x.getDet()); //Меняем мощность у текущей грани, арнольд готов
-
-        //console.log("fullPower here", fullPower.getStr());
-        //console.log("x, kx, fullPower is", x.getStr(), kx.getStr(), fullPower.getStr());
-        //console.log("myPower after Arnold", target.power.getStr());
+        arnold(target, lastTarget, power);
     }
 
     target.already = true; //Ставим флаг, что мы прошли эту грань
