@@ -15,8 +15,11 @@ function branch_bypass(edge, test_path, path_2){
     let length_1;
     let length_2;
     let save;
+    //if (edge.__CYCLEEND) edge.line.classList.add("a1");
     if(edge.children[0] != undefined && (edge.children[0].visited === false || (edge.children[1] != undefined && edge.children[1].visited === false))){
         if(edge.children[1] != undefined){
+            //if (edge.children[0].__CYCLEPATH) edge.children[0].line.classList.add("a1");
+            //edge.children[0].line.classList.add("a2");
             if (edge.children[1].__CYCLEPATH && edge.children[1].visited === false){
                 edge = edge.children[1];
                 if (edge.visited_2 === false){
@@ -34,6 +37,8 @@ function branch_bypass(edge, test_path, path_2){
                 path_2.push(edge);
             }
             else{
+                // edge.children[1].line.classList.add("a1");
+                // edge.children[0].line.classList.add("a2");
                 edge.children[0].other_priorities.sort(compareNumeric);
                 edge.children[1].other_priorities.sort(compareNumeric);
                 length_1 = edge.children[0].other_priorities.length;
@@ -50,7 +55,7 @@ function branch_bypass(edge, test_path, path_2){
                         edge.visited_2 = true
                     }
                     path_2.push(edge);
-                    edge.other_priorities[length_2 - 1]
+                    if (edge.other_priorities[length_2 - 1] != -100) save = edge.other_priorities[length_2 - 1];
                     edge.other_priorities.pop();
                 }
                 else if(edge.children[1].visited === false && (edge.children[0].other_priorities[ length_1 - 1] === -100) && (edge.children[1].other_priorities[length_2 - 1] != -100) && (edge.children[0].bypass_priority < edge.children[1].other_priorities[length_2 - 1])){
@@ -60,7 +65,7 @@ function branch_bypass(edge, test_path, path_2){
                         edge.visited_2 = true
                     }
                     path_2.push(edge);
-                    edge.other_priorities[length_2 - 1]
+                    if (edge.other_priorities[length_2 - 1] != -100) save = edge.other_priorities[length_2 - 1];
                     edge.other_priorities.pop();
                 }
                 else if(edge.children[1].visited === false && (edge.children[1].other_priorities[ length_2 - 1] === -100) && (edge.children[0].other_priorities[length_1 - 1] != -100) && (edge.children[1].bypass_priority > edge.children[0].other_priorities[length_1 - 1])){
@@ -70,7 +75,7 @@ function branch_bypass(edge, test_path, path_2){
                         edge.visited_2 = true
                     }
                     path_2.push(edge);
-                    edge.other_priorities[length_2 - 1]
+                    if (edge.other_priorities[length_2 - 1] != -100) save = edge.other_priorities[length_2 - 1];
                     edge.other_priorities.pop();
                 }
                 else{
@@ -84,7 +89,7 @@ function branch_bypass(edge, test_path, path_2){
                             edge.visited_2 = true
                         }
                         path_2.push(edge);
-                        save = edge.other_priorities[length_2 - 1];
+                        if (edge.other_priorities[length_2 - 1] != -100) save = edge.other_priorities[length_2 - 1];
                         edge.other_priorities.pop(); 
                     }
                     else if (edge.children[0].visited === false){
@@ -94,7 +99,7 @@ function branch_bypass(edge, test_path, path_2){
                             edge.visited_2 = true
                         }
                         path_2.push(edge);
-                        save = edge.other_priorities[length_1 - 1];
+                        if (edge.other_priorities[length_1 - 1] != -100) save = edge.other_priorities[length_1 - 1];
                         edge.other_priorities.pop();
                     }
                 }  
@@ -110,18 +115,25 @@ function branch_bypass(edge, test_path, path_2){
         }
         if(edge.children[0] != undefined){
             for (let i = 0; i < edge.children[0].sideIn.length; i++){
+                let flag_3 = false;
+                let flag_4 = false;
                 if(edge === edge.children[0].sideIn[i]){
                     if(edge.__CYCLEEND) test_path.push(edge.children[0])
                     //if(edge.__CYCLEEND) test_path.push(edge.children[0].children[0])
                     // if(edge.__CYCLEEND) test_path.push(edge)
                     // if(edge.__CYCLEEND) test_path.push(edge.children[0])
 
-                    else stop = true;
-
+                    else flag_3 = true;
+                    stop = true;
                     while((edge.children[1] === undefined || (edge.children[1].visited === true && edge.children[0].visited === true)) && edge.parents[0] != undefined){
+                        //if(flag_3 === true && flag_4 === true) edge.other_priorities.push(save);
+                        if(edge.parents[0].children[1] !== undefined) flag_4 = true;
                         edge.visited = true;
+                        //edge.line.classList.add("a5");
                         edge = edge.parents[0];
                     }
+                    flag_3 = false;
+                    flag_4 = false;
                     // if(edge.children[0].__CYCLEPATH){
                     //     test_path.push(edge.children[0])
                     //     edge = edge.children[0];
@@ -144,8 +156,9 @@ function branch_bypass(edge, test_path, path_2){
         }
     }
     else{
-        while((edge.children[1] === undefined || (edge.children[1].visited === true && edge.children[0].visited === true) || edge.__CYCLEEND) && edge.parents[0] != undefined){
+        while((edge.children[1] === undefined || (edge.children[1].visited === true && edge.children[0].visited === true)) && edge.parents[0] != undefined){
             edge.visited = true;
+            //edge.line.classList.add("a2");
             edge = edge.parents[0];
         }
         stop = true;
@@ -198,6 +211,11 @@ function forming_paths(lines){
     // console.log("длинна пути 2", all_path[1].path.length);
     // console.log("длинна пути 3", all_path[2].path.length);
     // console.log("длинна пути 4", all_path[3].path.length);
+    // console.log("длинна пути 5", all_path[4].path.length);
+    // console.log("длинна пути 6", all_path[5].path.length);
+    // for (let key in lines){
+    //     if(lines[key].visited_2 === true) lines[key].line.classList.add("a5");
+    // }
     return all_path;
     
 }

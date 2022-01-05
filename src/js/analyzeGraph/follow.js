@@ -35,7 +35,7 @@ function follow(path){
         }
 
         if(path.length === 1){
-            console.warn("path length === 1", path[0], firstPower.getStr(), firstLastTarget);
+            //console.warn("path length === 1", path[0], firstPower.getStr(), firstLastTarget);
             if(step(path[0], firstPower, firstLastTarget) === false){
                 no_error = false;
             }
