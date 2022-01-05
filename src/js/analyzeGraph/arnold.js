@@ -56,6 +56,9 @@ function arnold(target, lastTarget, power){
     //6
     target.power.plus(power); //Меняем мощность у текущей грани, арнольд готов
 
+    for (let i = 0; i < cycle.length - 1; i++) {
+        cycle[i].power.multiply(x);
+    }
     console.log("x", x.getStr());
     console.log("final target power", target.power.getStr());
 }
