@@ -171,11 +171,14 @@ class Path{
         this.path = [];
         this.passed = false;
         this.path_2 = [];
+        this.cycle = false;
+        this.passed_count = 0;
     }
 }
 
 function forming_paths(lines){
     let start_line;
+    let flag_cycle = false;
     let all_path = [];
     let flag = false;
     let keys = Object.keys(lines);
@@ -197,8 +200,11 @@ function forming_paths(lines){
         while(start_line.children[0].visited === false || (start_line.children[1] != undefined && start_line.children[1].visited === false)){
             while (!flag){
                 flag = branch_bypass(obj_path.path_2[obj_path.path_2.length - 1], obj_path.path, obj_path.path_2);
+                if (obj_path.path_2[obj_path.path_2.length - 1].__CYCLEEND === true) flag_cycle = true;
             }
             flag = false;
+            if (flag_cycle) obj_path.cycle = true;
+            flag_cycle = false;
             all_path.push(obj_path);
             obj_path = new Path();
             obj_path.path_2.push(start_line);
@@ -216,6 +222,9 @@ function forming_paths(lines){
     // for (let key in lines){
     //     if(lines[key].visited_2 === true) lines[key].line.classList.add("a5");
     // }
+    for (let i = 0; i < all_path.length; i++){
+        if(all_path[i].cycle === true) console.log("ЦИКЛ!");
+    }
     return all_path;
     
 }
