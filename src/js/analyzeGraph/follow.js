@@ -4,7 +4,7 @@ import step from "./step";
 
 function follow(path){
     let no_error = true;
-    console.log("FOLLOW");
+
     state.mode = "follow";
     let firstPower;
     let firstLastTarget;
@@ -35,7 +35,8 @@ function follow(path){
         }
 
         if(path.length === 1){
-            if(!step(path[0], firstPower, firstLastTarget)){
+            console.warn("path length === 1", path[0], firstPower.getStr(), firstLastTarget);
+            if(step(path[0], firstPower, firstLastTarget) === false){
                 no_error = false;
             }
         } else {
