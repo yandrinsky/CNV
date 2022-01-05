@@ -12,22 +12,34 @@ function arnold(target, lastTarget, power){
 
     for (let i = 0; i < cycle.length; i++) {
         let line = cycle[i];
+
+        // if(line.sideIn.length > 0){
+        //     let sum = new Fraction(0);
+        //     for (let j = 0; j < line.sideIn.length; j++) {
+        //         sum.plus(line.sideIn[j].power);
+        //         sideInSum.plus(line.sideIn[j].power);
+        //     }
+        //     for (let j = i; j < cycle.length; j++) {
+        //         cycle[j].power.minus(sum);
+        //     }
+        // }
+
         if(line.sideIn.length > 0){
-            let sum = new Fraction(0);
             for (let j = 0; j < line.sideIn.length; j++) {
-                sum.plus(line.sideIn[j].power);
                 sideInSum.plus(line.sideIn[j].power);
-            }
-            for (let j = i; j < cycle.length; j++) {
-                cycle[j].power.minus(sum);
             }
         }
         if(line.children.length > 1){
-            for (let j = i; j < cycle.length; j++) {
-                //console.log("after divide",cycle[j].power.divide(line.children.length).getStr());
-                sideInSum.divide(2);
-            }
+            sideInSum.divide(line.children.length);
+            // for (let j = i; j < cycle.length; j++) {
+            //     //console.log("after divide",cycle[j].power.divide(line.children.length).getStr());
+            //     sideInSum.divide(2);
+            // }
         }
+
+        line.power.minus(sideInSum);
+
+
     }
 
 
