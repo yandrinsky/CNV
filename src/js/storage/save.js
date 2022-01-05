@@ -1,7 +1,7 @@
 import CNV from "../CNV/library";
 import store from "../Store";
 
-function saveData(state, visualData, needToSave){
+function saveData(state, visualData, dontSave){
     const prepData = {...state, lines: {}};
     for(let key in state.lines){
         let data = state.lines[key];
@@ -33,7 +33,7 @@ function saveData(state, visualData, needToSave){
         SCRIPT: JSON.stringify(prepData),
         CNV: visualData,
     });
-    if(needToSave !== false){
+    if(!dontSave){
         localStorage.setItem("__saved", saved);
     }
     return saved;

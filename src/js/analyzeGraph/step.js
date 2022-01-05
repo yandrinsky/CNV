@@ -2,7 +2,6 @@ import Fraction from "../Fraction";
 import state from "./analyzeState";
 import canGo from "./canGo";
 import CNV from "../CNV/library";
-import follow from "./follow";
 import text from "./text";
 import {SHOW_PATH} from "../SETTINGS";
 import arnold from "./arnold";
