@@ -16,7 +16,7 @@ function arnold(target, lastTarget, power){
         if(line.sideIn.length > 0){
             for (let j = 0; j < line.sideIn.length; j++) {
                 if(line.sideIn[j].loop_powers && line.sideIn[j].loop_powers.length > 0){ //Если линия выходит из какого-то арнольда
-                    console.log("LOOP POWERS");
+                    //console.log("LOOP POWERS", line.sideIn[j].loop_powers);
                     let findSuccess = false;
                     //Пробегаемся по всем мощностям входящей ветки и ищем ту,что является петлёй для текущего арнольда
                     for (let k = 0; k < line.sideIn[j].loop_powers.length; k++) {
@@ -24,7 +24,8 @@ function arnold(target, lastTarget, power){
                         let flag = false;
                         //пробегаемся по всем id мощности и находим совпадение с веткой арнольда (проверям, петля ли это)
                         for (let l = 0; l < loop_child.ids.length; l++) {
-                            if(line.ids.include(loop_child.ids[l])){
+                            if(line.__CYCLEPATH_IDS.includes(loop_child.ids[l])){
+                                //console.log("ПЕТЛЯ!!!!!!!!!!", loop_child.power.getStr());
                                 flag = true;
                                 break;
                             }
@@ -32,7 +33,10 @@ function arnold(target, lastTarget, power){
                         if(flag){//Значит это петля.
                             //1) Вычитаем из мощности петли мощность родителя - арнольда. - это плюсуем в sideInSum
                             //2) Мощность родителя арнольда плюсуем в line.power
-                            sideInSum.plus(line.sideIn[j].clone().minus(loop_child.power)); // side += петля - вх.арнод;
+                            // console.log("loop_child.power", loop_child.power.getStr());
+                            // console.log("line.sideIn[j].power", line.sideIn[j].power.getStr());
+                            // console.log("sideInSum before plus");
+                            sideInSum.plus(line.sideIn[j].power.clone().minus(loop_child.power)); // side += петля - вх.арнод;
                             line.power.plus(loop_child.power); //line += вх.арнольд
                             findSuccess = true;
                             break;
@@ -55,9 +59,30 @@ function arnold(target, lastTarget, power){
 
             //Передаём всем элемпентам петли мощность родителя - арнольда
             if(line.loop_children){
-                line.loop_children.forEach(child => {
-                    child.power.plus(line.power); //Изначально child.power = 0;
+                line.loop_children.forEach((child, index) => {
+                    let formPower = line.power.clone().divide(line.children.length);
+                    let division;
+                    child.target.loop_powers.forEach(power => {
+                        if(power.power === child.power && power.division){
+                            //console.log("child.division", power.division);
+                            division = power.division;
+                        }
+                    })
+                    if(division){
+                        formPower.divide(division);
+                    }
+                    child.power.plus(formPower); //Изначально child.power = 0;
+
+
+                    // console.log("SET POWER (line.power)", line.power.getStr());
+                    // console.log("SET POWER (setted power)", child.power.getStr());
+                    //
+                    // console.log("AFTER SET child.target.loop_powers", child.target.loop_powers[0].power.getStr());
+                    // console.log("child.power === child.target.loop_powers[0].power", child.power ===  child.target.loop_powers[0].power);
+                    // line.line.classList.add("a5");
+                    // child.target.line.classList.add("a6");
                 })
+
             }
 
         }
