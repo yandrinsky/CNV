@@ -202,7 +202,6 @@ function forming_paths(lines){
                 flag = branch_bypass(obj_path.path_2[obj_path.path_2.length - 1], obj_path.path, obj_path.path_2);
                 if (obj_path.path[obj_path.path.length - 1] !== undefined && obj_path.path[obj_path.path.length - 1].__CYCLEPATH === true){
                     flag_cycle = true; 
-                    obj_path.path[obj_path.path.length - 1].line.classList.add("a6");
                 } 
             }
             flag = false;
@@ -226,7 +225,7 @@ function forming_paths(lines){
     //     if(lines[key].visited_2 === true) lines[key].line.classList.add("a5");
     // }
     for (let i = 0; i < all_path[1].path.length; i++){
-        if(all_path[i].cycle === true) console.log("ЦИКЛ!");
+        //if(all_path[i].cycle === true) console.log("ЦИКЛ!");
         // all_path[1].path[i].line.classList.add("a1")
         //all_path[1].line.classList.add("a2")
     }
