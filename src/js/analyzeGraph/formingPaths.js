@@ -60,7 +60,7 @@ function loop(edge_arnold, edge, lines){
             loop_children_obj.target = test_1;
             loop_children_obj.power = new Fraction(0);
             loop_powers_obj.ids = edge_arnold.__CYCLEPATH_IDS;
-            loop_powers_obj.power = new Fraction(0);
+            loop_powers_obj.power = loop_children_obj.power;
             loop_powers_obj.start_line = edge_arnold;
             test_1.loop_powers.push(loop_powers_obj);
             edge_arnold.loop_children.push(loop_children_obj);
