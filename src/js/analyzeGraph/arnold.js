@@ -27,7 +27,34 @@ function arnold(target, lastTarget, power){
 
         if(line.sideIn.length > 0){
             for (let j = 0; j < line.sideIn.length; j++) {
-                sideInSum.plus(line.sideIn[j].power);
+                if(line.sideIn[j].loop_powers && line.sideIn[j].loop_powers.length > 0){ //Если линия выходит из какого-то арнольда
+                    let findSuccess = false;
+                    //Пробегаемся по всем мощностям входящей ветки и ищем ту,что является петлёй для текущего арнольда
+                    for (let k = 0; k < line.sideIn[j].loop_powers.length; k++) {
+                        let loop_child = line.sideIn[j].loop_powers[k];
+                        let flag = false;
+                        //пробегаемся по всем id мощности и находим совпадение с веткой арнольда (проверям, петля ли это)
+                        for (let l = 0; l < loop_child.ids.length; l++) {
+                            if(line.ids.include(loop_child.ids[l])){
+                                flag = true;
+                                break;
+                            }
+                        }
+                        if(flag){//Значит это петля.
+                            //1) Вычитаем из мощности петли мощность родителя - арнольда. - это плюсуем в sideInSum
+                            //2) Мощность родителя арнольда плюсуем в line.power
+                            sideInSum.plus(line.sideIn[j].clone().minus(loop_child.power)); // side += петля - вх.арнод;
+                            line.power.plus(loop_child.power); //line += вх.арнольд
+                            findSuccess = true;
+                            break;
+                        }
+                    }
+                    if(!findSuccess){ //Если не одна из линий не оказалась для текущего арнольда петлёй, просто складываем в sideInSum
+                        sideInSum.plus(line.sideIn[j].power);
+                    }
+                } else {
+                    sideInSum.plus(line.sideIn[j].power);
+                }
             }
         }
 
@@ -37,7 +64,13 @@ function arnold(target, lastTarget, power){
             line.__SIDEINPOWER_STEMP = sideInSum.clone();
             sideInSum.divide(line.children.length);
 
-            line.arnold_loop[0] = line.power
+            //Передаём всем элемпентам петли мощность родителя - арнольда
+            if(line.loop_children){
+                line.loop_children.forEach(child => {
+                    child.power.plus(line.power); //Изначально child.power = 0;
+                })
+            }
+
         }
 
 
@@ -80,6 +113,16 @@ function arnold(target, lastTarget, power){
         line.power.multiply(x);
         if(line.__SIDEINPOWER_STEMP){
             line.power.plus(line.__SIDEINPOWER_STEMP);
+        }
+        if(line.loop_children){
+            line.loop_children.forEach(child => {
+                //1) Вычитаем из линии петли мощность родителя - арнольда
+                //2) Умножаем переданную родителем арнольдом мощность на x
+                //3) Складываем мощность линии петли и новую пересчитанную мощность родителя
+                child.target.power.minus(child.power);
+                child.power.multiply(x);
+                child.target.power.plus(child.power);
+            })
         }
     }
     console.log("x", x.getStr());

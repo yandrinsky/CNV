@@ -75,6 +75,19 @@ function step(target, power, lastTarget){
         target.power = fullPower;
     }
 
+    //Если элемент является элементов мыходной ветки из цикла
+    if(target.loop_powers && target.loop_powers.length > 0 && target.children.length > 1){
+        target.children.forEach(targetChild => {    //Пробегаемся по всем детям
+            targetChild.loop_powers.forEach(tch_child => { //Пробегаемся по всем мощностям ребёнка
+                target.loop_powers.forEach(t_child => { //Пробегаемся по всем мощностям родителя
+                    //Если мощноти принадлежат к одному циклу и начальное ребро одно - делим мощность на количество детей
+                    if(tch_child.ids === t_child.ids && t_child.start_line === tch_child.start_line){
+                        tch_child.power.divide(target.children.length);
+                    }
+                })
+            })
+        })
+    }
 
     //Уравнение арнольда
     if(target.already && power.getStr() !== fullPower.getStr()) {
