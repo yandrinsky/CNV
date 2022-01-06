@@ -6,15 +6,21 @@ function go(paths){
         let successCount = 0;
         for (let i = 0; i < paths.length; i++) {
             if(follow(paths[i].path)){
-                paths[i].passed = true;
-                successCount += 1;
-                // paths[i].path.forEach(line => {
-                //     console.log("line", line);
-                //     line.line.classList.add("a4");
-                // });
-                paths.splice(i, 1);
-                i -= 1;
-
+                successCount += 1; //Оставь это, и тогда мы пройдём все пути
+                if(paths[i].cycle){
+                    successCount += 1; //Оставь тут и мы не пройдём все пути из-за остановки GO, но вроде считаем арнольд в арнольд
+                    paths[i].passed = true;
+                    paths.splice(i, 1);
+                    i -= 1;
+                } else {
+                    paths[i].passed_count += 1;
+                    if(paths[i].passed_count === 2){
+                        successCount += 1; //Оставь тут и мы не пройдём все пути из-за остановки GO, но вроде считаем арнольд в арнольд
+                        paths[i].passed = true;
+                        paths.splice(i, 1);
+                        i -= 1;
+                    }
+                }
             } else {
                 console.log("In go: follow returned false");
             }
