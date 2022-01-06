@@ -12,7 +12,6 @@ function go(paths){
                     paths[i].passed = true;
                     paths.splice(i, 1);
                     i -= 1;
-                    console.log("Кол-во путей", paths.length);
                 } else {
                     paths[i].passed_count += 1;
                     console.log("here")

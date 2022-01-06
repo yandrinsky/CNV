@@ -51,7 +51,9 @@ function primary_bypass(lines){
         lines[key].branch_index = -1;
         lines[key].other_priorities = [];
         lines[key].visited = false;
+        lines[key].arnold_loop = [];
         lines[key].visited_2 = false;
+        lines[key].visited_3 = false;
     }
     test_1 = lines[start_key];
     while (flag === false){

@@ -3,6 +3,28 @@ import state from "./analyzeState";
 import text from "./text";
 
 
+function loop(test_1, arn_loop_obj){
+    let flag = false;
+    while (flag === false){
+        while (test_1.children[0] != undefined && test_1.children[0].branch_index === test_1.branch_index&& test_1.children[0].visited_3 === false){
+            test_1 = test_1.children[0];
+            test_1.arnold_loop.push(arn_loop_obj);
+            test_1.visited_3 = true;
+        }
+        while ((test_1.children[1] === undefined || test_1.children[1].visited_3 === true) && test_1.parents[0] != undefined){
+            test_1 = test_1.parents[0];
+        }
+
+        if (test_1.parents[0] === undefined && (test_1.children[1] === undefined || test_1.children[1].visited_3 === true)) {
+            flag = true;
+        }
+        if(test_1.children[1] != undefined){
+            test_1 = test_1.children[1];
+            test_1.visited_3 = true;
+        }
+    }
+}
+
 
 function compareNumeric(a, b) {
     if (a > b) return 1;
@@ -10,12 +32,19 @@ function compareNumeric(a, b) {
     if (a < b) return -1;
 }
 
-function branch_bypass(edge, test_path, path_2){
+function branch_bypass(edge, test_path, path_2, arn_loop_obj){
     let stop = false;
     let length_1;
     let length_2;
     let save;
     //if (edge.__CYCLEEND) edge.line.classList.add("a1");
+    // for(let i = 0; i < edge.parents.length; i++){
+    //     if(edge.parents[i].__CYCLEPATH === true)
+    //     {
+    //          edge.arnold_loop.push(arn_loop_obj);
+    //          loop(edge, arn_loop_obj);
+    //     }
+    // }
     if(edge.children[0] != undefined && (edge.children[0].visited === false || (edge.children[1] != undefined && edge.children[1].visited === false))){
         if(edge.children[1] != undefined){
             //if (edge.children[0].__CYCLEPATH) edge.children[0].line.classList.add("a1");
@@ -180,6 +209,8 @@ function forming_paths(lines){
     let start_line;
     let flag_cycle = false;
     let all_path = [];
+    let arn = {}; 
+    let arn_loop_obj = arn; 
     let flag = false;
     let keys = Object.keys(lines);
 
@@ -199,15 +230,17 @@ function forming_paths(lines){
     if(!flag){
         while(start_line.children[0].visited === false || (start_line.children[1] != undefined && start_line.children[1].visited === false)){
             while (!flag){
-                flag = branch_bypass(obj_path.path_2[obj_path.path_2.length - 1], obj_path.path, obj_path.path_2);
+                flag = branch_bypass(obj_path.path_2[obj_path.path_2.length - 1], obj_path.path, obj_path.path_2, arn_loop_obj);
                 if (obj_path.path[obj_path.path.length - 1] !== undefined && obj_path.path[obj_path.path.length - 1].__CYCLEPATH === true){
                     flag_cycle = true; 
+                    console.log("wtf")
                 } 
             }
             flag = false;
             if (flag_cycle) obj_path.cycle = true;
             flag_cycle = false;
             all_path.push(obj_path);
+            arn_loop_obj = arn; 
             obj_path = new Path();
             obj_path.path_2.push(start_line);
         }
@@ -215,8 +248,8 @@ function forming_paths(lines){
     else all_path.push(obj_path);
     console.log("Все пути");
     console.log("Кол-во путей", all_path.length);
-    // console.log("длинна пути 1", all_path[0].path.length);
-    // console.log("длинна пути 2", all_path[1].path.length);
+    console.log("длинна пути 1", all_path[0].path.length);
+    console.log("длинна пути 2", all_path[1].path.length);
     // console.log("длинна пути 3", all_path[2].path.length);
     // console.log("длинна пути 4", all_path[3].path.length);
     // console.log("длинна пути 5", all_path[4].path.length);
@@ -224,8 +257,8 @@ function forming_paths(lines){
     // for (let key in lines){
     //     if(lines[key].visited_2 === true) lines[key].line.classList.add("a5");
     // }
-    for (let i = 0; i < all_path[1].path.length; i++){
-        //if(all_path[i].cycle === true) console.log("ЦИКЛ!");
+    for (let i = 0; i < all_path.length; i++){
+        if(all_path[i].cycle === true) console.log("ЦИКЛ!");
         // all_path[1].path[i].line.classList.add("a1")
         //all_path[1].line.classList.add("a2")
     }
