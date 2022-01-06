@@ -55,7 +55,7 @@ function follow(path){
                         }
                     } catch (e){
                         no_error = false;
-                        console.error("Функция follow встретила на пути ветку с мощностью undefined");
+                        console.error("Функция follow встретила на пути ветку с мощностью undefined", e);
                         break;
                     }
 

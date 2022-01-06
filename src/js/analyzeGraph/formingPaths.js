@@ -1,21 +1,57 @@
 import uniqueId from "../CNV/uniqueId";
+import Fraction from "../Fraction";
 import state from "./analyzeState";
 import text from "./text";
 
 
-function loop(test_1, arn_loop_obj){
+class Arn{
+    constructor(){
+        this.ids = [];
+        this.power = undefined;
+        this.start_line = undefined;
+    }
+}
+
+
+class L_C_O{
+    constructor(){
+        this.target = undefined;
+        this.power = undefined;
+    }
+}
+
+function loop(edge_arnold, edge, arn_loop_obj){
     let flag = false;
+    let flag_2 = false;
+    let test_1 = edge;
+    let loop_children_obj = new L_C_O();
+    let loop_powers_obj = new Arn();
+    for(let key in lines){
+        lines[key].visited_3 = false;
+    }
     while (flag === false){
-        while (test_1.children[0] != undefined && test_1.children[0].branch_index === test_1.branch_index&& test_1.children[0].visited_3 === false){
+        while (test_1.children[0] != undefined && test_1.children[0].visited_3 === false){
+            loop_children_obj.target = test_1;
+            loop_children_obj.power = new Fraction(0);
+            loop_powers_obj.ids = edge_arnold.__CYCLEPATH_IDS;
+            loop_powers_obj.power = new Fraction(0);
+            loop_powers_obj.start_line = edge_arnold;
+            test_1.loop_powers.push(loop_powers_obj);
+            edge_arnold.loop_children.push(loop_children_obj);
+            loop_powers_obj = new Arn();
+            loop_children_obj = new L_C_O();
             test_1 = test_1.children[0];
-            test_1.arnold_loop.push(arn_loop_obj);
             test_1.visited_3 = true;
         }
         while ((test_1.children[1] === undefined || test_1.children[1].visited_3 === true) && test_1.parents[0] != undefined){
-            test_1 = test_1.parents[0];
+            for(let i = 0; i < test_1.parents[0].sideIn.length; i++){
+                if(test_1.sideIn[i].visited_3 === true) flag_2 = true;
+            }
+            if(!flag_2 )test_1 = test_1.parents[0];
+            else test_1 = test_1.sideIn[i];
         }
 
-        if (test_1.parents[0] === undefined && (test_1.children[1] === undefined || test_1.children[1].visited_3 === true)) {
+        if (test_1.parents[0] === edge_arnold && (test_1.children[1] === undefined || test_1.children[1].visited_3 === true)) {
             flag = true;
         }
         if(test_1.children[1] != undefined){
@@ -32,19 +68,16 @@ function compareNumeric(a, b) {
     if (a < b) return -1;
 }
 
-function branch_bypass(edge, test_path, path_2, arn_loop_obj){
+function branch_bypass(edge, test_path, path_2){
     let stop = false;
     let length_1;
     let length_2;
     let save;
-    //if (edge.__CYCLEEND) edge.line.classList.add("a1");
-    // for(let i = 0; i < edge.parents.length; i++){
-    //     if(edge.parents[i].__CYCLEPATH === true)
-    //     {
-    //          edge.arnold_loop.push(arn_loop_obj);
-    //          loop(edge, arn_loop_obj);
-    //     }
-    // }
+    for(let i = 0; i < edge.parents.length; i++){
+        if(edge.parents[i].__CYCLEPATH === true && edge.parents[i].visited_2 === false  && edge.parents[i].children[1] !== undefined && edge.visited_3 !== true && ((edge.bypass_priority > edge.parents[i].children[1].bypass_priority) && edge.parents[i].children[0] === edge || (edge.bypass_priority > edge.parents[i].children[0].bypass_priority) && edge.parents[i].children[1] === edge)){
+            loop(edge.parents[0], edge);
+        }
+    }
     if(edge.children[0] != undefined && (edge.children[0].visited === false || (edge.children[1] != undefined && edge.children[1].visited === false))){
         if(edge.children[1] != undefined){
             //if (edge.children[0].__CYCLEPATH) edge.children[0].line.classList.add("a1");
@@ -208,9 +241,7 @@ class Path{
 function forming_paths(lines){
     let start_line;
     let flag_cycle = false;
-    let all_path = [];
-    let arn = {}; 
-    let arn_loop_obj = arn; 
+    let all_path = []; 
     let flag = false;
     let keys = Object.keys(lines);
 
@@ -230,30 +261,28 @@ function forming_paths(lines){
     if(!flag){
         while(start_line.children[0].visited === false || (start_line.children[1] != undefined && start_line.children[1].visited === false)){
             while (!flag){
-                flag = branch_bypass(obj_path.path_2[obj_path.path_2.length - 1], obj_path.path, obj_path.path_2, arn_loop_obj);
+                flag = branch_bypass(obj_path.path_2[obj_path.path_2.length - 1], obj_path.path, obj_path.path_2);
                 if (obj_path.path[obj_path.path.length - 1] !== undefined && obj_path.path[obj_path.path.length - 1].__CYCLEPATH === true){
                     flag_cycle = true; 
-                    console.log("wtf")
                 } 
             }
             flag = false;
             if (flag_cycle) obj_path.cycle = true;
             flag_cycle = false;
             all_path.push(obj_path);
-            arn_loop_obj = arn; 
             obj_path = new Path();
             obj_path.path_2.push(start_line);
         }
     }
     else all_path.push(obj_path);
-    console.log("Все пути");
-    console.log("Кол-во путей", all_path.length);
-    console.log("длинна пути 1", all_path[0].path.length);
-    console.log("длинна пути 2", all_path[1].path.length);
+    // console.log("Все пути");
+    // console.log("Кол-во путей", all_path.length);
+    // console.log("длинна пути 1", all_path[0].path.length);
+    // console.log("длинна пути 2", all_path[1].path.length);
     // console.log("длинна пути 3", all_path[2].path.length);
     // console.log("длинна пути 4", all_path[3].path.length);
     // console.log("длинна пути 5", all_path[4].path.length);
-    // console.log("длинна пути 6", all_path[5].path.length);
+    // // console.log("длинна пути 6", all_path[5].path.length);
     // for (let key in lines){
     //     if(lines[key].visited_2 === true) lines[key].line.classList.add("a5");
     // }
