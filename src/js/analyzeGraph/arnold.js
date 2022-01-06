@@ -24,21 +24,23 @@ function arnold(target, lastTarget, power){
         //     }
         // }
 
+
         if(line.sideIn.length > 0){
             for (let j = 0; j < line.sideIn.length; j++) {
                 sideInSum.plus(line.sideIn[j].power);
             }
         }
-        if(line.children.length > 1){
-            sideInSum.divide(line.children.length);
-            // for (let j = i; j < cycle.length; j++) {
-            //     //console.log("after divide",cycle[j].power.divide(line.children.length).getStr());
-            //     sideInSum.divide(2);
-            // }
-        }
 
         line.power.minus(sideInSum);
 
+        if(line.children.length > 1){
+            line.__SIDEINPOWER_STEMP = sideInSum.clone();
+            sideInSum.divide(line.children.length);
+        }
+
+
+
+        console.log("line power", line.power.getStr(), sideInSum.getStr());
 
     }
 
@@ -65,11 +67,17 @@ function arnold(target, lastTarget, power){
     let x = tmp.clone().divide(kx);
     //5
     power.multiply(x);
+    console.log("final income power", power.getStr());
     //6
     target.power.plus(power); //Меняем мощность у текущей грани, арнольд готов
 
+    //Изменяем мощности у всего цикла
     for (let i = 0; i < cycle.length - 1; i++) {
-        cycle[i].power.multiply(x);
+        let line = cycle[i];
+        line.power.multiply(x);
+        if(line.__SIDEINPOWER_STEMP){
+            line.power.plus(line.__SIDEINPOWER_STEMP);
+        }
     }
     console.log("x", x.getStr());
     console.log("final target power", target.power.getStr());
