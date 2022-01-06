@@ -200,7 +200,7 @@ function forming_paths(lines){
         while(start_line.children[0].visited === false || (start_line.children[1] != undefined && start_line.children[1].visited === false)){
             while (!flag){
                 flag = branch_bypass(obj_path.path_2[obj_path.path_2.length - 1], obj_path.path, obj_path.path_2);
-                if (obj_path.path_2[obj_path.path_2.length - 1].__CYCLEEND === true) flag_cycle = true;
+                if (obj_path.path[obj_path.path.length - 1] !== undefined && obj_path.path[obj_path.path.length - 1].__CYCLEEND === true) flag_cycle = true;
             }
             flag = false;
             if (flag_cycle) obj_path.cycle = true;
@@ -211,8 +211,8 @@ function forming_paths(lines){
         }
     }
     else all_path.push(obj_path);
-    // console.log("Все пути");
-    // console.log("Кол-во путей", all_path.length);
+    console.log("Все пути");
+    console.log("Кол-во путей", all_path.length);
     // console.log("длинна пути 1", all_path[0].path.length);
     // console.log("длинна пути 2", all_path[1].path.length);
     // console.log("длинна пути 3", all_path[2].path.length);
@@ -222,8 +222,10 @@ function forming_paths(lines){
     // for (let key in lines){
     //     if(lines[key].visited_2 === true) lines[key].line.classList.add("a5");
     // }
-    for (let i = 0; i < all_path.length; i++){
+    for (let i = 0; i < all_path[1].path.length; i++){
         if(all_path[i].cycle === true) console.log("ЦИКЛ!");
+        // all_path[1].path[i].line.classList.add("a1")
+        //all_path[1].line.classList.add("a2")
     }
     return all_path;
     

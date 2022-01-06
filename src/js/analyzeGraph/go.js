@@ -12,8 +12,10 @@ function go(paths){
                     paths[i].passed = true;
                     paths.splice(i, 1);
                     i -= 1;
+                    console.log("Кол-во путей", paths.length);
                 } else {
                     paths[i].passed_count += 1;
+                    console.log("here")
                     if(paths[i].passed_count === 2){
                         successCount += 1; //Оставь тут и мы не пройдём все пути из-за остановки GO, но вроде считаем арнольд в арнольд
                         paths[i].passed = true;
