@@ -27,6 +27,7 @@ canvas.width = window.innerWidth - 5;
 canvas.height = window.innerHeight - 100;
 
 
+
 let context = canvas.getContext("2d");
 
 //Инициализация библиотеки CNV

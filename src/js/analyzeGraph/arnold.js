@@ -36,6 +36,8 @@ function arnold(target, lastTarget, power){
         if(line.children.length > 1){
             line.__SIDEINPOWER_STEMP = sideInSum.clone();
             sideInSum.divide(line.children.length);
+
+            line.arnold_loop[0] = line.power
         }
 
 
@@ -48,6 +50,7 @@ function arnold(target, lastTarget, power){
     target.power.minus(lastTargetPower);
 
     power = lastTarget.power;
+
 
     lastTarget.cycle = true; //Сразу ставим флаг взодящей грани в значение true, чтобы больше по нему не проходить
     //Вычитаем из общей мощности переданную от входящей грани, потому что сейчас будет арнольд, а не простое сложение

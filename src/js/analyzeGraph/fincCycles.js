@@ -1,3 +1,5 @@
+import uniqueId from "../CNV/uniqueId";
+
 function findCycles(start){
     const cycles = []; //[[line, line, line], [line, line, line], [line, line, line]];
     const curPath = [];
@@ -8,7 +10,13 @@ function findCycles(start){
             lastTarget.__CYCLEEND = true;
             const index = curPath.indexOf(target);
             cycles.push(curPath.slice(index, curPath.length));
+            let id = uniqueId();
             cycles[cycles.length - 1].forEach(line => {
+                if(line.__CYCLEPATH_IDS){
+                    line.__CYCLEPATH_IDS.push(id);
+                } else {
+                    line.__CYCLEPATH_IDS = [id];
+                }
                 line.__CYCLEPATH = true;
             })
             //Не убираем checked, потому что у нас a1, a2, ...., a1 - мы на a1 и в конце, уберём, когда дойдём до начала
