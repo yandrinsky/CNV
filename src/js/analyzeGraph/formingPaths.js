@@ -51,12 +51,14 @@ function loop(edge_arnold, edge, lines){
             edge_arnold.loop_children.push(loop_children_obj);
             loop_powers_obj = new Arn();
             loop_children_obj = new L_C_O();
-            test_1 = test_1.children[0];
             test_1.visited_3 = true;
+            test_1 = test_1.children[0];
             round_count += 1;
         }
         round_count = 0;
         flag_3 = false;
+        if(test_1.visited_3 === false){
+            //test_1.line.classList.add("a2")
             loop_children_obj.target = test_1;
             loop_children_obj.power = new Fraction(0);
             loop_powers_obj.ids = edge_arnold.__CYCLEPATH_IDS;
@@ -66,7 +68,9 @@ function loop(edge_arnold, edge, lines){
             edge_arnold.loop_children.push(loop_children_obj);
             loop_powers_obj = new Arn();
             loop_children_obj = new L_C_O();
+            test_1.visited_3 = true;
             round_count += 1;
+        }
         while ((test_1.children[1] === undefined || test_1.children[1].visited_3 === true) && test_1.parents[0] != edge_arnold){
             for(let i = 0; i < test_1.sideIn.length; i++){
                 if(test_1.sideIn[i] !== undefined && test_1.sideIn[i].visited_3 === true){
@@ -92,9 +96,10 @@ function loop(edge_arnold, edge, lines){
         }
         if(test_1.children[1] != undefined && flag_3 === false){
             test_1 = test_1.children[1];
-            test_1.visited_3 = true;
+            //test_1.line.classList.add("a5")
+            //test_1.visited_3 = true;
         }
-        else if(test_1.children[1] != undefined){
+        else if(test_1.children[1] != undefined  && flag_3 === true){
             test_1.children[1].visited_3 = true;
         }
         flag_3 = false;
@@ -116,6 +121,8 @@ function branch_bypass(edge, test_path, path_2){
     for(let i = 0; i < edge.parents.length; i++){
         if(edge.parents[i].__CYCLEPATH === true && edge.parents[i].children[1] !== undefined && (edge.parents[i].children[1].__CYCLEPATH === true && edge.parents[i].children[0].__CYCLEPATH === true) && edge.visited_3 !== true && edge.__LOOPSTART){
             loop(edge.parents[0], edge);
+            console.log("fuck you!");
+            //edge.line.classList.add("a5")
         }
     }
     //if(edge.__LOOPSTART) edge.line.classList.add("a5")
