@@ -51,7 +51,7 @@ function step(target, power, lastTarget){
             } else { //Спортное решение. Выйдет ошибка, если войдёт undefined и это НЕ цикл. А если сложный цикл?..
                 if(canGOres){
                     console.error("В режиме follow встретилась ветка (подсвечена зелёным) с мощность undefined");
-                    item.line.classList.add("a7");
+                    //item.line.classList.add("a7");
                     target.power = undefined;
                     return false;
                 }

@@ -70,6 +70,7 @@ function analyze(lines){
             lines[key].__CYCLEEND = undefined;
             lines[key].__NOT_CIRCLE = undefined;
             lines[key].__CHECKED = undefined;
+            lines[key].__LOOPSTART = undefined;
             Store.state.cycles = undefined;
         }
 
@@ -89,6 +90,7 @@ function analyze(lines){
             lines[key].__GET_POWER_FOR = undefined;
             lines[key].__NOT_CIRCLE = undefined;
             lines[key].__CHECKED = undefined;
+            lines[key].__LOOPSTART = undefined;
             Store.state.cycles = undefined;
         }
         console.error("Граф замкнут. Анализ невозможен", e);

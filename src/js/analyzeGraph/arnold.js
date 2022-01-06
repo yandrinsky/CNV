@@ -13,21 +13,10 @@ function arnold(target, lastTarget, power){
     for (let i = 0; i < cycle.length; i++) {
         let line = cycle[i];
 
-        // if(line.sideIn.length > 0){
-        //     let sum = new Fraction(0);
-        //     for (let j = 0; j < line.sideIn.length; j++) {
-        //         sum.plus(line.sideIn[j].power);
-        //         sideInSum.plus(line.sideIn[j].power);
-        //     }
-        //     for (let j = i; j < cycle.length; j++) {
-        //         cycle[j].power.minus(sum);
-        //     }
-        // }
-
-
         if(line.sideIn.length > 0){
             for (let j = 0; j < line.sideIn.length; j++) {
                 if(line.sideIn[j].loop_powers && line.sideIn[j].loop_powers.length > 0){ //Если линия выходит из какого-то арнольда
+                    console.log("LOOP POWERS");
                     let findSuccess = false;
                     //Пробегаемся по всем мощностям входящей ветки и ищем ту,что является петлёй для текущего арнольда
                     for (let k = 0; k < line.sideIn[j].loop_powers.length; k++) {
