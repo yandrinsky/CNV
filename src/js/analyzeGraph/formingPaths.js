@@ -118,9 +118,10 @@ function branch_bypass(edge, test_path, path_2){
             loop(edge.parents[0], edge);
         }
     }
+    //if(edge.__LOOPSTART) edge.line.classList.add("a5")
     if(edge.children[0] != undefined && (edge.children[0].visited === false || (edge.children[1] != undefined && edge.children[1].visited === false))){
         if(edge.children[1] != undefined){
-            if (edge.children[1].__CYCLEPATH && edge.children[1].visited === false){
+            if (edge.children[1].__CYCLEPATH && !edge.children[1].__LOOPSTART && edge.children[1].visited === false){
                 edge = edge.children[1];
                 if (edge.visited_2 === false){
                     test_path.push(edge);
@@ -128,7 +129,7 @@ function branch_bypass(edge, test_path, path_2){
                 }
                 path_2.push(edge);
             }
-            else if (edge.children[0].__CYCLEPATH && edge.children[0].visited === false){
+            else if (edge.children[0].__CYCLEPATH && !edge.children[0].__LOOPSTART && edge.children[0].visited === false){
                 edge = edge.children[0];
                 if (edge.visited_2 === false){
                     test_path.push(edge);
