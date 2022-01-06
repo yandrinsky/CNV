@@ -4,7 +4,7 @@ import Fraction from "../Fraction";
 
 function arnold(target, lastTarget, power){
     console.log("Арнольд");
-    let cycle = exactCycle(target, lastTarget);
+    let cycle = exactCycle(target, lastTarget)[0];
     cycle = cycle.slice(1, cycle.length - 1);
     let lastTargetPower = lastTarget.power.clone();
     let sideInSum = new Fraction(0);
