@@ -181,7 +181,7 @@ function primary_bypass(lines){
         for (let key in lines){
             text({
                 aux: true,
-                text: lines[key].bypass_priority,
+                text: lines[key].other_priorities,
                 target: lines[key],
                 output: state.results,
             })
