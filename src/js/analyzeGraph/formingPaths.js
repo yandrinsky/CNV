@@ -200,7 +200,10 @@ function forming_paths(lines){
         while(start_line.children[0].visited === false || (start_line.children[1] != undefined && start_line.children[1].visited === false)){
             while (!flag){
                 flag = branch_bypass(obj_path.path_2[obj_path.path_2.length - 1], obj_path.path, obj_path.path_2);
-                if (obj_path.path[obj_path.path.length - 1] !== undefined && obj_path.path[obj_path.path.length - 1].__CYCLEEND === true) flag_cycle = true;
+                if (obj_path.path[obj_path.path.length - 1] !== undefined && obj_path.path[obj_path.path.length - 1].__CYCLEPATH === true){
+                    flag_cycle = true; 
+                    obj_path.path[obj_path.path.length - 1].line.classList.add("a6");
+                } 
             }
             flag = false;
             if (flag_cycle) obj_path.cycle = true;
