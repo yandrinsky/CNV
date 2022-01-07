@@ -107,18 +107,25 @@ function step(target, power, lastTarget){
                     }
                 })
             })
-        } else if(target.children.length === 1 && !target.__CYCLEIN){
+        } else if(target.children.length === 1){
+            console.warn("target.children.length === 1");
             if(target.children[0].loop_powers){
                 target.children[0].loop_powers.forEach(child => {
+                    console.warn("child", child)
                     target.loop_powers.forEach(parent => {
+                        console.warn("parent", parent)
                         if(!child.__BLOCK){
+                            console.warn("NOT BLOCK");
+                            target.children[0].line.classList.add("a5");
                             if(target.children[0].sideIn.includes(target)){
+                                console.warn("FIRST");
                                 console.log("SIDE INNNNNNNNNNNNNNNNNNNNNNN before", child.division.getStr());
                                 child.division.plus(parent.division).divide(target.children[0].parents.length ** target.children[0].parents.length);
                                 console.log("SIDE INNNNNNNNNNNNNNNNNNNNNNN after", child.division.getStr());
                                 child.__BLOCK = true
                             } else {
-                                if(child.ids === parent.ids && child.start_line === parent.start_line && parent.division.getNum() > child.division.getNum()){
+                                console.warn("SECOND");
+                                if(child.ids === parent.ids && child.start_line === parent.start_line ){ //&& parent.division.getNum() > child.division.getNum()
                                     console.log("SET DIVISION to", child.division.getStr(), "parent power ", parent.division.getStr());
                                     child.division = parent.division.clone();
                                 }

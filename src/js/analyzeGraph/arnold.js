@@ -35,9 +35,12 @@ function arnold(target, lastTarget, power){
                             //2) Мощность родителя арнольда плюсуем в line.power
                             console.log("loop_child.power", loop_child.power.getStr());
                             console.log("line.sideIn[j].power", line.sideIn[j].power.getStr());
-                            console.log("sideInSum before plus");
+                            console.log("sideInSum before plus", sideInSum.getStr());
+                            console.log("line.power before plus", line.power.getStr());
                             sideInSum.plus(line.sideIn[j].power.clone().minus(loop_child.power)); // side += петля - вх.арнод;
-                            line.power.plus(loop_child.power); //line += вх.арнольд
+                            //line.power.plus(loop_child.power); //line += вх.арнольд
+                            console.log("line power after loop IN", line.power.getStr());
+                            console.log("sideInSum after loop IN", line.power.getStr());
                             findSuccess = true;
                             break;
                         }
