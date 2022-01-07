@@ -96,17 +96,35 @@ function cyclesOptimize(start){
             res[i].cycles.forEach(cycle => {
                 cycle[cycle.length - 2].cycle = true;
                 cycle[cycle.length - 2].__BREAK = true;
+                //cycle[cycle.length - 2].line.classList.add("a9");
             })
         }
     }
 
     res.forEach(cycleGroup => {
-        let lastCycle = cycleGroup.cycles[cycleGroup.cycles.length - 1];
+        let max = cycleGroup.cycles[0].length;
+        let maxCycle = cycleGroup.cycles[0];
+        for (let i = 1; i < cycleGroup.cycles.length; i++) {
+            let cycle = cycleGroup.cycles[i];
+            if(cycle.length > maxCycle.length){
+                maxCycle = cycle;
+                max = cycle.length;
+            }
+        }
+
+        //let lastCycle = cycleGroup.cycles[cycleGroup.cycles.length - 1];
+        let lastCycle = maxCycle;
+
         lastCycle[lastCycle.length - 2].cycle = false;
         lastCycle[lastCycle.length - 2].__BREAK = false;
+        //lastCycle[lastCycle.length - 2].line.classList.remove("a9");
+
         lastCycle[lastCycle.length - 2].__GET_POWER_FOR = [];
-        cycleGroup.cycles.slice(0, cycleGroup.cycles.length - 1).forEach(cycle => {
-            lastCycle[lastCycle.length - 2].__GET_POWER_FOR.push(cycle[cycle.length - 2]);
+
+        cycleGroup.cycles.forEach(cycle => {
+            if(lastCycle !== cycle){
+                lastCycle[lastCycle.length - 2].__GET_POWER_FOR.push(cycle[cycle.length - 2]);
+            }
         })
     })
     return res;
