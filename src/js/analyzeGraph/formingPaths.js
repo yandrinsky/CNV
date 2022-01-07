@@ -46,7 +46,7 @@ function loop(edge_arnold, edge, lines){
                 //     }
                 // }
             }
-            //test_1.line.classList.add("a2");
+            test_1.line.classList.add("a2");
             loop_children_obj.target = test_1;
             loop_children_obj.power = new Fraction(0);
             loop_powers_obj.ids = edge_arnold.__CYCLEPATH_IDS;
@@ -64,7 +64,7 @@ function loop(edge_arnold, edge, lines){
         round_count = 0;
         flag_3 = false;
         if(test_1.visited_3 === false){
-            ///test_1.line.classList.add("a2")
+            test_1.line.classList.add("a2")
             loop_children_obj.target = test_1;
             loop_children_obj.power = new Fraction(0);
             loop_powers_obj.ids = edge_arnold.__CYCLEPATH_IDS;
@@ -110,7 +110,7 @@ function loop(edge_arnold, edge, lines){
                 loop_children_obj = new L_C_O();
                 test_1.children[1].visited_3 = true;
                 round_count += 1;
-                //test_1 = test_1.children[1];
+                test_1 = test_1.children[1];
             }
             // for(let i = 0; i < test_1.children[1].children[0].__CYCLEPATH_IDS.length; i++){
             //     if(test_1.children[1].__CYCLEPATH_IDS !== undefined && (test_1.children[1].__CYCLEPATH_IDS[0] === test_1.children[1].children[0].__CYCLEPATH_IDS[i] && test_1.children[1].children[0].visited_3 === false)){
@@ -154,21 +154,37 @@ function branch_bypass(edge, test_path, path_2){
     //if(edge.__LOOPSTART) edge.line.classList.add("a5")
     if(edge.children[0] != undefined && (edge.children[0].visited === false || (edge.children[1] != undefined && edge.children[1].visited === false))){
         if(edge.children[1] != undefined){
-            if (edge.children[1].__CYCLEPATH && !edge.children[1].__LOOPSTART && edge.children[1].visited === false){
+            //if(edge.children[1].__BREAK) edge.children[1].line.classList.add("a5")
+            //if(edge.children[0].__BREAK) edge.children[0].line.classList.add("a5")
+            if ((edge.children[1].__CYCLEPATH && !edge.children[1].__LOOPSTART && edge.children[1].visited === false && (!edge.children[0].__BREAK || edge.children[0].visited === true) || (edge.children[1].__BREAK && edge.children[1].visited === false))){
                 edge = edge.children[1];
                 if (edge.visited_2 === false){
                     test_path.push(edge);
                     edge.visited_2 = true
                 }
                 path_2.push(edge);
+                //if(edge.__BREAK) edge.line.classList.add("a5")
+                if(edge.__BREAK){
+                    edge.visited = true;
+                    edge = edge.parents[0].children[0];
+                    test_path.push(edge);
+                    edge.visited_2 = true
+                }
             }
-            else if (edge.children[0].__CYCLEPATH && !edge.children[0].__LOOPSTART && edge.children[0].visited === false){
+            else if ((edge.children[0].__CYCLEPATH && !edge.children[0].__LOOPSTART && edge.children[0].visited === false) || (edge.children[0].__BREAK && edge.children[0].visited === false)){
                 edge = edge.children[0];
                 if (edge.visited_2 === false){
                     test_path.push(edge);
                     edge.visited_2 = true
                 }
                 path_2.push(edge);
+                //if(edge.__BREAK) edge.line.classList.add("a5")
+                if(edge.__BREAK){
+                    edge.visited = true;
+                    edge = edge.parents[0].children[1];
+                    test_path.push(edge);
+                    edge.visited_2 = true
+                }
             }
             else{
                 edge.children[0].other_priorities.sort(compareNumeric);
@@ -250,7 +266,7 @@ function branch_bypass(edge, test_path, path_2){
                 let flag_3 = false;
                 let flag_4 = false;
                 if(edge === edge.children[0].sideIn[i]){
-                    if(edge.__CYCLEEND) test_path.push(edge.children[0])
+                    if(edge.__CYCLEEND && !edge.__BREAK) test_path.push(edge.children[0])
                     //if(edge.__CYCLEEND) test_path.push(edge.children[0].children[0])
                     // if(edge.__CYCLEEND) test_path.push(edge)
                     // if(edge.__CYCLEEND) test_path.push(edge.children[0])
