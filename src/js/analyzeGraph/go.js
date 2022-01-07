@@ -2,6 +2,7 @@ import follow from "./follow";
 
 function go(paths){
     console.log("paths", paths);
+    let arnold_unpassed = 2;
     while(paths.length > 0){
         let successCount = 0;
         for (let i = 0; i < paths.length; i++) {
@@ -15,7 +16,7 @@ function go(paths){
                 } else {
                     paths[i].passed_count += 1;
                     console.log("here")
-                    if(paths[i].passed_count === 2){
+                    if(paths[i].passed_count === arnold_unpassed){
                         successCount += 1; //Оставь тут и мы не пройдём все пути из-за остановки GO, но вроде считаем арнольд в арнольд
                         paths[i].passed = true;
                         paths.splice(i, 1);
@@ -23,6 +24,7 @@ function go(paths){
                     }
                 }
             } else {
+                if(paths[i].cycle) arnold_unpassed += 1;
                 console.log("In go: follow returned false");
             }
         }
