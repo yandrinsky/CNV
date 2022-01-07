@@ -95,7 +95,7 @@ function step(target, power, lastTarget){
                             console.log("IN STEP DIVIDE!!!");
                             console.log("tch_child division before", tch_child.division.getStr());
 
-                            tch_child.division.multiply(target.children.length);
+                            tch_child.division.multiply(target.children.length * t_child.division.getNum());
 
                             console.log("tch_child.division after", tch_child.division.getStr());
                             targetChild.line.classList.add("a5");
@@ -109,7 +109,7 @@ function step(target, power, lastTarget){
                 target.children[0].loop_powers.forEach(child => {
                     target.loop_powers.forEach(parent => {
                         if(child.ids === parent.ids && child.start_line === parent.start_line && parent.division.getNum() > child.division.getNum()){
-                            console.log("SET DIVISION");
+                            console.log("SET DIVISION to", child.division.getStr(), "parent power ", parent.division.getStr());
                             child.division = parent.division.clone();
                         }
                     })
