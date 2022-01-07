@@ -75,31 +75,48 @@ function step(target, power, lastTarget){
         target.power = fullPower;
     }
 
+
+
     //Если элемент является элементов мыходной ветки из цикла
-    if(target.loop_powers && target.loop_powers.length > 0 && target.children.length > 1){
-        target.children.forEach(targetChild => {    //Пробегаемся по всем детям
-            targetChild.loop_powers.forEach(tch_child => { //Пробегаемся по всем мощностям ребёнка
-                console.log("targetChild.loop_powers.length", targetChild.loop_powers.length);
-                target.loop_powers.forEach(t_child => { //Пробегаемся по всем мощностям родителя
-                    console.log("target.loop_powers.length", target.loop_powers.length);
-                    console.log("target.loop_powers", target.loop_powers);
-                    target.line.classList.add("a9")
-                    //Если мощноти принадлежат к одному циклу и начальное ребро одно - делим мощность на количество детей
-                    if(tch_child.ids === t_child.ids && t_child.start_line === tch_child.start_line){
-                        //console.log("IN STEP DIVIDE!!!");
-                        //console.log("tch_child division before", tch_child.division?.getStr());
-                        tch_child.power.divide(target.children.length);
-                        if(!tch_child.division){
-                            tch_child.division = new Fraction(target.children.length)
-                        } else {
-                            tch_child.division.plus(target.children.length);
+
+
+
+    if(target.loop_powers && target.loop_powers.length > 0 ){
+        if(target.children.length > 1){
+            target.children.forEach(targetChild => {    //Пробегаемся по всем детям
+                targetChild.loop_powers.forEach(tch_child => { //Пробегаемся по всем мощностям ребёнка
+                    //console.log("targetChild.loop_powers.length", targetChild.loop_powers.length);
+                    target.loop_powers.forEach(t_child => { //Пробегаемся по всем мощностям родителя
+                        //console.log("target.loop_powers.length", target.loop_powers.length);
+                        console.log("target.loop_powers", target.loop_powers);
+                        target.line.classList.add("a9")
+                        //Если мощноти принадлежат к одному циклу и начальное ребро одно - делим мощность на количество детей
+                        if(tch_child.ids === t_child.ids && t_child.start_line === tch_child.start_line){
+                            console.log("IN STEP DIVIDE!!!");
+                            console.log("tch_child division before", tch_child.division.getStr());
+
+                            tch_child.division.multiply(target.children.length);
+
+                            console.log("tch_child.division after", tch_child.division.getStr());
+                            targetChild.line.classList.add("a5");
+
                         }
-                        //console.log("tch_child.power after", tch_child.division?.getStr());
-                        targetChild.line.classList.add("a5");
-                    }
+                    })
                 })
             })
-        })
+        } else if(target.children.length === 1){
+            if(target.children[0].loop_powers){
+                target.children[0].loop_powers.forEach(child => {
+                    target.loop_powers.forEach(parent => {
+                        if(child.ids === parent.ids && child.start_line === parent.start_line && parent.division.getNum() > child.division.getNum()){
+                            console.log("SET DIVISION");
+                            child.division = parent.division.clone();
+                        }
+                    })
+                })
+            }
+        }
+
     }
 
     //Уравнение арнольда

@@ -71,6 +71,9 @@ function analyze(lines){
             lines[key].__NOT_CIRCLE = undefined;
             lines[key].__CHECKED = undefined;
             lines[key].__LOOPSTART = undefined;
+            lines[key].__SIDEINPOWER_STEMP = undefined;
+            lines[key].loop_children = undefined;
+            lines[key].loop_powers = undefined;
             Store.state.cycles = undefined;
         }
 
@@ -91,6 +94,9 @@ function analyze(lines){
             lines[key].__NOT_CIRCLE = undefined;
             lines[key].__CHECKED = undefined;
             lines[key].__LOOPSTART = undefined;
+            lines[key].__SIDEINPOWER_STEMP = undefined;
+            lines[key].loop_children = undefined;
+            lines[key].loop_powers = undefined;
             Store.state.cycles = undefined;
         }
         console.error("Граф замкнут. Анализ невозможен", e);

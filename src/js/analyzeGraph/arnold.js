@@ -25,7 +25,7 @@ function arnold(target, lastTarget, power){
                         //пробегаемся по всем id мощности и находим совпадение с веткой арнольда (проверям, петля ли это)
                         for (let l = 0; l < loop_child.ids.length; l++) {
                             if(line.__CYCLEPATH_IDS.includes(loop_child.ids[l])){
-                                //console.log("ПЕТЛЯ!!!!!!!!!!", loop_child.power.getStr());
+                                console.log("ПЕТЛЯ!!!!!!!!!!", loop_child.power.getStr());
                                 flag = true;
                                 break;
                             }
@@ -33,9 +33,9 @@ function arnold(target, lastTarget, power){
                         if(flag){//Значит это петля.
                             //1) Вычитаем из мощности петли мощность родителя - арнольда. - это плюсуем в sideInSum
                             //2) Мощность родителя арнольда плюсуем в line.power
-                            // console.log("loop_child.power", loop_child.power.getStr());
-                            // console.log("line.sideIn[j].power", line.sideIn[j].power.getStr());
-                            // console.log("sideInSum before plus");
+                            console.log("loop_child.power", loop_child.power.getStr());
+                            console.log("line.sideIn[j].power", line.sideIn[j].power.getStr());
+                            console.log("sideInSum before plus");
                             sideInSum.plus(line.sideIn[j].power.clone().minus(loop_child.power)); // side += петля - вх.арнод;
                             line.power.plus(loop_child.power); //line += вх.арнольд
                             findSuccess = true;
@@ -68,7 +68,8 @@ function arnold(target, lastTarget, power){
                             division = power.division;
                         }
                     })
-                    if(division){
+                    if(division && division.getNum() !== 0){
+                        console.log("GOT DIVISION in ARNOLD", division.getStr());
                         formPower.divide(division);
                     }
                     child.power.plus(formPower); //Изначально child.power = 0;
@@ -133,6 +134,7 @@ function arnold(target, lastTarget, power){
                 //1) Вычитаем из линии петли мощность родителя - арнольда
                 //2) Умножаем переданную родителем арнольдом мощность на x
                 //3) Складываем мощность линии петли и новую пересчитанную мощность родителя
+                //child.target.line.classList.add("a2");
                 child.target.power.minus(child.power);
                 child.power.multiply(x);
                 child.target.power.plus(child.power);
