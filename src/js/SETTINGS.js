@@ -6,4 +6,6 @@ const SHOW_PATH = false //показать путь обхода
 const SHOW_CYCLES = false; //показать циклы
 const CONTROL_SUM_WARNING = true; //выводить предупреждение о контрольной сумме
 const SHOW_PRIORITIES = false;
-export {BRANCHES, STACK_LIMIT, SHOW_PATH, CONTROL_SUM_WARNING, STACK, SHOW_CYCLES, SHOW_PRIORITIES};
+const START_POWER = 25;
+const NUMERIC_POWER = false;
+export {BRANCHES, STACK_LIMIT, SHOW_PATH, CONTROL_SUM_WARNING, STACK, SHOW_CYCLES, SHOW_PRIORITIES, START_POWER, NUMERIC_POWER};

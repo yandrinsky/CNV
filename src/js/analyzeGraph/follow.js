@@ -1,6 +1,9 @@
 import Fraction from "../Fraction";
 import state from "./analyzeState";
 import step from "./step";
+import {NUMERIC_POWER, START_POWER} from "../SETTINGS";
+import calcPower from "./calcPower";
+
 
 function follow(path){
     let no_error = true;
@@ -19,7 +22,8 @@ function follow(path){
         if(flag){
             if(parent.power){
                 firstLastTarget = parent;
-                firstPower = new Fraction(parent.power.getNum(), parent.power.getDet() * parent.children.length);
+                //firstPower = new Fraction(parent.power.getNum(), parent.power.getDet() * parent.children.length);
+                firstPower = calcPower(parent);
                 break;
             } else {
                 no_error = false;
@@ -31,7 +35,7 @@ function follow(path){
 
     if(no_error){
         if(firstPower === undefined){
-            firstPower = new Fraction(1);
+            firstPower = NUMERIC_POWER ? new Fraction(START_POWER) : new Fraction(1);
         }
 
         if(path.length === 1){
@@ -48,7 +52,8 @@ function follow(path){
                 } else {
                     let parent = path[index - 1];
                     try{
-                        let res = step(line, new Fraction(parent.power.getNum(), parent.power.getDet() * parent.children.length), path[index - 1]);
+                        //let res = step(line, new Fraction(parent.power.getNum(), parent.power.getDet() * parent.children.length), path[index - 1]);
+                        let res = step(line, calcPower(parent), path[index - 1]);
                         if(res === false){
                             no_error = false;
                             break;

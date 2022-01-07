@@ -15,7 +15,7 @@ function go(paths){
                     i -= 1;
                 } else {
                     paths[i].passed_count += 1;
-                    console.log("here")
+                    //console.log("here")
                     if(paths[i].passed_count === arnold_unpassed){
                         successCount += 1; //Оставь тут и мы не пройдём все пути из-за остановки GO, но вроде считаем арнольд в арнольд
                         paths[i].passed = true;

@@ -60,6 +60,7 @@ function cyclesOptimize(start){
                                 let loopCycle = cyclePath.cycles[k];
                                 if(loopCycle.includes(child) && loopCycle.length > goingCycle.length){
                                     child.__LOOPSTART = true;
+                                    //child.line.classList.add("a2");
                                 }
                             }
                         }

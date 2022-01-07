@@ -6,7 +6,7 @@ import cyclesOptimize from "./cyclesOptimize";
 import state from "./analyzeState";
 import step from "./step";
 import { primary_bypass } from "./priority";
-import {CONTROL_SUM_WARNING, SHOW_CYCLES} from "../SETTINGS";
+import {CONTROL_SUM_WARNING, NUMERIC_POWER, SHOW_CYCLES, START_POWER} from "../SETTINGS";
 import showCycles from "./showCycles";
 import { forming_paths } from "./formingPaths";
 import follow from "./follow";
@@ -74,10 +74,11 @@ function analyze(lines){
             lines[key].__SIDEINPOWER_STEMP = undefined;
             lines[key].loop_children = undefined;
             lines[key].loop_powers = undefined;
+            lines[key].__MINUS_ONE = undefined;
             Store.state.cycles = undefined;
         }
 
-        if(controlSum.getStr() !== "1"){
+        if((NUMERIC_POWER && controlSum.getStr() !== String(START_POWER)) || (!NUMERIC_POWER && controlSum.getStr() !== "1")){
             if(CONTROL_SUM_WARNING){
                 alert("Критическая ошибка анализа пути: сумма выходов равна: " + controlSum.getStr());
             }
@@ -97,6 +98,7 @@ function analyze(lines){
             lines[key].__SIDEINPOWER_STEMP = undefined;
             lines[key].loop_children = undefined;
             lines[key].loop_powers = undefined;
+            lines[key].__MINUS_ONE = undefined;
             Store.state.cycles = undefined;
         }
         console.error("Граф замкнут. Анализ невозможен", e);

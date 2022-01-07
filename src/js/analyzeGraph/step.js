@@ -5,6 +5,7 @@ import CNV from "../CNV/library";
 import text from "./text";
 import {SHOW_PATH} from "../SETTINGS";
 import arnold from "./arnold";
+import calcPower from "./calcPower";
 
 
 function step(target, power, lastTarget){
@@ -61,8 +62,9 @@ function step(target, power, lastTarget){
         }
         //Флаг break нужен для того, чтобы обратывать множественные Арнольды. Ставится в функции optimizeCycles
         if(item.power && !item.__BREAK) { //Если мощность была, складываем её
-            console.log("PARENT POWER", new Fraction(item.power.getNum(), item.power.getDet() * item.children.length).getStr());
+            //console.log("PARENT POWER", new Fraction(item.power.getNum(), item.power.getDet() * item.children.length).getStr());
             fullPower.plus(item.power.getNum(), item.power.getDet() * item.children.length);
+            //fullPower.plus(calcPower(item));
         }
     }
 
@@ -165,7 +167,8 @@ function step(target, power, lastTarget){
             // })
         } else { //Иначе просто идём по всем нашим детям
             target.children.forEach(item => {
-                let transmittingPower= new Fraction(target.power.getNum(), target.power.getDet() * target.children.length)
+                //new Fraction(target.power.getNum(), target.power.getDet() * target.children.length)
+                let transmittingPower = calcPower(target);
                 step(item, transmittingPower, target);
             })
         }
