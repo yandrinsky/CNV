@@ -133,22 +133,11 @@ function arnold(target, lastTarget, power){
             line.loop_children.forEach(child => {
                 //1) Вычитаем из линии петли мощность родителя - арнольда
                 //2) Умножаем переданную родителем арнольдом мощность на x
-                //3) Складываем мощность линии петли и новую пересчитанную мощность родителя
-                //child.target.line.classList.add("a2");
                 if(child.target.power){
                     child.target.power.minus(child.power);
                     child.power.multiply(x);
                     child.target.power.plus(child.power);
                 }
-
-                // try{
-                //     child.target.power.minus(child.power);
-                //     child.power.multiply(x);
-                //     child.target.power.plus(child.power);
-                // } catch (e){
-                //     console.error(e);
-                //     child.target.line.classList.add("a6");
-                // }
 
             })
         }

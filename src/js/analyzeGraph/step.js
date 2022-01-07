@@ -61,6 +61,7 @@ function step(target, power, lastTarget){
         }
         //Флаг break нужен для того, чтобы обратывать множественные Арнольды. Ставится в функции optimizeCycles
         if(item.power && !item.__BREAK) { //Если мощность была, складываем её
+            console.log("PARENT POWER", new Fraction(item.power.getNum(), item.power.getDet() * item.children.length).getStr());
             fullPower.plus(item.power.getNum(), item.power.getDet() * item.children.length);
         }
     }
@@ -86,39 +87,43 @@ function step(target, power, lastTarget){
             target.children.forEach(targetChild => {    //Пробегаемся по всем детям
                 targetChild.loop_powers.forEach(tch_child => { //Пробегаемся по всем мощностям ребёнка
                     //console.log("targetChild.loop_powers.length", targetChild.loop_powers.length);
-                    target.loop_powers.forEach(t_child => { //Пробегаемся по всем мощностям родителя
-                        //console.log("target.loop_powers.length", target.loop_powers.length);
-                        console.log("target.loop_powers", target.loop_powers);
-                        target.line.classList.add("a9")
-                        //Если мощноти принадлежат к одному циклу и начальное ребро одно - делим мощность на количество детей
-                        if(tch_child.ids === t_child.ids && t_child.start_line === tch_child.start_line){
-                            console.log("IN STEP DIVIDE!!!");
-                            console.log("tch_child division before", tch_child.division.getStr());
+                    if(!tch_child.__BLOCK){
+                        target.loop_powers.forEach(t_child => { //Пробегаемся по всем мощностям родителя
+                            //console.log("target.loop_powers.length", target.loop_powers.length);
+                            console.log("target.loop_powers", target.loop_powers);
+                            target.line.classList.add("a9")
+                            //Если мощноти принадлежат к одному циклу и начальное ребро одно - делим мощность на количество детей
+                            if(tch_child.ids === t_child.ids && t_child.start_line === tch_child.start_line){
+                                console.log("IN STEP DIVIDE!!!");
+                                console.log("tch_child division before", tch_child.division.getStr());
 
-                            tch_child.division.multiply(target.children.length * t_child.division.getNum());
+                                tch_child.division.multiply(target.children.length * t_child.division.getNum());
+                                tch_child.__BLOCK = true;
+                                console.log("tch_child.division after", tch_child.division.getStr());
+                                targetChild.line.classList.add("a5");
 
-                            console.log("tch_child.division after", tch_child.division.getStr());
-                            targetChild.line.classList.add("a5");
-
-                        }
-                    })
+                            }
+                        })
+                    }
                 })
             })
-        } else if(target.children.length === 1){
+        } else if(target.children.length === 1 && !target.__CYCLEIN){
             if(target.children[0].loop_powers){
                 target.children[0].loop_powers.forEach(child => {
                     target.loop_powers.forEach(parent => {
-                        if(target.children[0].sideIn.includes(target)){
-                            console.log("SIDE INNNNNNNNNNNNNNNNNNNNNNN before", child.division.getStr());
-                            child.division.plus(parent.division).divide(target.children[0].parents.length);
-                            console.log("SIDE INNNNNNNNNNNNNNNNNNNNNNN after", child.division.getStr());
-                        } else {
-                            if(child.ids === parent.ids && child.start_line === parent.start_line && parent.division.getNum() > child.division.getNum()){
-                                console.log("SET DIVISION to", child.division.getStr(), "parent power ", parent.division.getStr());
-                                child.division = parent.division.clone();
+                        if(!child.__BLOCK){
+                            if(target.children[0].sideIn.includes(target)){
+                                console.log("SIDE INNNNNNNNNNNNNNNNNNNNNNN before", child.division.getStr());
+                                child.division.plus(parent.division).divide(target.children[0].parents.length ** target.children[0].parents.length);
+                                console.log("SIDE INNNNNNNNNNNNNNNNNNNNNNN after", child.division.getStr());
+                                child.__BLOCK = true
+                            } else {
+                                if(child.ids === parent.ids && child.start_line === parent.start_line && parent.division.getNum() > child.division.getNum()){
+                                    console.log("SET DIVISION to", child.division.getStr(), "parent power ", parent.division.getStr());
+                                    child.division = parent.division.clone();
+                                }
                             }
                         }
-
                     })
                 })
             }
@@ -134,6 +139,8 @@ function step(target, power, lastTarget){
     target.already = true; //Ставим флаг, что мы прошли эту грань
 
     if(target.children.length === 0){ //Если детей нет, значит это выход и нужно записать результат
+        // console.log("FINISH ZONE ", target.power.getStr());
+        // console.log("FINISH last target power ", lastTarget.children[0].power.getStr());
         CNV.preventRender(() => target.line.classList.add("finishLine"));
         text({target, output: state.results})
     }
