@@ -75,8 +75,7 @@ function step(target, power, lastTarget){
 
     if(target.__GET_POWER_FOR){ //Если есть этот массив, значит заберём все мощности из элементов массива (подробнее в файле)
         target.__GET_POWER_FOR.forEach(item => {
-           // fullPower.plus(item.power.getNum(), item.power.getDet() * item.children.length);
-           fullPower.plus(item, target);
+           fullPower.plus(item.power.clone().divide(item.children.length));
         })
     }
 

@@ -49,9 +49,9 @@ function analyze(lines){
     test = forming_paths(lines);
     try{
         //for(let i = 0; i < test.length; i++) follow(test[i].path);
-        go(test);
+        //go(test);
         //Запускаем анализ входной точки (грани, у которой нет родителя)
-        //step(startLines[0], new Fraction(1));
+        step(startLines[0], new Fraction(1));
         CNV.render(); //Отрисовываем изменения, проишедшие во время анализа графа
         for(let key in state.results){ //Отрисовываем значения у выходов графа
             if(!state.results[key].auxiliary){
