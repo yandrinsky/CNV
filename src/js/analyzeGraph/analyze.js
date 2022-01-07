@@ -76,6 +76,12 @@ function analyze(lines){
             lines[key].loop_powers = undefined;
             lines[key].__MINUS_ONE = undefined;
             Store.state.cycles = undefined;
+            lines[key].visited_2 = undefined;
+            lines[key].visited_3 = undefined;
+            lines[key].bypass_priority = undefined;
+            lines[key].branch_index = undefined;
+            lines[key].other_priorities = undefined;
+            lines[key].visited = undefined;
         }
 
         if((NUMERIC_POWER && controlSum.getStr() !== String(START_POWER)) || (!NUMERIC_POWER && controlSum.getStr() !== "1")){
@@ -100,6 +106,12 @@ function analyze(lines){
             lines[key].loop_powers = undefined;
             lines[key].__MINUS_ONE = undefined;
             Store.state.cycles = undefined;
+            lines[key].visited_2 = undefined;
+            lines[key].visited_3 = undefined;
+            lines[key].bypass_priority = undefined;
+            lines[key].branch_index = undefined;
+            lines[key].other_priorities = undefined;
+            lines[key].visited = undefined;
         }
         console.error("Граф замкнут. Анализ невозможен", e);
     }
