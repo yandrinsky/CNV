@@ -63,14 +63,20 @@ function step(target, power, lastTarget){
         //Флаг break нужен для того, чтобы обратывать множественные Арнольды. Ставится в функции optimizeCycles
         if(item.power && !item.__BREAK) { //Если мощность была, складываем её
             //console.log("PARENT POWER", new Fraction(item.power.getNum(), item.power.getDet() * item.children.length).getStr());
-            fullPower.plus(item.power.getNum(), item.power.getDet() * item.children.length);
-            //fullPower.plus(calcPower(item));
+            //fullPower.plus(item.power.getNum(), item.power.getDet() * item.children.length);
+            if(item !== lastTarget){
+                fullPower.plus(calcPower(item, target));
+            } else {
+                fullPower.plus(power);
+            }
+
         }
     }
 
     if(target.__GET_POWER_FOR){ //Если есть этот массив, значит заберём все мощности из элементов массива (подробнее в файле)
         target.__GET_POWER_FOR.forEach(item => {
-            fullPower.plus(item.power.getNum(), item.power.getDet() * item.children.length);
+           // fullPower.plus(item.power.getNum(), item.power.getDet() * item.children.length);
+           fullPower.plus(item, target);
         })
     }
 
@@ -168,7 +174,7 @@ function step(target, power, lastTarget){
         } else { //Иначе просто идём по всем нашим детям
             target.children.forEach(item => {
                 //new Fraction(target.power.getNum(), target.power.getDet() * target.children.length)
-                let transmittingPower = calcPower(target);
+                let transmittingPower = calcPower(target, item);
                 step(item, transmittingPower, target);
             })
         }

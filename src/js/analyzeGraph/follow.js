@@ -23,7 +23,7 @@ function follow(path){
             if(parent.power){
                 firstLastTarget = parent;
                 //firstPower = new Fraction(parent.power.getNum(), parent.power.getDet() * parent.children.length);
-                firstPower = calcPower(parent);
+                firstPower = calcPower(parent, path[0]);
                 break;
             } else {
                 no_error = false;
@@ -53,7 +53,7 @@ function follow(path){
                     let parent = path[index - 1];
                     try{
                         //let res = step(line, new Fraction(parent.power.getNum(), parent.power.getDet() * parent.children.length), path[index - 1]);
-                        let res = step(line, calcPower(parent), path[index - 1]);
+                        let res = step(line, calcPower(parent, line), path[index - 1]);
                         if(res === false){
                             no_error = false;
                             break;

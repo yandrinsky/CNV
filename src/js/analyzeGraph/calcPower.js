@@ -1,14 +1,35 @@
 import {NUMERIC_POWER} from "../SETTINGS";
 
-function calcPower(parent){
+// function calcPower(parent){
+//     if(NUMERIC_POWER){
+//         let power = parent.power.clone().divide(parent.children.length);
+//         if(power.getDet() === 2){
+//             if(parent.__MINUS_ONE){
+//                 power = parent.power.clone().minus(parent.power.clone().minus(1).divide(parent.children.length));
+//             } else {
+//                 power = parent.power.clone().minus(1).divide(parent.children.length);
+//                 parent.__MINUS_ONE = true;
+//             }
+//         }
+//         console.log("calcPower result", power.getStr());
+//         return power;
+//     } else{
+//         return parent.power.clone().divide(parent.children.length);
+//     }
+//
+// }
+
+function calcPower(parent, children){
     if(NUMERIC_POWER){
         let power = parent.power.clone().divide(parent.children.length);
         if(power.getDet() === 2){
-            if(parent.__MINUS_ONE){
+            if(parent.__MINUS_ONE && parent.__MINUS_ONE === children){
+                power = parent.power.clone().minus(1).divide(parent.children.length);
+            } else if(parent.__MINUS_ONE && parent.__MINUS_ONE !== children){
                 power = parent.power.clone().minus(parent.power.clone().minus(1).divide(parent.children.length));
             } else {
                 power = parent.power.clone().minus(1).divide(parent.children.length);
-                parent.__MINUS_ONE = true;
+                parent.__MINUS_ONE = children;
             }
         }
         console.log("calcPower result", power.getStr());
