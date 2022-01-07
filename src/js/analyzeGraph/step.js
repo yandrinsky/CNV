@@ -108,10 +108,17 @@ function step(target, power, lastTarget){
             if(target.children[0].loop_powers){
                 target.children[0].loop_powers.forEach(child => {
                     target.loop_powers.forEach(parent => {
-                        if(child.ids === parent.ids && child.start_line === parent.start_line && parent.division.getNum() > child.division.getNum()){
-                            console.log("SET DIVISION to", child.division.getStr(), "parent power ", parent.division.getStr());
-                            child.division = parent.division.clone();
+                        if(target.children[0].sideIn.includes(target)){
+                            console.log("SIDE INNNNNNNNNNNNNNNNNNNNNNN before", child.division.getStr());
+                            child.division.plus(parent.division).divide(target.children[0].parents.length);
+                            console.log("SIDE INNNNNNNNNNNNNNNNNNNNNNN after", child.division.getStr());
+                        } else {
+                            if(child.ids === parent.ids && child.start_line === parent.start_line && parent.division.getNum() > child.division.getNum()){
+                                console.log("SET DIVISION to", child.division.getStr(), "parent power ", parent.division.getStr());
+                                child.division = parent.division.clone();
+                            }
                         }
+
                     })
                 })
             }

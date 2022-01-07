@@ -135,9 +135,21 @@ function arnold(target, lastTarget, power){
                 //2) Умножаем переданную родителем арнольдом мощность на x
                 //3) Складываем мощность линии петли и новую пересчитанную мощность родителя
                 //child.target.line.classList.add("a2");
-                child.target.power.minus(child.power);
-                child.power.multiply(x);
-                child.target.power.plus(child.power);
+                if(child.target.power){
+                    child.target.power.minus(child.power);
+                    child.power.multiply(x);
+                    child.target.power.plus(child.power);
+                }
+
+                // try{
+                //     child.target.power.minus(child.power);
+                //     child.power.multiply(x);
+                //     child.target.power.plus(child.power);
+                // } catch (e){
+                //     console.error(e);
+                //     child.target.line.classList.add("a6");
+                // }
+
             })
         }
     }
