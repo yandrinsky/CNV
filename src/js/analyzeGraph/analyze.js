@@ -1,120 +1,82 @@
 import CNV from "../CNV/library";
 import Fraction from "../Fraction";
-import findCycles from "./fincCycles";
-import Store from "../Store";
-import cyclesOptimize from "./cyclesOptimize";
 import state from "./analyzeState";
-import step from "./step";
-import { primary_bypass } from "./priority";
 import {CONTROL_SUM_WARNING, NUMERIC_POWER, SHOW_CYCLES, START_POWER} from "../SETTINGS";
-import showCycles from "./showCycles";
-import { forming_paths } from "./formingPaths";
-import follow from "./follow";
-import go from "./go";
+import Iteration from "../gause";
+import text from "./text";
 
 
 
-function analyze(lines){
-    CNV.combineRender(()=> {
+function analyze(lines) {
+    CNV.combineRender(() => {
         CNV.querySelectorAll(".finishLine").forEach(item => item.classList.remove("finishLine"));
     })
-    
+
     state.results = {};
+    let newLines = Object.keys(lines).map(key => {
+        return lines[key];
+    });
 
     let startLines = [];
+    let finishLines = [];
     let controlSum = new Fraction(0);
 
 
-    for(let key in lines){ //Считаем количество точек входа
-        if(lines[key].parents.length === 0){
+    for (let key in lines) { //Считаем количество точек входа
+        if (lines[key].parents.length === 0) {
             startLines.push(lines[key])
         }
+        if (lines[key].children.length === 0) {
+            finishLines.push(lines[key]);
+        }
     }
-    if(startLines.length > 1){
+    if (startLines.length > 1) {
         alert("Путь имеет разрывы. Анализ невозможен");
         console.log(startLines)
         return;
     }
 
-    Store.state.cycles = findCycles(startLines[0]); //находим циклы
-    state.cycles = Store.state.cycles;
+    let m = [];
 
-    cyclesOptimize(startLines[0]) //Оптимизируем циклы (подробнее в файле)
+    newLines.forEach((item, index) => {
+        let arr = [];
+        for (let i = 0; i <= newLines.length; i++) {
+            arr.push(new Fraction(0));
+        }
+        item.parents.forEach(parent => {
+            arr[newLines.indexOf(parent)] = new Fraction(1, -parent.children.length);
+        })
+        arr[newLines.indexOf(item)] = new Fraction(1);
+        if (item === startLines[0]) {
+            arr[arr.length - 1] = new Fraction(1);
+        }
+        m.push(arr);
+    })
 
-    if(SHOW_CYCLES){
-        showCycles(startLines[0]); //Показываем циклы цветами - по желанию
+    let answers = Iteration(m);
+
+    newLines.forEach((line, index) => {
+        line.power = answers[index];
+    })
+
+    finishLines.forEach(line => {
+        line.line.classList.add("finishLine");
+        text({target: line, output: state.results});
+    })
+
+
+    CNV.render(); //Отрисовываем изменения, проишедшие во время анализа графа
+    for (let key in state.results) { //Отрисовываем значения у выходов графа
+        if (!state.results[key].auxiliary) {
+            controlSum.plus(state.results[key].data.num, state.results[key].data.det);
+        }
+        CNV.text(state.results[key])
+
     }
-    let test = [];
-    primary_bypass(lines);
-    test = forming_paths(lines);
-    try{
-        //for(let i = 0; i < test.length; i++) follow(test[i].path);
-        go(test);
-        //Запускаем анализ входной точки (грани, у которой нет родителя)
-        //step(startLines[0], new Fraction(1));
-        CNV.render(); //Отрисовываем изменения, проишедшие во время анализа графа
-        for(let key in state.results){ //Отрисовываем значения у выходов графа
-            if(!state.results[key].auxiliary){
-                controlSum.plus(state.results[key].data.num, state.results[key].data.det);
-            }
-            CNV.text(state.results[key])
-
+    if ((NUMERIC_POWER && controlSum.getStr() !== String(START_POWER)) || (!NUMERIC_POWER && controlSum.getStr() !== "1")) {
+        if (CONTROL_SUM_WARNING) {
+            alert("Критическая ошибка анализа пути: сумма выходов равна: " + controlSum.getStr());
         }
-        for(let key in lines){
-            //Чистим за собой после окончания работы
-            lines[key].power = undefined;
-            lines[key].already = undefined;
-            lines[key].cycle = undefined;
-            lines[key].__BREAK = undefined;
-            lines[key].__GET_POWER_FOR = undefined;
-            lines[key].__CYCLEEND = undefined;
-            lines[key].__NOT_CIRCLE = undefined;
-            lines[key].__CHECKED = undefined;
-            lines[key].__LOOPSTART = undefined;
-            lines[key].__SIDEINPOWER_STEMP = undefined;
-            lines[key].loop_children = undefined;
-            lines[key].loop_powers = undefined;
-            lines[key].__MINUS_ONE = undefined;
-            Store.state.cycles = undefined;
-            lines[key].visited_2 = undefined;
-            lines[key].visited_3 = undefined;
-            lines[key].bypass_priority = undefined;
-            lines[key].branch_index = undefined;
-            lines[key].other_priorities = undefined;
-            lines[key].visited = undefined;
-        }
-
-        if((NUMERIC_POWER && controlSum.getStr() !== String(START_POWER)) || (!NUMERIC_POWER && controlSum.getStr() !== "1")){
-            if(CONTROL_SUM_WARNING){
-                alert("Критическая ошибка анализа пути: сумма выходов равна: " + controlSum.getStr());
-            }
-        }
-    } catch (e){
-        for(let key in lines){
-            //Чиститим за собой даже если что-то пошло не так.
-            lines[key].power = undefined;
-            lines[key].already = undefined;
-            lines[key].cycle = undefined;
-            lines[key].__BREAK = undefined;
-            lines[key].__CYCLEEND = undefined;
-            lines[key].__GET_POWER_FOR = undefined;
-            lines[key].__NOT_CIRCLE = undefined;
-            lines[key].__CHECKED = undefined;
-            lines[key].__LOOPSTART = undefined;
-            lines[key].__SIDEINPOWER_STEMP = undefined;
-            lines[key].loop_children = undefined;
-            lines[key].loop_powers = undefined;
-            lines[key].__MINUS_ONE = undefined;
-            Store.state.cycles = undefined;
-            lines[key].visited_2 = undefined;
-            lines[key].visited_3 = undefined;
-            lines[key].bypass_priority = undefined;
-            lines[key].branch_index = undefined;
-            lines[key].other_priorities = undefined;
-            lines[key].visited = undefined;
-        }
-        console.error("Граф замкнут. Анализ невозможен", e);
     }
 }
-
 export default analyze;
