@@ -130,3 +130,25 @@ window.onresize = (e) => {
     CNV.render();
 }
 zHandlers();
+
+CNV.curve("black");
+
+
+window.addEventListener("mousemove", e => {
+    let mouse = {x: e.clientX, y: e.clientY};
+    let line = {
+        start: {x: 188, y: 150},
+        end: {x: 388, y: 200},
+        check: {x: 10, y: 10}
+    }
+    if(inInLine(line, mouse)){
+        CNV.curve("red");
+    } else {
+        CNV.curve("black");
+    }
+})
+
+
+function inInLine(){
+
+}

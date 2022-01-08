@@ -76,6 +76,15 @@ const CNV = {
         return shape;
     },
 
+    curve(color){
+        this.context.beginPath();
+        this.context.moveTo(188, 150);
+        this.context.quadraticCurveTo(10, 10, 388, 200);
+        this.context.lineWidth = 3;
+        this.context.strokeStyle = color;
+        this.context.stroke();
+    },
+
     createCircle(config){
         let id = uniqueId();
         if(config.className){
