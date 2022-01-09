@@ -84,7 +84,7 @@ function firstDraw() {
     }
 }
 
-firstDraw();
+//firstDraw();
 
 
 delLineBtn.onclick = e => {
@@ -131,24 +131,64 @@ window.onresize = (e) => {
 }
 zHandlers();
 
-CNV.curve("black");
 
 
-window.addEventListener("mousemove", e => {
+// window.addEventListener("mousemove", e => {
+//     let mouse = {x: e.clientX, y: e.clientY};
+//     let line = {
+//         start: {x: 188, y: 150},
+//         end: {x: 388, y: 200},
+//         check: {x: 10, y: 10}
+//     }
+//     if(inInLine(line, mouse)){
+//         CNV.curve("red");
+//     } else {
+//         CNV.curve("black");
+//     }
+// })
+
+
+// function inInLine(line, mouse){
+//     let t = 0;
+//     let x = 0;
+//     let y = 0;
+//     let flag = false;
+//     while(t <= 1){
+//         x = Math.pow((1 - t), 2)*line.start.x + 2*(1 - t)*t*line.check.x + Math.pow(t, 2)*line.end.x;
+//         y = Math.pow((1 - t), 2)*line.start.y + 2*(1 - t)*t*line.check.y + Math.pow(t, 2)*line.end.y;
+//         x = Math.round(x)
+//         y = Math.round(y)
+//         for(let i = 0; i < 9; i++){
+//             if((x+i) === mouse.x && (y+i) === mouse.y) flag = true;
+//             if((x-i) === mouse.x && (y-i) === mouse.y) flag = true;
+//         }
+//         t += 0.001;
+//     }
+//     return flag;
+// }
+
+
+let line = {
+    start: {x: 188, y: 150},
+    end: {x: 388, y: 200},
+    check: {x: 10, y: 10}
+}
+
+
+CNV.curve("black", line);
+
+
+window.addEventListener("click", e => {
     let mouse = {x: e.clientX, y: e.clientY};
-    let line = {
-        start: {x: 188, y: 150},
-        end: {x: 388, y: 200},
-        check: {x: 10, y: 10}
-    }
-    if(inInLine(line, mouse)){
-        CNV.curve("red");
-    } else {
-        CNV.curve("black");
+
+    let res = getCheckCoords(line, mouse);
+    if(res){
+        line.check = res;
+        CNV.curve("black", line);
     }
 })
 
 
-function inInLine(){
+function getCheckCoords(line, mouse){
 
 }

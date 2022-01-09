@@ -7,6 +7,7 @@ import dragCanvas from "./Engine/dragCanvas";
 import Shape from "./Engine/Shape";
 import render from "./Engine/render/render";
 import Store from "./Store";
+import clearCanvas from "./Engine/render/clearCanvas";
 
 const CNV = {
     state: Store.getState(),
@@ -76,10 +77,16 @@ const CNV = {
         return shape;
     },
 
-    curve(color){
+    curve(color, line){
+        clearCanvas({
+            backgroundColor: "white",
+            context: this.context,
+            canvas: this.canvas,
+        })
         this.context.beginPath();
-        this.context.moveTo(188, 150);
-        this.context.quadraticCurveTo(10, 10, 388, 200);
+        this.context.moveTo(line.start.x, line.start.y);
+        this.context.quadraticCurveTo(line.check.x, line.check.y, line.end.x, line.end.y);
+        //this.context.quadraticCurveTo(188, 150, 388, 150);
         this.context.lineWidth = 3;
         this.context.strokeStyle = color;
         this.context.stroke();
