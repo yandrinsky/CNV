@@ -4,6 +4,41 @@ import {addEdge, createEdge} from "./graphHandlers";
 import drawingLine from "./drawingLine";
 import {BRANCHES} from "./SETTINGS";
 
+function getBlackPointCoord(line){
+    let t = 0.5;
+    let x = 0;
+    let y = 0;
+    let black_point_coord = {
+        x: undefined,
+        y:undefined,
+    }
+    x = Math.pow((1 - t), 2)*line.start.x + 2*(1 - t)*t*line.check.x + Math.pow(t, 2)*line.end.x;
+    y = Math.pow((1 - t), 2)*line.start.y + 2*(1 - t)*t*line.check.y + Math.pow(t, 2)*line.end.y;
+    x = Math.round(x)
+    y = Math.round(y)
+    black_point_coord.x = x;
+    black_point_coord.y = y;
+    return black_point_coord;
+}
+
+function getCheckCoords(line, mouse){
+    let t = 0.5;
+    let x = 0;
+    let y = 0;
+    let check_line_coord = {
+        x: undefined,
+        y:undefined,
+    }
+    let flag = false;
+    x = (mouse.x - Math.pow((1 - t), 2)*line.start.x - Math.pow(t, 2)*line.end.x)/(2*(1-t)*t);
+    y = (mouse.y - Math.pow((1 - t), 2)*line.start.y - Math.pow(t, 2)*line.end.y)/(2*(1-t)*t);
+    x = Math.round(x)
+    y = Math.round(y)
+    check_line_coord.x = x;
+    check_line_coord.y = y;
+    return check_line_coord;
+}
+
 function resetAllEndCircleClick(){
     Object.keys(store.state.lines).forEach(key => {
         store.state.lines[key].endCircle.onclick = undefined;
@@ -107,11 +142,25 @@ function setStickToTailHandler(currentData){
                 setTimeout(()=> {
                     data.line.onclick = e => {
                         data.line.classList.remove("stickyLine");
-                        const coords = data.line.system.moveTo(data.line.system.length / 2, data.line.system.coordinates.x1);
+
+                        let coords;
+                        if(data.line.link.start.x === data.line.link.check.x && data.line.link.start.y === data.line.link.check.y){
+                            coords = data.line.system.moveTo(data.line.system.length / 2, data.line.system.coordinates.x1);
+                        } else {
+                            coords = getBlackPointCoord({
+                                start: data.line.link.start,
+                                end: data.line.link.end,
+                                check: data.line.link.check,
+                            })
+                        }
+
                         currentData.line.update.endPosition.x = coords.x;
                         currentData.line.update.endPosition.y = coords.y;
                         currentData.endCircle.update.startPosition.x = coords.x;
                         currentData.endCircle.update.startPosition.y = coords.y;
+
+
+
                         currentData.endCircle.classList.add("hidden");
                         currentData.__NOT_CIRCLE = true;
 
@@ -152,5 +201,5 @@ function setStickToTailHandler(currentData){
 
 export {
     lineMouseEnter, lineMouseLeave, endCircleMouseEnter, endCircleMouseLeave, setAllEndCircleClick,
-    resetAllEndCircleClick, endCircleClick, setStickToTailHandler, resetStickToTailHandler
+    resetAllEndCircleClick, endCircleClick, setStickToTailHandler, resetStickToTailHandler, getCheckCoords, getBlackPointCoord
 }

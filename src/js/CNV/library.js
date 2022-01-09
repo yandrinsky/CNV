@@ -63,6 +63,10 @@ const CNV = {
                 x: config.x1,
                 y: config.y1,
             },
+            check: {
+                x: config.x0,
+                y: config.y0,
+            },
             type: "line",
             id,
             classList: config.className ? [config.className] : [],

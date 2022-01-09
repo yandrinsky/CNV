@@ -1,6 +1,6 @@
 import gause from "./gause";
 const BRANCHES = 2; //Количество линий, которые могут выходить из конца прошлой
-const STACK_LIMIT = 7; //максимальное количество сохранений в stack
+const STACK_LIMIT = 10; //максимальное количество сохранений в stack
 const STACK = true; //сохранине в stack изменений
 const SHOW_PATH = false //показать путь обхода
 const SHOW_CYCLES = false; //показать циклы

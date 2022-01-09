@@ -49,6 +49,8 @@ function mouseMoveEngine(e){
                     y1: link.start.y + this.state.shift.y,
                     x2: link.end?.x + this.state.shift.x || link.start.x + this.state.shift.x,
                     y2: link.end?.y + this.state.shift.y || link.start.y + this.state.shift.y,
+                    x3: link.check?.x + this.state.shift.x || link.start.x + this.state.shift.x,
+                    y3: link.check?.y + this.state.shift.y || link.start.y + this.state.shift.y,
                 }, successCallback.bind(this, link, e),
                 failCallback.bind(this, link, e)
             )

@@ -7,12 +7,15 @@ function pointer(line, context, shift){
         y0: line.start.y + shift.y,
         x1: line.end.x + shift.x,
         y1: line.end.y + shift.y,
+        x2: line.check.x + shift.x,
+        y2: line.check.y + shift.y,
     }
 
     //Чтобы срелочки после выхода за границы экрана не творили дичь
     if(config.x1 < 3) return;
 
-    let eqInit = getEquationFor2points(config.x0, config.y0, config.x1, config.y1);
+    let eqInit = getEquationFor2points(config.x2, config.y2, config.x1, config.y1);
+    //let eqInit = getEquationFor2points(config.x0, config.y0, config.x1, config.y1);
     let linePosition = moveTo(eqInit, -10);
     let equation = getEquationForLine(linePosition.x, linePosition.y, eqInit);
     let len = 50;
@@ -34,7 +37,7 @@ function pointer(line, context, shift){
 function pointersRender(props){
     //console.log(CNV);
     CNV.querySelectorAll("line").forEach(shape => {
-        if(shape.isPointer){
+        if(shape.isPointer ){
             pointer(shape.link, props.context, props.shift);
         }
     })

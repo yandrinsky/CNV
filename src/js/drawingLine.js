@@ -3,6 +3,7 @@ import {endCircleClick, resetStickToTailHandler, setStickToTailHandler} from "./
 import store from "./Store";
 import save from "./storage/save";
 import {STACK} from "./SETTINGS";
+import Store from "./Store";
 
 function drawingLine(data, finishCallback = () => {}){
     function stopDrawing(e){
@@ -20,6 +21,10 @@ function drawingLine(data, finishCallback = () => {}){
             //Сохраняем изменения в стек
             store.addToStack(save({dont_save: true}));
         }
+
+        CNV.querySelectorAll(".black").forEach(item => {
+            item.classList.remove("black");
+        })
     }
 
     function drawing(e){

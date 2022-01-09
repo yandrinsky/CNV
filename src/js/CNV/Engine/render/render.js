@@ -4,6 +4,8 @@ import lineRender from "./lineRender";
 import circleRender from "./circleRender";
 import pointersRender from "./pointersRender";
 
+
+
 //props: elements, css, context, canvas, shift
 function render(props){
     clearCanvas({
