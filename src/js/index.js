@@ -131,43 +131,6 @@ window.onresize = (e) => {
 }
 zHandlers();
 
-
-
-// window.addEventListener("mousemove", e => {
-//     let mouse = {x: e.clientX, y: e.clientY};
-//     let line = {
-//         start: {x: 188, y: 150},
-//         end: {x: 388, y: 200},
-//         check: {x: 10, y: 10}
-//     }
-//     if(inInLine(line, mouse)){
-//         CNV.curve("red");
-//     } else {
-//         CNV.curve("black");
-//     }
-// })
-
-
-// function inInLine(line, mouse){
-//     let t = 0;
-//     let x = 0;
-//     let y = 0;
-//     let flag = false;
-//     while(t <= 1){
-//         x = Math.pow((1 - t), 2)*line.start.x + 2*(1 - t)*t*line.check.x + Math.pow(t, 2)*line.end.x;
-//         y = Math.pow((1 - t), 2)*line.start.y + 2*(1 - t)*t*line.check.y + Math.pow(t, 2)*line.end.y;
-//         x = Math.round(x)
-//         y = Math.round(y)
-//         for(let i = 0; i < 9; i++){
-//             if((x+i) === mouse.x && (y+i) === mouse.y) flag = true;
-//             if((x-i) === mouse.x && (y-i) === mouse.y) flag = true;
-//         }
-//         t += 0.001;
-//     }
-//     return flag;
-// }
-
-
 let line = {
     start: {x: 188, y: 150},
     end: {x: 388, y: 200},
@@ -176,6 +139,40 @@ let line = {
 
 
 CNV.curve("black", line);
+
+
+window.addEventListener("mousemove", e => {
+    let mouse = {x: e.clientX, y: e.clientY};
+
+    if(inInLine(line, mouse)){
+        CNV.curve("red", line);
+    } else {
+        CNV.curve("black", line);
+    }
+})
+
+
+function inInLine(line, mouse){
+    let t = 0;
+    let x = 0;
+    let y = 0;
+    let flag = false;
+    while(t <= 1){
+        x = Math.pow((1 - t), 2)*line.start.x + 2*(1 - t)*t*line.check.x + Math.pow(t, 2)*line.end.x;
+        y = Math.pow((1 - t), 2)*line.start.y + 2*(1 - t)*t*line.check.y + Math.pow(t, 2)*line.end.y;
+        x = Math.round(x)
+        y = Math.round(y)
+        for(let i = 0; i < 9; i++){
+            if((x+i) === mouse.x && (y+i) === mouse.y) flag = true;
+            if((x-i) === mouse.x && (y-i) === mouse.y) flag = true;
+        }
+        t += 0.001;
+    }
+    return flag;
+}
+
+
+
 
 
 window.addEventListener("click", e => {
@@ -190,5 +187,19 @@ window.addEventListener("click", e => {
 
 
 function getCheckCoords(line, mouse){
-
+    let t = 0.5;
+    let x = 0;
+    let y = 0;
+    let check_line_coord = {
+        x: undefined,
+        y:undefined,
+    }
+    let flag = false;
+    x = (mouse.x - Math.pow((1 - t), 2)*line.start.x - Math.pow(t, 2)*line.end.x)/(2*(1-t)*t);
+    y = (mouse.y - Math.pow((1 - t), 2)*line.start.y - Math.pow(t, 2)*line.end.y)/(2*(1-t)*t);
+    x = Math.round(x)
+    y = Math.round(y)
+    check_line_coord.x = x;
+    check_line_coord.y = y;
+    return check_line_coord;
 }
