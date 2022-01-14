@@ -91,20 +91,21 @@ class Shape{
                 }
             },
             get endPosition (){
-                return {
-                    set x(x){
-                        link.end.x = x;
-                        CNV.render();
-                    },
-                    set y(y){
-                        link.end.y = y;
-                        CNV.render();
+                if(link.type === "line"){
+                    return {
+                        set x(x){
+                            link.end.x = x;
+                            CNV.render();
+                        },
+                        set y(y){
+                            link.end.y = y;
+                            CNV.render();
+                        }
                     }
                 }
             }
         }
     }
-
 
     set pointer(bool){
         this.isPointer = !!bool;

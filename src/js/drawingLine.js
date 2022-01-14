@@ -4,6 +4,7 @@ import store from "./Store";
 import save from "./storage/save";
 import {STACK} from "./SETTINGS";
 import Store from "./Store";
+import analyze from "./analyzeGraph/analyze";
 
 function drawingLine(data, finishCallback = () => {}){
     function stopDrawing(e){
@@ -21,7 +22,7 @@ function drawingLine(data, finishCallback = () => {}){
             //Сохраняем изменения в стек
             store.addToStack(save({dont_save: true}));
         }
-
+        analyze(Store.state.lines);
         CNV.querySelectorAll(".black").forEach(item => {
             item.classList.remove("black");
         })

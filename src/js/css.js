@@ -31,6 +31,10 @@ const css = {
     finishLine:{
         color: "blue",
     },
+    finishText: {
+        color: "green",
+        fontFamily: "sans-serif",
+    },
     stickyLine: {
         color: "gray",
     },
@@ -40,6 +44,7 @@ const css = {
     hidden:{
         visibility: "hidden",
     },
+
     ignore: {
 
     },
@@ -47,6 +52,7 @@ const css = {
         radius: 3,
         color: "yellow",
     },
+
     orange: {
         color: "#FF4E39FF",
     },

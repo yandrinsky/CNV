@@ -10,6 +10,7 @@ import text from "./text";
 function analyze(lines) {
     CNV.combineRender(() => {
         CNV.querySelectorAll(".finishLine").forEach(item => item.classList.remove("finishLine"));
+        CNV.querySelectorAll(".finishText").forEach(item => item.remove());
     })
 
     state.results = {};
@@ -70,7 +71,12 @@ function analyze(lines) {
         if (!state.results[key].auxiliary) {
             controlSum.plus(state.results[key].data.num, state.results[key].data.det);
         }
-        CNV.text(state.results[key])
+        CNV.createText({
+            ...state.results[key],
+            className: "finishText",
+        })
+        CNV.render();
+        //CNV.text(state.results[key])
 
     }
     if ((NUMERIC_POWER && controlSum.getStr() !== String(START_POWER)) || (!NUMERIC_POWER && controlSum.getStr() !== "1")) {

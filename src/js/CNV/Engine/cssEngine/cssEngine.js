@@ -9,6 +9,11 @@ function cssEngine(css, classes, type){
             endAngle: 2 * Math.PI,
             radius: 10,
             color: "black",
+        },
+        text: {
+            fontSize: "14px",
+            fontFamily: "serif",
+            color: "black",
         }
 
     }

@@ -3,6 +3,7 @@ import clearCanvas from "./clearCanvas";
 import lineRender from "./lineRender";
 import circleRender from "./circleRender";
 import pointersRender from "./pointersRender";
+import textRender from "./textRender";
 
 
 
@@ -26,6 +27,12 @@ function render(props){
                 shift: props.shift,
             });
             else if(shape.type === "circle") circleRender({
+                link: shape,
+                context: props.context,
+                css: props.css,
+                shift: props.shift,
+            });
+            else if(shape.type === "text") textRender({
                 link: shape,
                 context: props.context,
                 css: props.css,

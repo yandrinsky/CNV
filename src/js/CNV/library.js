@@ -54,6 +54,17 @@ const CNV = {
 
     createLine(config){
         let id = uniqueId();
+
+        let classList;
+        if(config.className){
+            if(config.className instanceof Array){
+                classList = config.className;
+            } else {
+                classList = [config.className];
+            }
+        } else {
+            classList = [];
+        }
         this.state.__shapes[id] = {
             start: {
                 x: config.x0,
@@ -69,7 +80,7 @@ const CNV = {
             },
             type: "line",
             id,
-            classList: config.className ? [config.className] : [],
+            classList,
             events: {
                 mouseenter: false,
             }
@@ -81,19 +92,26 @@ const CNV = {
         return shape;
     },
 
-    curve(color, line){
-        clearCanvas({
-            backgroundColor: "white",
-            context: this.context,
-            canvas: this.canvas,
-        })
-        this.context.beginPath();
-        this.context.moveTo(line.start.x, line.start.y);
-        this.context.quadraticCurveTo(line.check.x, line.check.y, line.end.x, line.end.y);
-        //this.context.quadraticCurveTo(188, 150, 388, 150);
-        this.context.lineWidth = 3;
-        this.context.strokeStyle = color;
-        this.context.stroke();
+    createText(config){
+        let id = uniqueId();
+        this.state.__shapes[id] = {
+            start: {
+                x: config.x,
+                y: config.y,
+            },
+            text: config.text,
+            type: "text",
+            id,
+            classList: config.className ? [config.className] : [],
+            events: {
+                mouseenter: false,
+            }
+        }
+        let link = this.state.__shapes[id]
+        let shape = new Shape(link, id);
+        this.state.shapes[id] = shape;
+
+        return shape;
     },
 
     createCircle(config){
