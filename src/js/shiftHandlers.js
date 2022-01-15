@@ -39,157 +39,184 @@ const shiftDownHandler = (e) => {
 
         window.removeEventListener("keydown", shiftDownHandler);
         window.addEventListener("keyup", shiftUpHandler);
+        function set(){
+            for(let key in store.state.lines){
+                let obj = store.state.lines[key];
+                let item = obj.endCircle;
+                item.onclick = undefined;
 
-        for(let key in store.state.lines){
-            let obj = store.state.lines[key];
-            let item = obj.endCircle;
-            item.onclick = undefined;
+                function onMouseMove3(event, obj) {
+                    //setStickToTailHandler(obj);
+                    const item = obj.endCircle;
+                    CNV.combineRender(() => {
+                        // item.update.startPosition.x = event.clientX - CNV.state.shift.x;
+                        // item.update.startPosition.y = event.clientY - CNV.state.shift.y;
+                        item.update.startPosition.x = item.link.start.x + event.movementX;
+                        item.update.startPosition.y = item.link.start.y + event.movementY;
 
-            function onMouseMove3(event, obj) {
-                //setStickToTailHandler(obj);
-                const item = obj.endCircle;
-                CNV.combineRender(() => {
-                    // item.update.startPosition.x = event.clientX - CNV.state.shift.x;
-                    // item.update.startPosition.y = event.clientY - CNV.state.shift.y;
-                    item.update.startPosition.x = item.link.start.x + event.movementX;
-                    item.update.startPosition.y = item.link.start.y + event.movementY;
+                        // console.log("item.link.start.x;", item.link.start.x);
+                        // console.log("item.link.start.y;", item.link.start.y);
 
-                    // console.log("item.link.start.x;", item.link.start.x);
-                    // console.log("item.link.start.y;", item.link.start.y);
+                        obj.line.update.endPosition.x = item.link.start.x;
+                        obj.line.update.endPosition.y = item.link.start.y;
 
-                    obj.line.update.endPosition.x = item.link.start.x;
-                    obj.line.update.endPosition.y = item.link.start.y;
-
-                    // obj.line.link.check.x += event.movementX;
-                    // obj.line.link.check.y += event.movementY;
+                        // obj.line.link.check.x += event.movementX;
+                        // obj.line.link.check.y += event.movementY;
 
 
-                    obj.parents.forEach(parent => {
-                        if(parent.__NOT_CIRCLE){
-                            const newCoordinates = obj.line.system.moveTo(obj.line.system.length / 2, obj.line.system.coordinates.x1);
-                            parent.line.update.endPosition.x = newCoordinates.x;
-                            parent.line.update.endPosition.y = newCoordinates.y;
-                            parent.endCircle.update.startPosition.x = newCoordinates.x;
-                            parent.endCircle.update.startPosition.y = newCoordinates.y;
-                        }
-                    })
-
-                    obj.children.forEach(children => {
-                        children.line.update.startPosition.x = item.link.start.x;
-                        children.line.update.startPosition.y = item.link.start.y;
-                        children.startCircle.update.startPosition.x = item.link.start.x;
-                        children.startCircle.update.startPosition.y = item.link.start.y;
-
-                        children.line.link.check.x += event.movementX;
-                        children.line.link.check.y += event.movementY;
-
-                        children.parents.forEach(parent => {
-                            if(parent !== obj){
-                                const newCoordinates = children.line.system.moveTo(children.line.system.length / 2, children.line.system.coordinates.x1);
+                        obj.parents.forEach(parent => {
+                            if(parent.__NOT_CIRCLE){
+                                const newCoordinates = obj.line.system.moveTo(obj.line.system.length / 2, obj.line.system.coordinates.x1);
                                 parent.line.update.endPosition.x = newCoordinates.x;
                                 parent.line.update.endPosition.y = newCoordinates.y;
                                 parent.endCircle.update.startPosition.x = newCoordinates.x;
                                 parent.endCircle.update.startPosition.y = newCoordinates.y;
                             }
                         })
+
+                        obj.children.forEach(children => {
+                            children.line.update.startPosition.x = item.link.start.x;
+                            children.line.update.startPosition.y = item.link.start.y;
+                            children.startCircle.update.startPosition.x = item.link.start.x;
+                            children.startCircle.update.startPosition.y = item.link.start.y;
+
+                            children.line.link.check.x += event.movementX;
+                            children.line.link.check.y += event.movementY;
+
+                            children.parents.forEach(parent => {
+                                if(parent !== obj){
+                                    const newCoordinates = children.line.system.moveTo(children.line.system.length / 2, children.line.system.coordinates.x1);
+                                    parent.line.update.endPosition.x = newCoordinates.x;
+                                    parent.line.update.endPosition.y = newCoordinates.y;
+                                    parent.endCircle.update.startPosition.x = newCoordinates.x;
+                                    parent.endCircle.update.startPosition.y = newCoordinates.y;
+                                }
+                            })
+                        })
                     })
-                })
-            }
-
-            function onMouseMove4(event, obj) {
-                CNV.combineRender(() => {
-
-                    let {x, y} = getCheckCoords({
-                        start: obj.line.link.start,
-                        end: obj.line.link.end,
-                        check: obj.line.link.check,
-                    }, {x: event.clientX - CNV.state.shift.x, y: event.clientY - CNV.state.shift.y})
-
-
-                    obj.line.link.check.x = x;
-                    obj.line.link.check.y = y;
-
-                    let sideInCoors = getBlackPointCoord({
-                        start: obj.line.link.start,
-                        end: obj.line.link.end,
-                        check: obj.line.link.check,
-                    })
-
-                    obj.sideIn.forEach(item => {
-                        item.line.update.endPosition.x = sideInCoors.x;
-                        item.line.update.endPosition.y = sideInCoors.y;
-                        item.endCircle.update.startPosition.x = sideInCoors.x;
-                        item.endCircle.update.startPosition.y = sideInCoors.y;
-                        let current = item;
-
-                    })
-                })
-            }
-
-            function mouseLeave(e){
-                store.canvas.style.cursor = "default";
-                document.onmousemove = undefined;
-                //resetStickToTailHandler();
-
-                store.canvas.onmousedown = undefined;
-                store.canvas.onmouseup = undefined;
-            }
-
-
-
-            function lineMouseEnter(obj){
-                obj.line.onmouseenter = e => {
-                    store.canvas.style.cursor = "move";
-                    store.canvas.onmousedown = e => {
-                        resetAllBut(obj);
-                        document.onmousemove = (e) => onMouseMove4(e, obj);
-                        obj.line.onmouseleave = undefined;
-                    }
-                    store.canvas.onmouseup = e => {
-                        if(e.button === 0) {
-                            //setAllBut(obj, lineMouseEnter, circleMouseEnter, leaveHandler);
-                            document.onmousemove = undefined;
-                            //resetStickToTailHandler();
-                            obj.line.onmouseleave = mouseLeave;
-                        }
-                    };
                 }
-            }
 
-            function circleMouseEnter(obj){
-                let item = obj.endCircle;
-                item.onmouseenter = (e) => {
-                    obj.line.onmouseenter = undefined;
-                    store.canvas.style.cursor = "move";
-                    store.canvas.onmousedown = e => {
-                        resetAllBut(obj);
-                        document.onmousemove = (e) => onMouseMove3(e, obj);
-                        item.onmouseleave = undefined;
-                    }
+                function onMouseMove4(event, obj) {
+                    CNV.combineRender(() => {
 
-                    store.canvas.onmouseup = e => {
-                        //setAllBut(obj, lineMouseEnter, circleMouseEnter, leaveHandler);
-                        if(e.button === 0) {
-                            document.onmousemove = undefined;
-                            //resetStickToTailHandler();
-                            item.onmouseleave = mouseLeave;
-                        }
-                    };
+                        let {x, y} = getCheckCoords({
+                            start: obj.line.link.start,
+                            end: obj.line.link.end,
+                            check: obj.line.link.check,
+                        }, {x: event.clientX - CNV.state.shift.x, y: event.clientY - CNV.state.shift.y})
+
+
+                        obj.line.link.check.x = x;
+                        obj.line.link.check.y = y;
+
+                        let sideInCoors = getBlackPointCoord({
+                            start: obj.line.link.start,
+                            end: obj.line.link.end,
+                            check: obj.line.link.check,
+                        })
+
+                        obj.sideIn.forEach(item => {
+                            item.line.update.endPosition.x = sideInCoors.x;
+                            item.line.update.endPosition.y = sideInCoors.y;
+                            item.endCircle.update.startPosition.x = sideInCoors.x;
+                            item.endCircle.update.startPosition.y = sideInCoors.y;
+                            let current = item;
+
+                        })
+                    })
                 }
+
+                function mouseLeave(e){
+                    e.target.classList.remove("black");
+
+
+                    store.canvas.style.cursor = "default";
+                    document.onmousemove = undefined;
+                    //resetStickToTailHandler();
+
+                    store.canvas.onmousedown = undefined;
+                    store.canvas.onmouseup = undefined;
+                    set();
+                }
+
+
+
+                function lineMouseEnter(obj){
+                    obj.line.onmouseenter = e => {
+                        resetAllBut(obj);
+                        obj.line.classList.add("black");
+                        store.canvas.style.cursor = "move";
+                        store.canvas.onmousedown = e => {
+                            // resetAllBut(obj);
+                            document.onmousemove = (e) => onMouseMove4(e, obj);
+                            obj.line.onmouseleave = undefined;
+                        }
+                        store.canvas.onmouseup = e => {
+                            if(e.button === 0) {
+                                set();
+                                //setAllBut(obj, lineMouseEnter, circleMouseEnter, leaveHandler);
+                                document.onmousemove = undefined;
+                                //resetStickToTailHandler();
+                                obj.line.onmouseleave = mouseLeave;
+                            }
+                        };
+                    }
+                }
+
+                function circleMouseEnter(obj){
+                    let item = obj.endCircle;
+                    item.onmouseenter = (e) => {
+                        resetAllBut(obj);
+                        item.classList.add("black");
+
+                        obj.children.forEach(child => {
+                            child.line.mouseenter = undefined;
+                            child.line.classList.remove("black");
+                        })
+
+                        obj.line.onmouseenter = undefined;
+                        store.canvas.style.cursor = "move";
+                        store.canvas.onmousedown = e => {
+                            // resetAllBut(obj);
+                            document.onmousemove = (e) => onMouseMove3(e, obj);
+                            item.onmouseleave = undefined;
+                        }
+
+                        store.canvas.onmouseup = e => {
+                            item.classList.remove("black");
+                            set();
+                            if(e.button === 0) {
+                                document.onmousemove = undefined;
+                                //resetStickToTailHandler();
+                                item.onmouseleave = mouseLeave;
+                            }
+                        };
+                    }
+                }
+
+                function leaveHandler(obj){
+                    item.onmouseleave = mouseLeave;
+                    obj.line.onmouseleave = mouseLeave;
+                }
+
+                //Для линии
+                lineMouseEnter(obj);
+
+                //Для конечной точки
+                circleMouseEnter(obj);
+
+
+
+
+
+                leaveHandler(obj);
+
             }
-
-            function leaveHandler(obj){
-                item.onmouseleave = mouseLeave;
-                obj.line.onmouseleave = mouseLeave;
-            }
-            //Для линии
-            lineMouseEnter(obj);
-
-            //Для конечной точки
-            circleMouseEnter(obj);
-
-            leaveHandler(obj);
         }
+
+        set();
+
+        console.log("set All");
         return () => {
             document.removeEventListener('mousemove', onMouseMove3);
             store.canvas.onmousedown = undefined;
