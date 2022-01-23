@@ -26,6 +26,7 @@ function drawingLine(data, finishCallback = () => {}){
         CNV.querySelectorAll(".black").forEach(item => {
             item.classList.remove("black");
         })
+
     }
 
     function drawing(e){

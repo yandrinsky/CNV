@@ -11,6 +11,7 @@ export default {
         shouldRenderUpdates: true,
         shift: {x: 0, y: 0},
         draggableCanvas: false,
+        zoom: 1,
     },
     getState() {
         return this.state;

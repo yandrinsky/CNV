@@ -35,6 +35,14 @@ const css = {
         color: "green",
         fontFamily: "sans-serif",
     },
+    finishText2: {
+        color: "green",
+        fontSize: "14px",
+        fontFamily: "Arial bold",
+        backgroundColor: "white",
+        zIndex: 999,
+        padding: 4,
+    },
     stickyLine: {
         color: "gray",
     },

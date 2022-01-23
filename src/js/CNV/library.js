@@ -81,6 +81,7 @@ const CNV = {
             type: "line",
             id,
             classList,
+            userId: config.id || undefined,
             events: {
                 mouseenter: false,
             }
@@ -103,6 +104,7 @@ const CNV = {
             type: "text",
             id,
             classList: config.className ? [config.className] : [],
+            userId: config.id || undefined,
             events: {
                 mouseenter: false,
             }
@@ -129,6 +131,7 @@ const CNV = {
             type: "circle",
             id,
             classList: config.className ? config.className : [],
+            userId: config.id || undefined,
             events: {
                 mouseenter: false,
             }
@@ -155,6 +158,7 @@ const CNV = {
                 context: this.context,
                 shift: this.state.shift,
                 elements: this.state.__shapes,
+                zoom: this.state.zoom,
             })
         }
     },

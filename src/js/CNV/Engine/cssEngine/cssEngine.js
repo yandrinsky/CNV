@@ -14,6 +14,7 @@ function cssEngine(css, classes, type){
             fontSize: "14px",
             fontFamily: "serif",
             color: "black",
+            padding: 0,
         }
 
     }
@@ -42,6 +43,13 @@ function cssIndex(css, shapes){
             final[index] = [shape];
         }
     }
+
+    if(final.hasOwnProperty(10)){
+        final[10].push({type: "__POINTERS_RENDER"});
+    } else {
+        final[10] = [{type: "__POINTERS_RENDER"}];
+    }
+
     let keys = Object.keys(final).sort((a, b)=> a - b);
     return {
         shapes: final,

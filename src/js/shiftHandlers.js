@@ -49,19 +49,17 @@ const shiftDownHandler = (e) => {
                     //setStickToTailHandler(obj);
                     const item = obj.endCircle;
                     CNV.combineRender(() => {
-                        // item.update.startPosition.x = event.clientX - CNV.state.shift.x;
-                        // item.update.startPosition.y = event.clientY - CNV.state.shift.y;
                         item.update.startPosition.x = item.link.start.x + event.movementX;
                         item.update.startPosition.y = item.link.start.y + event.movementY;
-
-                        // console.log("item.link.start.x;", item.link.start.x);
-                        // console.log("item.link.start.y;", item.link.start.y);
 
                         obj.line.update.endPosition.x = item.link.start.x;
                         obj.line.update.endPosition.y = item.link.start.y;
 
-                        // obj.line.link.check.x += event.movementX;
-                        // obj.line.link.check.y += event.movementY;
+                        let finishText = CNV.querySelector("#" + obj.line.id + "_finishText");
+                        if(finishText){
+                            finishText.update.startPosition.x = item.link.start.x + event.movementX + 10;
+                            finishText.update.startPosition.y = item.link.start.y + event.movementY  + 10;
+                        }
 
 
                         obj.parents.forEach(parent => {
@@ -147,6 +145,7 @@ const shiftDownHandler = (e) => {
                         obj.line.classList.add("black");
                         store.canvas.style.cursor = "move";
                         store.canvas.onmousedown = e => {
+                            CNV.querySelectorAll(".finishText2").forEach(item => item.remove());
                             // resetAllBut(obj);
                             document.onmousemove = (e) => onMouseMove4(e, obj);
                             obj.line.onmouseleave = undefined;
@@ -177,6 +176,7 @@ const shiftDownHandler = (e) => {
                         obj.line.onmouseenter = undefined;
                         store.canvas.style.cursor = "move";
                         store.canvas.onmousedown = e => {
+                            CNV.querySelectorAll(".finishText2").forEach(item => item.remove());
                             // resetAllBut(obj);
                             document.onmousemove = (e) => onMouseMove3(e, obj);
                             item.onmouseleave = undefined;

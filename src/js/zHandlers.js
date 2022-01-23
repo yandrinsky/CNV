@@ -1,5 +1,6 @@
 import recover from "./storage/recover";
 import Store from "./Store";
+import analyze from "./analyzeGraph/analyze";
 
 function ctrlZHandler(){
     window.addEventListener("keydown", e => {
@@ -7,6 +8,7 @@ function ctrlZHandler(){
             recover(Store.getStackNext());
         }  else if(e.key === "z" && e.ctrlKey){
             recover(Store.getStackPrev());
+            analyze(Store.state.lines);
         }
     })
 }

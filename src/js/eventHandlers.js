@@ -57,6 +57,14 @@ function lineMouseEnter(data, e){
     if(data.children.length === 0){
         data.endCircle.classList.remove("hidden");
     }
+    let coordinates = e.target.system.moveTo(e.target.system.length / 2, e.target.system.coordinates.x1);
+    CNV.createText({
+        x: coordinates.x,
+        y: coordinates.y,
+        text: store.state.lines[e.target.id].power.getStr(),
+        id: e.target.id + "_text",
+        className: "finishText2",
+    })
 }
 
 function lineMouseLeave(data, e){
@@ -64,6 +72,7 @@ function lineMouseLeave(data, e){
     if(data.children.length === 0){
         data.endCircle.classList.add("hidden");
     }
+    CNV.querySelector("#" + e.target.id + "_text")?.remove();
 }
 
 function endCircleMouseEnter(e){
@@ -78,11 +87,14 @@ function endCircleClick(data, e){
     CNV.settings.draggableCanvas = false;
     CNV.querySelectorAll(".finishLine").forEach(el => el.classList.remove("finishLine"));
 
+
     //Против бага, что после нажатия линия остаётся чёрной
     data.line.classList.remove("black");
 
     //вести можно только 2 линии, не больше
     if(data.children.length < BRANCHES){
+        CNV.querySelectorAll(".finishText2").forEach(el => el.remove());
+
         //после того, как начали вести линию сбрасываем у всех круглешков событие нажатия
         resetAllEndCircleClick();
         //создаём новуб линию и указываем ей коорлинаты начала как у круга, по которому кликнули

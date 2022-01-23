@@ -20,11 +20,13 @@ function render(props){
     preRender.keys.forEach(key => {
         let shapes = preRender.shapes[key];
         shapes.forEach(shape => {
+
             if(shape.type === "line") lineRender({
                 link: shape,
                 context: props.context,
                 css: props.css,
                 shift: props.shift,
+                zoom: props.zoom,
             });
             else if(shape.type === "circle") circleRender({
                 link: shape,
@@ -38,15 +40,16 @@ function render(props){
                 css: props.css,
                 shift: props.shift,
             });
+            else if(shape.type === "__POINTERS_RENDER") pointersRender({
+                context: props.context,
+                shift: props.shift,
+            });
         })
     })
 
 
 
-    pointersRender({
-        context: props.context,
-        shift: props.shift,
-    });
+
 
 }
 

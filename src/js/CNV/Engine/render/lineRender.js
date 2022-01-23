@@ -5,9 +5,18 @@ import CNV from "../../library";
 //props: link, css, context, shift
 function lineRender(props){
     const style = cssEngine(props.css, props.link.classList, props.link.type);
+
+    let x1 = (props.link.start.x + props.shift.x) / props.zoom;
+    let x2 = (props.link.end.x + props.shift.x) / props.zoom;
+    let xCheck = (props.link.check.x + props.shift.x) / props.zoom;
+
+    let y1 = (props.link.start.y + props.shift.y) / props.zoom;
+    let y2 = (props.link.end.y + props.shift.y) / props.zoom;
+    let yCheck = (props.link.check.y + props.shift.y) / props.zoom;
+
     if(!(style.visibility === "hidden")){
         props.context.beginPath();
-        props.context.moveTo(props.link.start.x + props.shift.x, props.link.start.y + props.shift.y);
+        props.context.moveTo(x1, y1);
         if(!props.link.pointer){
             // props.context.lineTo(props.link.end.x + props.shift.x, props.link.end.y + props.shift.y);
             // props.context.lineWidth = style.lineWidth;
@@ -15,10 +24,10 @@ function lineRender(props){
             // props.context.stroke();
 
             props.context.quadraticCurveTo(
-                props.link.check.x + props.shift.x,
-                props.link.check.y + props.shift.y,
-                props.link.end.x + props.shift.x,
-                props.link.end.y + props.shift.y,
+                xCheck,
+                yCheck,
+                x2,
+                y2,
             );
 
             props.context.lineWidth = style.lineWidth;

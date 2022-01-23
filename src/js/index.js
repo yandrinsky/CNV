@@ -50,7 +50,13 @@ function setDelMode(){
 
     for(let key in store.state.lines){
         store.state.lines[key].line.onclick = e => {
+            CNV.querySelectorAll(".finishText").forEach(item => item.remove());
+            CNV.querySelector("#" + e.target.id + "_text").remove();
             removeEdge(key);
+            //охраняем изменения в стек
+            store.addToStack(save({dont_save: true}));
+
+            analyze(store.state.lines);
         }
     }
 

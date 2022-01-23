@@ -74,6 +74,7 @@ function analyze(lines) {
         CNV.createText({
             ...state.results[key],
             className: "finishText",
+            id: key + "_finishText",
         })
         CNV.render();
         //CNV.text(state.results[key])
