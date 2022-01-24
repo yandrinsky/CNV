@@ -103,6 +103,7 @@ delLineBtn.onclick = e => {
 
 recoverBtn.onclick = e => {
     recover();
+    analyze(store.state.lines)
 }
 
 analyzeBtn.onclick = e => {
