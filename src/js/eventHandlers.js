@@ -59,8 +59,8 @@ function lineMouseEnter(data, e){
     }
     let coordinates = e.target.system.moveTo(e.target.system.length / 2, e.target.system.coordinates.x1);
     CNV.createText({
-        x: coordinates.x,
-        y: coordinates.y,
+        x0: coordinates.x,
+        y0: coordinates.y,
         text: store.state.lines[e.target.id].power.getStr(),
         id: e.target.id + "_text",
         className: "finishText2",
@@ -93,6 +93,7 @@ function endCircleClick(data, e){
 
     //вести можно только 2 линии, не больше
     if(data.children.length < BRANCHES){
+        CNV.querySelectorAll(".finishText").forEach(el => el.remove());
         CNV.querySelectorAll(".finishText2").forEach(el => el.remove());
 
         //после того, как начали вести линию сбрасываем у всех круглешков событие нажатия

@@ -8,6 +8,11 @@ const css = {
         lineWidth: 3,
     },
 
+    background: {
+        backgroundColor: "#B97A57",
+        zIndex: -1,
+        position: "fixed",
+    },
 
     black: {
         color: "black",

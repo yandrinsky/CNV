@@ -103,6 +103,16 @@ class Shape{
                         }
                     }
                 }
+            },
+
+            set width (newWidth){
+                link.width = newWidth;
+                CNV.render();
+            },
+
+            set height (newHeight){
+                link.height = newHeight;
+                CNV.render();
             }
         }
     }

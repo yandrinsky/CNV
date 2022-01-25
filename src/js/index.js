@@ -31,11 +31,24 @@ canvas.height = window.innerHeight - 100;
 let context = canvas.getContext("2d");
 
 //Инициализация библиотеки CNV
+
+//Базовая настройка
 CNV.setContext(context);
 CNV.setCanvas(canvas);
 CNV.setCSS(css);
 CNV.settings.draggableCanvas = false;
+
+//запуск
 CNV.start();
+
+let background = CNV.createRect({
+    x0: 0,
+    y0: 0,
+    width: canvas.getBoundingClientRect().width,
+    height: canvas.getBoundingClientRect().height,
+    className: "background",
+})
+
 
 //Инициализация store
 store.setCanvas(canvas);
@@ -134,6 +147,8 @@ window.addEventListener("keydown", shiftDownHandler);
 window.onresize = (e) => {
     canvas.width = window.innerWidth - 5;
     canvas.height = window.innerHeight - 100;
+    background.update.width = canvas.width;
+    background.update.height = canvas.height;
     CNV.render();
 }
 zHandlers();

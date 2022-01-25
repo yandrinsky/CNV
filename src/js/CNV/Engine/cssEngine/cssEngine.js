@@ -1,22 +1,34 @@
 function cssEngine(css, classes, type){
+
+    const common = {
+        position: "static",
+    }
     const std = {
         line: {
+            ...common,
             lineWidth: 5,
             color: "black"
         },
         circle: {
+            ...common,
             startAngle: 0,
             endAngle: 2 * Math.PI,
             radius: 10,
             color: "black",
         },
         text: {
+            ...common,
             fontSize: "14px",
             fontFamily: "serif",
             color: "black",
             padding: 0,
+        },
+        rect: {
+            ...common,
+            backgroundColor: "white",
+            padding: 0,
+            position: "static",
         }
-
     }
     let custom = {...std[type]};
     classes.forEach(className => {

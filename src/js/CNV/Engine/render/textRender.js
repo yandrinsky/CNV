@@ -1,9 +1,12 @@
 import {cssEngine} from "../cssEngine/cssEngine";
 
 function textRender(props){
+    // console.log("textRender!");
+    // console.log("in textRender props.link", props.link);
 
-    let x = props.link.start.x + props.shift.x;
-    let y = props.link.start.y + props.shift.y;
+    let coords = props.link.getCoords();
+    let x = coords.start.x; //props.link.start.x + props.shift.x;
+    let y = coords.start.y; //props.link.start.y + props.shift.y;
     const style = cssEngine(props.css, props.link.classList, props.link.type);
     props.context.font = `${style.fontSize} ${style.fontFamily}`;
 
