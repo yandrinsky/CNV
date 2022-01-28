@@ -1,10 +1,28 @@
 import CNV from "../library";
 import {getCoordinates, getEquationFor2points, length, moveTo} from "./geometry/geometry"
+import availableProperties from "./cssEngine/availableProperties";
+
 class Shape{
     constructor(link, id) {
         this.link = link;
         this.id = id;
         this.isPointer = false;
+
+        this.styleProp = {};
+        availableProperties.forEach(property => {
+            link = this.link;
+            Object.defineProperty(this.styleProp, property, {
+                get: function (){
+                    return link.style[property];
+                },
+
+                set: function (arg){
+                    link.style[property] = arg;
+                    CNV.render();
+                },
+            })
+        })
+
     }
 
     get system(){
@@ -74,6 +92,9 @@ class Shape{
         }
     }
 
+    get style(){
+        return this.styleProp;
+    }
 
     get update(){
         const link = this.link;

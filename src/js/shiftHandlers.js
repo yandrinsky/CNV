@@ -8,6 +8,7 @@ import {
 } from "./eventHandlers";
 import store from "./Store";
 import save from "./storage/save";
+import analyze from "./analyzeGraph/analyze";
 
 
 
@@ -251,6 +252,7 @@ const shiftUpHandler = (e) => {
             item.onclick = (e) => endCircleClick(obj, e);
         }
         store.addToStack(save({dont_save: true}));
+        analyze(store.state.lines);
     }
 }
 

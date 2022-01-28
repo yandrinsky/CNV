@@ -8,6 +8,11 @@ const css = {
         lineWidth: 3,
     },
 
+    line: {
+        color: "#99D9EA",
+        lineWidth: 10,
+    },
+
     background: {
         backgroundColor: "#B97A57",
         zIndex: -1,
@@ -21,8 +26,13 @@ const css = {
         color: "black",
         radius: 3,
     },
+
+    startCircle: {
+        color: "#99D9EA",
+    },
+
     endCircle:{
-        color: "red",
+        color: "#99D9EA",
         radius: 8,
         zIndex: 1,
     },

@@ -1,4 +1,3 @@
-import gause from "./gause";
 const BRANCHES = 2; //Количество линий, которые могут выходить из конца прошлой
 const STACK_LIMIT = 10; //максимальное количество сохранений в stack
 const STACK = true; //сохранине в stack изменений
@@ -8,4 +7,10 @@ const CONTROL_SUM_WARNING = true; //выводить предупреждени�
 const SHOW_PRIORITIES = false;
 const START_POWER = 25;
 const NUMERIC_POWER = false;
-export {BRANCHES, STACK_LIMIT, SHOW_PATH, CONTROL_SUM_WARNING, STACK, SHOW_CYCLES, SHOW_PRIORITIES, START_POWER, NUMERIC_POWER};
+const LINE_WIDTH = 10;
+const LINE_DIVISION = 1.1;
+export {
+    BRANCHES, LINE_WIDTH, STACK_LIMIT, SHOW_PATH,
+    CONTROL_SUM_WARNING, STACK, SHOW_CYCLES, SHOW_PRIORITIES,
+    START_POWER, NUMERIC_POWER, LINE_DIVISION
+};

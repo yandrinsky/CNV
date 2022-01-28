@@ -1,5 +1,5 @@
-function cssEngine(css, classes, type){
-
+function cssEngine(props){
+    const {css, classes, type, ownStyle} = props;
     const common = {
         position: "static",
     }
@@ -34,6 +34,8 @@ function cssEngine(css, classes, type){
     classes.forEach(className => {
         custom = {...custom, ...css[className]};
     })
+    custom = {...custom, ...ownStyle};
+
     return custom;
 }
 

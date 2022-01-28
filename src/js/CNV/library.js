@@ -142,6 +142,7 @@ const CNV = {
                 width: link.width,
                 height: link.height,
                 pointer: link.pointer,
+                style: link.style,
             }
         }
         return JSON.stringify(preparedStore);

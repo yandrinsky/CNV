@@ -1,7 +1,7 @@
 import CNV from "../CNV/library";
 import Fraction from "../Fraction";
 import state from "./analyzeState";
-import {CONTROL_SUM_WARNING, NUMERIC_POWER, SHOW_CYCLES, START_POWER} from "../SETTINGS";
+import {CONTROL_SUM_WARNING, LINE_DIVISION, LINE_WIDTH, NUMERIC_POWER, SHOW_CYCLES, START_POWER} from "../SETTINGS";
 import Iteration from "../gause";
 import text from "./text";
 
@@ -56,12 +56,28 @@ function analyze(lines) {
 
     let answers = Iteration(m);
 
-    newLines.forEach((line, index) => {
-        line.power = answers[index];
+    function double(int){
+        let count = 0;
+        while (int / 2 >= 1){
+            int /= 2;
+            count += 1;
+        }
+        return count;
+    }
+
+    CNV.combineRender(() => {
+        newLines.forEach((line, index) => {
+            line.power = answers[index];
+            if(line.line.style.lineWidth > 3){
+                console.log("lineWidth", line.line.style.lineWidth)
+                line.line.style.lineWidth = LINE_WIDTH / (LINE_DIVISION ** (double(line.power.getDet() - line.power.getNum())));
+            }
+        });
     })
 
+
     finishLines.forEach(line => {
-        line.line.classList.add("finishLine");
+        //line.line.classList.add("finishLine");
         text({target: line, output: state.results});
     })
 

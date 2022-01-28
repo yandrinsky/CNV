@@ -1,13 +1,17 @@
 import {cssEngine} from "../cssEngine/cssEngine";
 
 function textRender(props){
-    // console.log("textRender!");
-    // console.log("in textRender props.link", props.link);
+    const style = cssEngine({
+        css: props.css,
+        classes: props.link.classList,
+        type: props.link.type,
+        ownStyle: props.link.style,
+    });
 
     let coords = props.link.getCoords();
-    let x = coords.start.x; //props.link.start.x + props.shift.x;
-    let y = coords.start.y; //props.link.start.y + props.shift.y;
-    const style = cssEngine(props.css, props.link.classList, props.link.type);
+    let x = coords.start.x;
+    let y = coords.start.y;
+
     props.context.font = `${style.fontSize} ${style.fontFamily}`;
 
     let info = props.context.measureText(props.link.text);
@@ -20,8 +24,6 @@ function textRender(props){
     }
 
     props.context.fillStyle = style.color;
-
-
     props.context.fillText(props.link.text, x, y);
 }
 

@@ -12,6 +12,7 @@ class Standard{
         } else {
             this.classList = [];
         }
+        this.style = {};
         this.start = {
             x: config.x0,
             y: config.y0,

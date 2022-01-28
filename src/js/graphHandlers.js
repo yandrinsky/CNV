@@ -2,6 +2,7 @@ import store from "./Store";
 import CNV from "./CNV/library";
 import uniqueId from "./CNV/uniqueId";
 import {endCircleMouseEnter, endCircleMouseLeave, lineMouseEnter, lineMouseLeave} from "./eventHandlers";
+import {LINE_WIDTH} from "./SETTINGS";
 
 //функция для добавбления ребёнка к родителю
 function addEdge(parent, children){
@@ -50,12 +51,14 @@ function createEdge(e, option = {}){
         y0: option.y0 || e.clientY,
         x1: option.x0 || e.clientX,
         y1: option.y0 || e.clientY,
-        className: "red",
+        className: "line",
     })
+    line.style.lineWidth = LINE_WIDTH;
+
     let startCircle = CNV.createCircle({
         x0: option.x0 || e.clientX,
         y0: option.y0 || e.clientY,
-        className: ["red", "hidden"],
+        className: ["startCircle", "hidden"],
     })
     let endCircle = CNV.createCircle({
         x0: option.x0 || e.clientX,
@@ -63,8 +66,10 @@ function createEdge(e, option = {}){
         className: ["endCircle", "hidden"],
 
     })
+    endCircle.style.radius = line.style.lineWidth / 2;
+    startCircle.style.radius = line.style.lineWidth / 2;
 
-    line.pointer = true;
+    //line.pointer = true;
 
     let data = {
         line,

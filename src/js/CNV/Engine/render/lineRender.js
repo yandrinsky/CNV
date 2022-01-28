@@ -4,7 +4,12 @@ import CNV from "../../library";
 
 //props: link, css, context, shift
 function lineRender(props){
-    const style = cssEngine(props.css, props.link.classList, props.link.type);
+    const style = cssEngine({
+        css: props.css,
+        classes: props.link.classList,
+        type: props.link.type,
+        ownStyle: props.link.style,
+    });
 
     let x1 = (props.link.start.x + props.shift.x) / props.zoom;
     let x2 = (props.link.end.x + props.shift.x) / props.zoom;
