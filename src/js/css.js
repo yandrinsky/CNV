@@ -13,6 +13,11 @@ const css = {
         lineWidth: 10,
     },
 
+    innerLine: {
+        color: "black",
+        lineWidth: "1",
+    },
+
     background: {
         backgroundColor: "#B97A57",
         zIndex: -1,

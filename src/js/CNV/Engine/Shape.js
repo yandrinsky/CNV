@@ -99,6 +99,33 @@ class Shape{
     get update(){
         const link = this.link;
         return {
+
+            get check(){
+                return {
+                    set x(x){
+                        link.check.x = x;
+                        CNV.render();
+                    },
+                    set y(y){
+                        link.check.y = y;
+                        CNV.render();
+                    }
+                }
+            },
+
+            get start(){
+                return {
+                    set x(x){
+                        link.start.x = x;
+                        CNV.render();
+                    },
+                    set y(y){
+                        link.start.y = y;
+                        CNV.render();
+                    }
+                }
+            },
+
             get startPosition (){
                 return {
                     set x(x){
@@ -111,6 +138,22 @@ class Shape{
                     }
                 }
             },
+
+            get end(){
+                if(link.type === "line"){
+                    return {
+                        set x(x){
+                            link.end.x = x;
+                            CNV.render();
+                        },
+                        set y(y){
+                            link.end.y = y;
+                            CNV.render();
+                        }
+                    }
+                }
+            },
+
             get endPosition (){
                 if(link.type === "line"){
                     return {

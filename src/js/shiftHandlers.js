@@ -9,6 +9,7 @@ import {
 import store from "./Store";
 import save from "./storage/save";
 import analyze from "./analyzeGraph/analyze";
+import innerLine from "./innerLine";
 
 
 
@@ -56,6 +57,8 @@ const shiftDownHandler = (e) => {
                         obj.line.update.endPosition.x = item.link.start.x;
                         obj.line.update.endPosition.y = item.link.start.y;
 
+                        innerLine(obj.line);
+
                         let finishText = CNV.querySelector("#" + obj.line.id + "_finishText");
                         if(finishText){
                             finishText.update.startPosition.x = item.link.start.x + event.movementX + 10;
@@ -70,6 +73,7 @@ const shiftDownHandler = (e) => {
                                 parent.line.update.endPosition.y = newCoordinates.y;
                                 parent.endCircle.update.startPosition.x = newCoordinates.x;
                                 parent.endCircle.update.startPosition.y = newCoordinates.y;
+                                innerLine(parent.line);
                             }
                         })
 
@@ -79,6 +83,7 @@ const shiftDownHandler = (e) => {
                             children.startCircle.update.startPosition.x = item.link.start.x;
                             children.startCircle.update.startPosition.y = item.link.start.y;
 
+                            innerLine(children.line);
                             children.line.link.check.x += event.movementX;
                             children.line.link.check.y += event.movementY;
 
@@ -89,10 +94,12 @@ const shiftDownHandler = (e) => {
                                     parent.line.update.endPosition.y = newCoordinates.y;
                                     parent.endCircle.update.startPosition.x = newCoordinates.x;
                                     parent.endCircle.update.startPosition.y = newCoordinates.y;
+                                    innerLine(parent.line);
                                 }
                             })
                         })
                     })
+
                 }
 
                 function onMouseMove4(event, obj) {
@@ -122,6 +129,7 @@ const shiftDownHandler = (e) => {
                             let current = item;
 
                         })
+                        innerLine(obj.line);
                     })
                 }
 
@@ -206,18 +214,12 @@ const shiftDownHandler = (e) => {
                 //Для конечной точки
                 circleMouseEnter(obj);
 
-
-
-
-
                 leaveHandler(obj);
 
             }
         }
 
         set();
-
-        console.log("set All");
         return () => {
             document.removeEventListener('mousemove', onMouseMove3);
             store.canvas.onmousedown = undefined;
