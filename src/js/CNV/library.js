@@ -10,6 +10,7 @@ import Line from "./Templates/Line";
 import Circle from "./Templates/Circle";
 import Text from "./Templates/Text";
 import Rectangle from "./Templates/Rectangle";
+import {collision} from "./Engine/geometry/geometry";
 
 function create(link){
     this.state.__shapes[link.id] = link;
@@ -105,6 +106,10 @@ const CNV = {
         }
     },
 
+    lineCollision(line1, line2){
+        return collision(line1.system.equation, line2.system.equation);
+    },
+
     preventRender(callback){
         this.state.shouldRenderUpdates = false;
         callback();
@@ -152,13 +157,19 @@ const CNV = {
         const state = {...Store.createState(), ...JSON.parse(data)};
 
         for(let key in state.__shapes) {
-            let link = state.__shapes[key];
+            let oldLink = state.__shapes[key]
+            let link = oldLink;
             let pointer = link.pointer;
 
             if(link.type === "line") link = new Line({...link});
             else if(link.type === "circle") link = new Circle({...link});
             else if(link.type === "text") link = new Text({...link});
             else if(link.type === "rect") link = new Rectangle({...link});
+
+            for(let key in oldLink.style) {
+                link.style[key] = oldLink.style[key];
+            }
+
             state.__shapes[key] = link;
             state.shapes[key] = new Shape(link, key);
             state.shapes[key].pointer = pointer;

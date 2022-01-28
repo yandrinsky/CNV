@@ -30,12 +30,15 @@ class Shape{
         return {
             get equation(){
                 if(__this.link.type === "line"){
-                    return getEquationFor2points(
+                    let eq = getEquationFor2points(
                         __this.link.start.x,
                         __this.link.start.y,
                         __this.link.end.x,
                         __this.link.end.y,
                     )
+                    eq.x3 = __this.link.check.x;
+                    eq.y3 = __this.link.check.y;
+                    return eq;
                 }
             },
             get coordinates(){

@@ -10,6 +10,14 @@ function getCoordinates(equation, x, y){
     }
 }
 
+//На вход - куравнения двух линий - выход boolean.
+function collision(equation1, equation2){
+    console.log("collision", equation1, equation2);
+    return false;
+    //x1 === x3 && y1 === y3 - это прямая
+}
+
+
 function getEquationFor2points(x1, y1, x2, y2){
     let xTop = -x1
     let xBottom = (x2 - x1);
@@ -190,4 +198,4 @@ function nearDot(config, callbackSuccess = [], callbackFail = []){
     }
 }
 
-export {getCoordinates, getEquationFor2points, getEquationForLine, moveTo, nearLine, nearDot, length};
+export {getCoordinates, getEquationFor2points, getEquationForLine, moveTo, nearLine, nearDot, length, collision};

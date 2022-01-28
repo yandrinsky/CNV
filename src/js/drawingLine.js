@@ -7,8 +7,16 @@ import Store from "./Store";
 import analyze from "./analyzeGraph/analyze";
 import innerLine from "./innerLine";
 
+
 function drawingLine(data, finishCallback = () => {}){
     function stopDrawing(e){
+        let isCollision = false;
+        CNV.querySelectorAll(".line").forEach(line => {
+            if(data.line !== line){
+                if(CNV.lineCollision(data.line, line)) isCollision = true;
+            }
+        })
+        if(isCollision) return;
         e.preventDefault();
         //убирает событие рисования
         store.canvas.removeEventListener("mousemove", drawing);

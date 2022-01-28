@@ -24,7 +24,6 @@ function innerLine(line){
         } else {
             innerLine = CNV.createLine({
                 x0, y0, x1, y1,x2, y2,
-                // x0: 10, y0: 10, x1: 100, y1: 100,
                 className: "innerLine",
                 id: line.id + "_innerLine",
             });
