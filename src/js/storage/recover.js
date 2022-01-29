@@ -7,6 +7,9 @@ import {
     lineMouseLeave
 } from "../eventHandlers";
 import store from "../Store";
+import innerLine from "../innerLine";
+import analyze from "../analyzeGraph/analyze";
+import Store from "../CNV/Store";
 
 function recover(data){
     const disk = JSON.parse(data || localStorage.getItem("__saved"));
@@ -17,6 +20,7 @@ function recover(data){
         item.line = CNV.getElementByUniqueId(item.line);
         item.endCircle = CNV.getElementByUniqueId(item.endCircle);
         item.startCircle = CNV.getElementByUniqueId(item.startCircle);
+        innerLine(item.line);
 
         item.children = item.children.map(id => {
             return script.lines[id];

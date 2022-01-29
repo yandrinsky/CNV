@@ -10,9 +10,12 @@ import store from "./Store";
 import save from "./storage/save";
 import analyze from "./analyzeGraph/analyze";
 import innerLine from "./innerLine";
+import lineCollision from "./lineCollision";
+import recover from "./storage/recover";
+import Store from "./Store";
 
 
-
+let lastDrag;
 
 function resetAllBut(item){
     for(let key in store.state.lines){
@@ -50,6 +53,7 @@ const shiftDownHandler = (e) => {
                 function onMouseMove3(event, obj) {
                     //setStickToTailHandler(obj);
                     const item = obj.endCircle;
+                    lastDrag = obj.line;
                     CNV.combineRender(() => {
                         item.update.startPosition.x = item.link.start.x + event.movementX;
                         item.update.startPosition.y = item.link.start.y + event.movementY;
@@ -99,10 +103,10 @@ const shiftDownHandler = (e) => {
                             })
                         })
                     })
-
                 }
 
                 function onMouseMove4(event, obj) {
+                    lastDrag = obj.line;
                     CNV.combineRender(() => {
 
                         let {x, y} = getCheckCoords({
@@ -230,8 +234,8 @@ const shiftDownHandler = (e) => {
 
 const shiftUpHandler = (e) => {
     if(e.key === "Shift"){
-        CNV.settings.draggableCanvas = true;
 
+        CNV.settings.draggableCanvas = true;
         store.canvas.style.cursor = "default";
         window.removeEventListener("keyup", shiftUpHandler);
         window.addEventListener("keydown", shiftDownHandler);
@@ -253,8 +257,16 @@ const shiftUpHandler = (e) => {
             item.onmouseleave = endCircleMouseLeave;
             item.onclick = (e) => endCircleClick(obj, e);
         }
+
         store.addToStack(save({dont_save: true}));
-        analyze(store.state.lines);
+        if(lastDrag){
+            console.log("here")
+            if(lineCollision(lastDrag)) setTimeout(()=> {
+                recover(Store.getStackPrev());
+                analyze(store.state.lines);
+            }, 1000)
+        }
+        lastDrag = undefined;
     }
 }
 

@@ -61,7 +61,7 @@ function lineMouseEnter(data, e){
     CNV.createText({
         x0: coordinates.x,
         y0: coordinates.y,
-        text: store.state.lines[e.target.id].power.getStr(),
+        text: store.state.lines[e.target.id]?.power?.getStr(),
         id: e.target.id + "_text",
         className: "finishText2",
     })

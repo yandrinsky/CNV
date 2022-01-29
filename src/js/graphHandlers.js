@@ -19,7 +19,7 @@ function addEdge(parent, children){
 function removeEdge(key){
     let data = store.state.lines[key]
     //при удалении элемента CNV удаляет и его слушатели событий
-    data.line.remove();
+    data.line.remove()
     CNV.querySelector("#" + data.line.id + "_innerLine")?.remove();
     data.startCircle.remove();
     data.endCircle.remove();

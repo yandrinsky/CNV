@@ -59,7 +59,6 @@ function collision(equation1, equation2){
         result: false,
         target: undefined,
     }
-    console.log("collision", equation1, equation2);
     if(equation1.x1 === equation1.x3 && equation2.x1 === equation2.x3){
         obj_collision.result = linesCross(equation1.x1, equation1.y1, equation1.x2, equation1.y2, equation2.x1, equation2.y1, equation2.x2, equation2.y2);
         if(obj_collision.result) obj_collision.target = equation2.target;

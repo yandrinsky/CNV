@@ -6,29 +6,14 @@ import {STACK} from "./SETTINGS";
 import Store from "./Store";
 import analyze from "./analyzeGraph/analyze";
 import innerLine from "./innerLine";
+import lineCollision from "./lineCollision";
 
 
 function drawingLine(data, finishCallback = () => {}){
     function stopDrawing(e){
-        let isCollision = false;
-        CNV.querySelectorAll(".line").forEach(line => {
-            if(data.line !== line){
-                let res = CNV.lineCollision(data.line, line);
-                if(res.result) {
-                    isCollision = true;
-                    let warning = setInterval(() => {
-                        res.target.classList.toggle("lineWarning");
-                    }, 100)
-                    setTimeout(() => {
-                        clearInterval(warning);
-                        res.target.classList.remove("lineWarning");
-                    }, 1000)
-                }
-            }
-        })
-
-        if(isCollision) return;
+        if(lineCollision(data.line)) return;
         e.preventDefault();
+
         //убирает событие рисования
         store.canvas.removeEventListener("mousemove", drawing);
         //самоуничножается
