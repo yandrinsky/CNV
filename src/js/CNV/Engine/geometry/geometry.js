@@ -48,12 +48,15 @@ function linesCross(x1,y1,x2,y2,x3,y3,x4,y4){
 //На вход - куравнения двух линий - выход boolean.
 function collision(equation1, equation2){
     //Пересекаются ли 2 отрезка?
-    let t = 0.1;
+    let t = 0, t1 = 0;
     let x1 = 0;
     let y1 = 0;
     let x2 = 0;
     let y2 = 0;
-    let flag = false;
+    let x3 = 0;
+    let y3 = 0;
+    let x4 = 0;
+    let y4 = 0;
 
     let obj_collision = {
         result: false,
@@ -64,7 +67,7 @@ function collision(equation1, equation2){
         if(obj_collision.result) obj_collision.target = equation2.target;
         return obj_collision;
     }
-    else{
+    else if(equation1.x1 === equation1.x3 && equation2.x1 !== equation2.x3){
         while(t <= 1){
             x1 = Math.pow((1 - t), 2)*equation2.x1 + 2*(1 - t)*t*equation2.x3 + Math.pow(t, 2)*equation2.x2;
             y1 = Math.pow((1 - t), 2)*equation2.y1 + 2*(1 - t)*t*equation2.y3 + Math.pow(t, 2)*equation2.y2;
@@ -76,6 +79,12 @@ function collision(equation1, equation2){
                 x2 = Math.round(x2); 
                 y2 = Math.round(y2);
             }
+            else{
+                x2 = Math.pow((1 - (t+0.1)), 2)*equation2.x1 + 2*(1 - (t+0.1))*(t+0.1)*equation2.x3 + Math.pow((t+0.1), 2)*equation2.x2;
+                y2 = Math.pow((1 - (t+0.1)), 2)*equation2.y1 + 2*(1 - (t+0.1))*(t+0.1)*equation2.y3 + Math.pow((t+0.1), 2)*equation2.y2;
+                x2 = Math.round(x2); 
+                y2 = Math.round(y2);
+            }
             t += 0.1;
             if(linesCross(equation1.x1, equation1.y1, equation1.x2, equation1.y2, x2, y2, x1, y1)) {
                 obj_collision.result = true;
@@ -83,6 +92,78 @@ function collision(equation1, equation2){
             }
         }
         return obj_collision;
+    }
+    else if(equation1.x1 !== equation1.x3 && equation2.x1 === equation2.x3){
+        while(t <= 1){
+            x1 = Math.pow((1 - t), 2)*equation1.x1 + 2*(1 - t)*t*equation1.x3 + Math.pow(t, 2)*equation1.x2;
+            y1 = Math.pow((1 - t), 2)*equation1.y1 + 2*(1 - t)*t*equation1.y3 + Math.pow(t, 2)*equation1.y2;
+            x1 = Math.round(x1); 
+            y1 = Math.round(y1);
+            if(t !== 0){
+                x2 = Math.pow((1 - (t-0.1)), 2)*equation1.x1 + 2*(1 - (t-0.1))*(t-0.1)*equation1.x3 + Math.pow((t-0.1), 2)*equation1.x2;
+                y2 = Math.pow((1 - (t-0.1)), 2)*equation1.y1 + 2*(1 - (t-0.1))*(t-0.1)*equation1.y3 + Math.pow((t-0.1), 2)*equation1.y2;
+                x2 = Math.round(x2); 
+                y2 = Math.round(y2);
+            }
+            else{
+                x2 = Math.pow((1 - (t+0.1)), 2)*equation1.x1 + 2*(1 - (t+0.1))*(t+0.1)*equation1.x3 + Math.pow((t+0.1), 2)*equation1.x2;
+                y2 = Math.pow((1 - (t+0.1)), 2)*equation1.y1 + 2*(1 - (t+0.1))*(t+0.1)*equation1.y3 + Math.pow((t+0.1), 2)*equation1.y2;
+                x2 = Math.round(x2); 
+                y2 = Math.round(y2); 
+            }
+            t += 0.1;
+            if(linesCross(equation2.x1, equation2.y1, equation2.x2, equation2.y2, x2, y2, x1, y1)) {
+                obj_collision.result = true;
+                obj_collision.target = equation2.target;
+            }
+        }
+        return obj_collision;
+    }
+    else{
+        while(t <= 1){
+            x1 = Math.pow((1 - t), 2)*equation1.x1 + 2*(1 - t)*t*equation1.x3 + Math.pow(t, 2)*equation1.x2;
+            y1 = Math.pow((1 - t), 2)*equation1.y1 + 2*(1 - t)*t*equation1.y3 + Math.pow(t, 2)*equation1.y2;
+            x1 = Math.round(x1); 
+            y1 = Math.round(y1);
+            if(t !== 0){
+                x2 = Math.pow((1 - (t-0.1)), 2)*equation1.x1 + 2*(1 - (t-0.1))*(t-0.1)*equation1.x3 + Math.pow((t-0.1), 2)*equation1.x2;
+                y2 = Math.pow((1 - (t-0.1)), 2)*equation1.y1 + 2*(1 - (t-0.1))*(t-0.1)*equation1.y3 + Math.pow((t-0.1), 2)*equation1.y2;
+                x2 = Math.round(x2); 
+                y2 = Math.round(y2);
+            }
+            else{
+                x2 = Math.pow((1 - (t+0.1)), 2)*equation1.x1 + 2*(1 - (t+0.1))*(t+0.1)*equation1.x3 + Math.pow((t+0.1), 2)*equation1.x2;
+                y2 = Math.pow((1 - (t+0.1)), 2)*equation1.y1 + 2*(1 - (t+0.1))*(t+0.1)*equation1.y3 + Math.pow((t+0.1), 2)*equation1.y2;
+                x2 = Math.round(x2); 
+                y2 = Math.round(y2); 
+            }
+            t += 0.1;
+            t1 = 0;
+            while(t1 <= 1){
+                x3 = Math.pow((1 - t1), 2)*equation2.x1 + 2*(1 - t1)*t1*equation2.x3 + Math.pow(t1, 2)*equation2.x2;
+                y3 = Math.pow((1 - t1), 2)*equation2.y1 + 2*(1 - t1)*t1*equation2.y3 + Math.pow(t1, 2)*equation2.y2;
+                x3 = Math.round(x3); 
+                y3 = Math.round(y3);
+                if(t1 !== 0){
+                    x4 = Math.pow((1 - (t1-0.1)), 2)*equation2.x1 + 2*(1 - (t1-0.1))*(t1-0.1)*equation2.x3 + Math.pow((t1-0.1), 2)*equation2.x2;
+                    y4 = Math.pow((1 - (t1-0.1)), 2)*equation2.y1 + 2*(1 - (t1-0.1))*(t1-0.1)*equation2.y3 + Math.pow((t1-0.1), 2)*equation2.y2;
+                    x4 = Math.round(x4); 
+                    y4 = Math.round(y4);
+                }
+                else{
+                    x4 = Math.pow((1 - (t1+0.1)), 2)*equation2.x1 + 2*(1 - (t1+0.1))*(t1+0.1)*equation2.x3 + Math.pow((t1+0.1), 2)*equation2.x2;
+                    y4 = Math.pow((1 - (t1+0.1)), 2)*equation2.y1 + 2*(1 - (t1+0.1))*(t1+0.1)*equation2.y3 + Math.pow((t1+0.1), 2)*equation2.y2;
+                    x4 = Math.round(x4); 
+                    y4 = Math.round(y4);
+                }
+                t1 += 0.1;
+                if(linesCross(x2, y2, x1, y1, x4, y4, x3, y3)) {
+                    obj_collision.result = true;
+                    obj_collision.target = equation2.target;
+                }
+            }
+        }
+        return obj_collision; 
     }
     //x1 === x3 && y1 === y3 - это прямая
 }
