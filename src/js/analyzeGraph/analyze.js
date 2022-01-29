@@ -78,8 +78,7 @@ function analyze(lines) {
     })
 
 
-    findCycles(startLines[0]);
-    console.log(collecting_statistics(lines));
+    console.log(collecting_statistics(lines, startLines[0]));
 
     finishLines.forEach(line => {
         //line.line.classList.add("finishLine");
