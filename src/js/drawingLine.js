@@ -13,9 +13,20 @@ function drawingLine(data, finishCallback = () => {}){
         let isCollision = false;
         CNV.querySelectorAll(".line").forEach(line => {
             if(data.line !== line){
-                if(CNV.lineCollision(data.line, line)) isCollision = true;
+                let res = CNV.lineCollision(data.line, line);
+                if(res.result) {
+                    isCollision = true;
+                    let warning = setInterval(() => {
+                        res.target.classList.toggle("lineWarning");
+                    }, 100)
+                    setTimeout(() => {
+                        clearInterval(warning);
+                        res.target.classList.remove("lineWarning");
+                    }, 1000)
+                }
             }
         })
+
         if(isCollision) return;
         e.preventDefault();
         //убирает событие рисования

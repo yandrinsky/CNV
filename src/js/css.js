@@ -1,11 +1,11 @@
 const css = {
-    green: {
-        color: "green",
-        lineWidth: 3,
-    },
     red: {
         color: "red",
         lineWidth: 3,
+    },
+
+    lineWarning: {
+        color: "red",
     },
 
     myLine: {

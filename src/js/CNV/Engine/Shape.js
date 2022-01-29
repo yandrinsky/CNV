@@ -38,6 +38,7 @@ class Shape{
                     )
                     eq.x3 = __this.link.check.x;
                     eq.y3 = __this.link.check.y;
+                    eq.target = __this;
                     return eq;
                 }
             },
@@ -81,7 +82,7 @@ class Shape{
             },
             toggle(className){
                 const index = link.classList.indexOf(className);
-                if(index){
+                if(index !== -1){
                     link.classList.splice(index, 1);
                     CNV.render();
                 } else {

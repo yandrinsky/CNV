@@ -123,18 +123,6 @@ analyzeBtn.onclick = e => {
     analyze(store.state.lines);
 }
 
-
-let line1 = CNV.createLine({
-    x0: 10, y0: 10, y1: 100, x1: 100
-})
-
-let line2 = CNV.createLine({
-    x0: 10, y0: 100, y1: 10, x1: 100
-})
-
-
-
-
 saveBtn.onclick = e => {
     saveBtn.classList.remove("saveOk");
     const CNVrecoveryData = CNV.save();
