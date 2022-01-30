@@ -100,41 +100,42 @@ function endCircleMouseLeave(e){
 }
 
 function endCircleClick(data, e){
-    CNV.settings.draggableCanvas = false;
-    CNV.querySelectorAll(".finishLine").forEach(el => el.classList.remove("finishLine"));
+    if(!data.endCircle.classList.contains("stickyCircle")){
+        CNV.settings.draggableCanvas = false;
+        CNV.querySelectorAll(".finishLine").forEach(el => el.classList.remove("finishLine"));
 
+        //Против бага, что после нажатия линия остаётся чёрной
+        data.line.classList.remove("black");
 
-    //Против бага, что после нажатия линия остаётся чёрной
-    data.line.classList.remove("black");
+        //вести можно только 2 линии, не больше
+        if(data.children.length < BRANCHES){
+            CNV.querySelectorAll(".finishText").forEach(el => el.remove());
+            CNV.querySelectorAll(".finishText2").forEach(el => el.remove());
 
-    //вести можно только 2 линии, не больше
-    if(data.children.length < BRANCHES){
-        CNV.querySelectorAll(".finishText").forEach(el => el.remove());
-        CNV.querySelectorAll(".finishText2").forEach(el => el.remove());
+            //после того, как начали вести линию сбрасываем у всех круглешков событие нажатия
+            resetAllEndCircleClick();
+            //создаём новуб линию и указываем ей коорлинаты начала как у круга, по которому кликнули
+            const newData = createEdge(e, {
+                x0: data.endCircle.link.start.x,
+                y0: data.endCircle.link.start.y,
+            });
+            newData.parents.push(data) ;
+            addEdge(data, newData);
 
-        //после того, как начали вести линию сбрасываем у всех круглешков событие нажатия
-        resetAllEndCircleClick();
-        //создаём новуб линию и указываем ей коорлинаты начала как у круга, по которому кликнули
-        const newData = createEdge(e, {
-            x0: data.endCircle.link.start.x,
-            y0: data.endCircle.link.start.y,
-        });
-        newData.parents.push(data) ;
-        addEdge(data, newData);
-
-        newData.line.onmouseenter = undefined;
-        newData.line.onmouseleave = undefined;
-        //запускаем процесс построения линии за движением мыши;
-        drawingLine(newData, ()=> {
-            setAllEndCircleClick();
-            newData.line.onmouseenter = e => lineMouseEnter(newData, e);
-            newData.line.onmouseleave = e => lineMouseLeave(newData, e);
-            setTimeout(()=> {
-                CNV.settings.draggableCanvas = true;
-            }, 100)
-
-        });
+            newData.line.onmouseenter = undefined;
+            newData.line.onmouseleave = undefined;
+            //запускаем процесс построения линии за движением мыши;
+            drawingLine(newData, ()=> {
+                setAllEndCircleClick();
+                newData.line.onmouseenter = e => lineMouseEnter(newData, e);
+                newData.line.onmouseleave = e => lineMouseLeave(newData, e);
+                setTimeout(()=> {
+                    CNV.settings.draggableCanvas = true;
+                }, 100)
+            });
+        }
     }
+
 }
 function resetStickToTailHandler(){
     console.log("resetStickToTailHandler")

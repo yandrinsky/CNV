@@ -71,15 +71,18 @@ function analyze(lines) {
     CNV.combineRender(() => {
         newLines.forEach((line, index) => {
             line.power = answers[index];
-            if(line.line.style.lineWidth > 3){
-                line.line.style.lineWidth = LINE_WIDTH / (LINE_DIVISION ** (double(line.power.getDet() - line.power.getNum())));
+
+            let newWidth = LINE_WIDTH / (LINE_DIVISION ** (double(line.power.getDet() / line.power.getNum())));
+            if(newWidth > 2){
+                line.line.style.lineWidth = newWidth;
+                //line.endCircle.style.radius = newWidth / 2;
             }
         });
     })
 
 
     //АНАЛИЗ
-    //console.log(collecting_statistics(lines, startLines[0]));
+    console.log(collecting_statistics(lines, startLines[0]));
 
     finishLines.forEach(line => {
         //line.line.classList.add("finishLine");

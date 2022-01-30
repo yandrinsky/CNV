@@ -80,12 +80,14 @@ const shiftDownHandler = (e) => {
                                 innerLine(parent.line);
                             }
                         })
-
+                        let objects = [];
                         obj.children.forEach(children => {
                             children.line.update.startPosition.x = item.link.start.x;
                             children.line.update.startPosition.y = item.link.start.y;
                             children.startCircle.update.startPosition.x = item.link.start.x;
                             children.startCircle.update.startPosition.y = item.link.start.y;
+
+                            objects.push(children);
 
                             innerLine(children.line);
                             children.line.link.check.x += event.movementX;
@@ -102,6 +104,28 @@ const shiftDownHandler = (e) => {
                                 }
                             })
                         })
+
+                        while(true){
+                            let curObj = objects[0];
+                            if(!curObj) break;
+
+                            let sideInCoors = getBlackPointCoord({
+                                start: curObj.line.link.start,
+                                end: curObj.line.link.end,
+                                check: curObj.line.link.check,
+                            })
+                            innerLine(obj.line);
+                            curObj.sideIn.forEach(item => {
+                                item.line.update.endPosition.x = sideInCoors.x;
+                                item.line.update.endPosition.y = sideInCoors.y;
+                                item.endCircle.update.startPosition.x = sideInCoors.x;
+                                item.endCircle.update.startPosition.y = sideInCoors.y;
+                                innerLine(item.line);
+                                objects.push(item);
+                            })
+                            objects.shift();
+                        }
+
                     })
                 }
 
@@ -119,21 +143,28 @@ const shiftDownHandler = (e) => {
                         obj.line.link.check.x = x;
                         obj.line.link.check.y = y;
 
-                        let sideInCoors = getBlackPointCoord({
-                            start: obj.line.link.start,
-                            end: obj.line.link.end,
-                            check: obj.line.link.check,
-                        })
+                        let objects = [obj];
+                        while(true){
+                            let curObj = objects[0];
+                            if(!curObj) break;
 
-                        obj.sideIn.forEach(item => {
-                            item.line.update.endPosition.x = sideInCoors.x;
-                            item.line.update.endPosition.y = sideInCoors.y;
-                            item.endCircle.update.startPosition.x = sideInCoors.x;
-                            item.endCircle.update.startPosition.y = sideInCoors.y;
-                            let current = item;
+                            let sideInCoors = getBlackPointCoord({
+                                start: curObj.line.link.start,
+                                end: curObj.line.link.end,
+                                check: curObj.line.link.check,
+                            })
+                            innerLine(obj.line);
+                            curObj.sideIn.forEach(item => {
+                                item.line.update.endPosition.x = sideInCoors.x;
+                                item.line.update.endPosition.y = sideInCoors.y;
+                                item.endCircle.update.startPosition.x = sideInCoors.x;
+                                item.endCircle.update.startPosition.y = sideInCoors.y;
+                                innerLine(item.line);
+                                objects.push(item);
+                            })
+                            objects.shift();
+                        }
 
-                        })
-                        innerLine(obj.line);
                     })
                 }
 

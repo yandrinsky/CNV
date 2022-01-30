@@ -161,8 +161,6 @@ window.addEventListener("keydown", shiftDownHandler);
 window.onresize = (e) => {
     canvas.width = window.innerWidth - 5;
     canvas.height = window.innerHeight - 100;
-    // background.update.width = canvas.width;
-    // background.update.height = canvas.height;
     CNV.render();
 }
 zHandlers();
