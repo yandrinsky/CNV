@@ -4,6 +4,7 @@ import {addEdge, createEdge} from "./graphHandlers";
 import drawingLine from "./drawingLine";
 import {BRANCHES} from "./SETTINGS";
 import Store from "./Store";
+import lineCollision from "./lineCollision";
 
 function getBlackPointCoord(line){
     let t = 0.5;
@@ -170,33 +171,35 @@ function setStickToTailHandler(currentData){
                 }
                 setTimeout(()=> {
                     data.line.onclick = e => {
-                        console.log("clickSetstickTOToal");
-                        data.line.classList.remove("stickyLine");
+                        if(!lineCollision(currentData.line)){
+                            console.log("clickSetstickTOToal");
+                            data.line.classList.remove("stickyLine");
 
-                        let coords;
-                        if(data.line.link.start.x === data.line.link.check.x && data.line.link.start.y === data.line.link.check.y){
-                            coords = data.line.system.moveTo(data.line.system.length / 2, data.line.system.coordinates.x1);
-                        } else {
-                            coords = getBlackPointCoord({
-                                start: data.line.link.start,
-                                end: data.line.link.end,
-                                check: data.line.link.check,
-                            })
+                            let coords;
+                            if(data.line.link.start.x === data.line.link.check.x && data.line.link.start.y === data.line.link.check.y){
+                                coords = data.line.system.moveTo(data.line.system.length / 2, data.line.system.coordinates.x1);
+                            } else {
+                                coords = getBlackPointCoord({
+                                    start: data.line.link.start,
+                                    end: data.line.link.end,
+                                    check: data.line.link.check,
+                                })
+                            }
+
+                            currentData.line.update.endPosition.x = coords.x;
+                            currentData.line.update.endPosition.y = coords.y;
+                            currentData.endCircle.update.startPosition.x = coords.x;
+                            currentData.endCircle.update.startPosition.y = coords.y;
+
+
+
+                            currentData.endCircle.classList.add("hidden");
+                            currentData.__NOT_CIRCLE = true;
+
+                            data.parents.push(currentData);
+                            data.sideIn.push(currentData);
+                            addEdge(currentData, data);
                         }
-
-                        currentData.line.update.endPosition.x = coords.x;
-                        currentData.line.update.endPosition.y = coords.y;
-                        currentData.endCircle.update.startPosition.x = coords.x;
-                        currentData.endCircle.update.startPosition.y = coords.y;
-
-
-
-                        currentData.endCircle.classList.add("hidden");
-                        currentData.__NOT_CIRCLE = true;
-
-                        data.parents.push(currentData);
-                        data.sideIn.push(currentData);
-                        addEdge(currentData, data);
                     }
                 }, 10);
             } else {

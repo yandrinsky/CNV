@@ -13,10 +13,10 @@ function pointer(line, context, shift){
 
     //Чтобы срелочки после выхода за границы экрана не творили дичь
     if(config.x1 < 3) return;
-
+    let triangleRadius = 3;
     let eqInit = getEquationFor2points(config.x2, config.y2, config.x1, config.y1);
     //let eqInit = getEquationFor2points(config.x0, config.y0, config.x1, config.y1);
-    let linePosition = moveTo(eqInit, -10);
+    let linePosition = moveTo(eqInit, -triangleRadius * 2);
     let equation = getEquationForLine(linePosition.x, linePosition.y, eqInit);
     let len = 50;
     equation.x1 = linePosition.x - len;
@@ -24,8 +24,9 @@ function pointer(line, context, shift){
     equation.x2 = linePosition.x + len;
     equation.y2 = getCoordinates(equation, linePosition.x + len);
 
-    let startPoint = moveTo(equation, -5, linePosition.x);
-    let endPoint = moveTo(equation, 5, linePosition.x);
+
+    let startPoint = moveTo(equation, -triangleRadius, linePosition.x);
+    let endPoint = moveTo(equation, triangleRadius, linePosition.x);
     context.fillStyle = "black";
     context.beginPath();
     context.moveTo(startPoint.x, startPoint.y);

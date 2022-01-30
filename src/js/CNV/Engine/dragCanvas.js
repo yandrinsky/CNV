@@ -1,5 +1,7 @@
 import CNV from "../library";
 import {nearDot} from "./geometry/geometry";
+import Store from "../Store";
+
 function dragCanvas(){
     function onMouseDown (e){
         if(CNV.state.draggableCanvas){
@@ -35,6 +37,9 @@ function dragCanvas(){
         if(CNV.state.draggableCanvas){
             CNV.state.shift.x += e.movementX;
             CNV.state.shift.y += e.movementY;
+            if(Store.draggableCanvasObserver) {
+                Store.draggableCanvasObserver(CNV.state.shift.x, CNV.state.shift.y);
+            }
             CNV.render();
         }
     }

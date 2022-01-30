@@ -39,6 +39,10 @@ CNV.setContext(context);
 CNV.setCanvas(canvas);
 CNV.setCSS(css);
 CNV.settings.draggableCanvas = false;
+CNV.settings.draggableCanvasObserver = (x, y) => {
+    canvas.style.backgroundPositionY = y + "px";
+    canvas.style.backgroundPositionX = x + "px";
+};
 
 //запуск
 CNV.start();

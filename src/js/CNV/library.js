@@ -51,7 +51,10 @@ const CNV = {
     settings: {
         set draggableCanvas(flag){
             CNV.state.draggableCanvas = !!flag;
-        }
+        },
+        set draggableCanvasObserver(observer){
+            Store.draggableCanvasObserver = observer;
+        },
     },
 
 

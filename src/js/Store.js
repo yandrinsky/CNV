@@ -41,7 +41,6 @@ export default {
     },
 
     addToStack(data){
-        console.log("add to stack")
         if(this.stack.len !== this.stack.current + 1){
             for (let i = this.stack.current + 1; i < this.stack.stack_limit; i++) {
                 delete this.stack[i];
