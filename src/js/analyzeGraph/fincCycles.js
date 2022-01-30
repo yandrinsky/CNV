@@ -5,7 +5,6 @@ function findCycles(start){
     const curPath = [];
     function check(target, lastTarget){
         curPath.push(target);
-
         if(target.__CHECKED){
             lastTarget.__CYCLEEND = true;
             const index = curPath.indexOf(target);

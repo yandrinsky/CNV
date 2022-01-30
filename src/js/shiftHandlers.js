@@ -170,6 +170,9 @@ const shiftDownHandler = (e) => {
                                 document.onmousemove = undefined;
                                 //resetStickToTailHandler();
                                 obj.line.onmouseleave = mouseLeave;
+
+                                console.log("shiftUpSave")
+                                store.addToStack(save({dont_save: true}));
                             }
                         };
                     }
@@ -203,6 +206,9 @@ const shiftDownHandler = (e) => {
                                 //resetStickToTailHandler();
                                 item.onmouseleave = mouseLeave;
                             }
+
+                            console.log("shiftUpSave")
+                            store.addToStack(save({dont_save: true}));
                         };
                     }
                 }
@@ -233,8 +239,7 @@ const shiftDownHandler = (e) => {
 }
 
 const shiftUpHandler = (e) => {
-    if(e.key === "Shift"){
-
+    if(e.key === "Shift" && !Store.zMode){
         CNV.settings.draggableCanvas = true;
         store.canvas.style.cursor = "default";
         window.removeEventListener("keyup", shiftUpHandler);
@@ -257,10 +262,9 @@ const shiftUpHandler = (e) => {
             item.onmouseleave = endCircleMouseLeave;
             item.onclick = (e) => endCircleClick(obj, e);
         }
-
-        store.addToStack(save({dont_save: true}));
+        // console.log("shiftUpSave")
+        // store.addToStack(save({dont_save: true}));
         if(lastDrag){
-            console.log("here")
             if(lineCollision(lastDrag)) setTimeout(()=> {
                 recover(Store.getStackPrev());
                 analyze(store.state.lines);

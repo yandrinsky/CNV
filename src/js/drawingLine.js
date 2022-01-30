@@ -7,11 +7,15 @@ import Store from "./Store";
 import analyze from "./analyzeGraph/analyze";
 import innerLine from "./innerLine";
 import lineCollision from "./lineCollision";
+import recover from "./storage/recover";
 
 
 function drawingLine(data, finishCallback = () => {}){
     function stopDrawing(e){
-        if(lineCollision(data.line)) return;
+        if(lineCollision(data.line)) {
+            //recover(Store.getStackPrev());
+            return;
+        }
         e.preventDefault();
 
         //убирает событие рисования

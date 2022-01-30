@@ -47,7 +47,9 @@ class Shape{
                 let y1 = __this.link.start.y;
                 let x2 = __this.link.end?.x;
                 let y2 = __this.link.end?.y;
-                return {x1, y1, x2, y2};
+                let x3 = __this.link.check?.x;
+                let y3 = __this.link.check?.y;
+                return {x1, y1, x2, y2, x3, y3};
             },
             getCoordinatesX(y){
                 return getCoordinates(this.equation, undefined, y);

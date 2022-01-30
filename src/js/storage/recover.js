@@ -8,8 +8,7 @@ import {
 } from "../eventHandlers";
 import store from "../Store";
 import innerLine from "../innerLine";
-import analyze from "../analyzeGraph/analyze";
-import Store from "../CNV/Store";
+
 
 function recover(data){
     const disk = JSON.parse(data || localStorage.getItem("__saved"));

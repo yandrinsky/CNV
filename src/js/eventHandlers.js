@@ -3,6 +3,7 @@ import store from "./Store";
 import {addEdge, createEdge} from "./graphHandlers";
 import drawingLine from "./drawingLine";
 import {BRANCHES} from "./SETTINGS";
+import Store from "./Store";
 
 function getBlackPointCoord(line){
     let t = 0.5;
@@ -57,10 +58,24 @@ function lineMouseEnter(data, e){
     if(data.children.length === 0){
         data.endCircle.classList.remove("hidden");
     }
-    let coordinates = e.target.system.moveTo(e.target.system.length / 2, e.target.system.coordinates.x1);
+
+    const {x1, x3, y1, y3} = e.target.system.coordinates;
+    let x0, y0;
+    if(x1 === x3 && y1 === y3) {
+        let coordinates = e.target.system.moveTo(e.target.system.length / 2, e.target.system.coordinates.x1);
+        x0 = coordinates.x;
+        y0 = coordinates.y;
+    } else {
+        let {x, y} = getBlackPointCoord(e.target.link);
+        x0 = x;
+        y0 = y;
+    }
+
+
+
     CNV.createText({
-        x0: coordinates.x,
-        y0: coordinates.y,
+        x0,
+        y0,
         text: store.state.lines[e.target.id]?.power?.getStr(),
         id: e.target.id + "_text",
         className: "finishText2",
@@ -121,6 +136,7 @@ function endCircleClick(data, e){
     }
 }
 function resetStickToTailHandler(){
+    console.log("resetStickToTailHandler")
     for(let key in store.state.lines){
         let data = store.state.lines[key];
         data.line.onmouseenter = e => lineMouseEnter(data, e);
@@ -154,6 +170,7 @@ function setStickToTailHandler(currentData){
                 }
                 setTimeout(()=> {
                     data.line.onclick = e => {
+                        console.log("clickSetstickTOToal");
                         data.line.classList.remove("stickyLine");
 
                         let coords;

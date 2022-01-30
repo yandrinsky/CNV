@@ -8,8 +8,9 @@ export default {
         isDragging: false,
         lines: {},  //id: {line, startCircle, endCircle, children: [], parents: [], ids: {line, startCircle, endCircle}}
     },
+    zMode: false,
     stack: {
-        length: 0,
+        len: 0,
         stack_limit: STACK_LIMIT,
         current: -1,
     },
@@ -32,27 +33,31 @@ export default {
     },
 
     getStackNext(){
-        this.stack.current + 1 < this.stack.stack_limit ? this.stack.current += 1 : this.stack.current = this.stack.stack_limit;
+        console.log("getStackNext")
+        this.stack.current + 1 < this.stack.len ?
+            this.stack.current += 1 :
+            this.stack.current;
         return this.stack[this.stack.current];
     },
 
     addToStack(data){
-        if(this.stack.length !== this.stack.current + 1){
+        console.log("add to stack")
+        if(this.stack.len !== this.stack.current + 1){
             for (let i = this.stack.current + 1; i < this.stack.stack_limit; i++) {
                 delete this.stack[i];
             }
-            this.stack.length = this.stack.current + 1;
+            this.stack.len = this.stack.current + 1;
         }
 
-        if(this.stack.length < this.stack.stack_limit){
-            this.stack[this.stack.length] = data;
-            this.stack.length += 1;
+        if(this.stack.len < this.stack.stack_limit){
+            this.stack[this.stack.len] = data;
+            this.stack.len += 1;
             this.stack.current += 1;
         } else {
-            for (let i = 1; i < this.stack.length; i++) {
+            for (let i = 1; i < this.stack.len; i++) {
                 this.stack[i - 1] = this.stack[i];
             }
-            this.stack[this.stack.length - 1] = data;
+            this.stack[this.stack.len - 1] = data;
         }
     },
     get canvas(){

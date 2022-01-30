@@ -46,6 +46,9 @@ function save(options){
             item.classList.remove("finishLine");
             item.classList.add("__PLACE_FOR_FINISH_LINE")
         })
+        CNV.querySelectorAll(".black").forEach((item) => {
+            item.classList.remove("black");
+        })
     })
     const saved = saveData(store.state, CNV.save(), options.dont_save);
     //Восстанавливаем синие линии, чтобы продолжить разработку

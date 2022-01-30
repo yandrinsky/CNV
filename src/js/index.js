@@ -14,6 +14,7 @@ import {shiftDownHandler} from "./shiftHandlers";
 import store from "./Store";
 import recover from "./storage/recover";
 import zHandlers from "./zHandlers";
+import Store from "./Store";
 
 const canvas = document.querySelector("#canvas");
 const delLineBtn = document.querySelector("#delLine");
@@ -22,6 +23,7 @@ const analyzeBtn = document.querySelector("#analyze");
 const modeField = document.querySelector("#mode");
 const savedCodeField = document.querySelector(".saved_code");
 const saveBtn = document.querySelector("#save");
+const stackBtn = document.querySelector("#stack");
 
 canvas.width = window.innerWidth - 5;
 canvas.height = window.innerHeight - 100;
@@ -41,13 +43,13 @@ CNV.settings.draggableCanvas = false;
 //запуск
 CNV.start();
 
-let background = CNV.createRect({
-    x0: 0,
-    y0: 0,
-    width: canvas.getBoundingClientRect().width,
-    height: canvas.getBoundingClientRect().height,
-    className: "background",
-})
+// let background = CNV.createRect({
+//     x0: 0,
+//     y0: 0,
+//     width: canvas.getBoundingClientRect().width,
+//     height: canvas.getBoundingClientRect().height,
+//     className: "background",
+// })
 
 
 //Инициализация store
@@ -116,11 +118,20 @@ delLineBtn.onclick = e => {
 
 recoverBtn.onclick = e => {
     recover();
-    analyze(store.state.lines)
+    analyze(store.state.lines);
 }
 
 analyzeBtn.onclick = e => {
     analyze(store.state.lines);
+}
+
+stackBtn.onclick = e => {
+    console.log({
+        len: Store.stack.len,
+        saves: Object.keys(Store.stack),
+        current: Store.stack.current,
+        stack_limit: Store.stack.stack_limit,
+    })
 }
 
 saveBtn.onclick = e => {
@@ -146,8 +157,10 @@ window.addEventListener("keydown", shiftDownHandler);
 window.onresize = (e) => {
     canvas.width = window.innerWidth - 5;
     canvas.height = window.innerHeight - 100;
-    background.update.width = canvas.width;
-    background.update.height = canvas.height;
+    // background.update.width = canvas.width;
+    // background.update.height = canvas.height;
     CNV.render();
 }
 zHandlers();
+
+

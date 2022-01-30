@@ -1,11 +1,12 @@
 import CNV from "../CNV/library";
 import Fraction from "../Fraction";
 import state from "./analyzeState";
-import findCycles from "C:/Users/mixai/OneDrive/Рабочий стол/альт/src/js/analyzeGraph/fincCycles.js";
+import findCycles from "./fincCycles";
 import { collecting_statistics } from "./priority";
 import {CONTROL_SUM_WARNING, LINE_DIVISION, LINE_WIDTH, NUMERIC_POWER, SHOW_CYCLES, START_POWER} from "../SETTINGS";
 import Iteration from "../gause";
 import text from "./text";
+
 
 
 
@@ -71,14 +72,14 @@ function analyze(lines) {
         newLines.forEach((line, index) => {
             line.power = answers[index];
             if(line.line.style.lineWidth > 3){
-                console.log("lineWidth", line.line.style.lineWidth)
                 line.line.style.lineWidth = LINE_WIDTH / (LINE_DIVISION ** (double(line.power.getDet() - line.power.getNum())));
             }
         });
     })
 
 
-    console.log(collecting_statistics(lines, startLines[0]));
+    //АНАЛИЗ
+    //console.log(collecting_statistics(lines, startLines[0]));
 
     finishLines.forEach(line => {
         //line.line.classList.add("finishLine");

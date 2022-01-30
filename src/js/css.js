@@ -8,11 +8,6 @@ const css = {
         color: "red",
     },
 
-    myLine: {
-        color: "red",
-        lineWidth: 10,
-    },
-
     line: {
         color: "#99D9EA",
         lineWidth: 10,

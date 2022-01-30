@@ -6,6 +6,7 @@ function ctrlZHandler(){
     window.addEventListener("keydown", e => {
         if(e.key === "Z" && e.ctrlKey && e.shiftKey){
             recover(Store.getStackNext());
+            analyze(Store.state.lines);
         }  else if(e.key === "z" && e.ctrlKey){
             recover(Store.getStackPrev());
             analyze(Store.state.lines);
