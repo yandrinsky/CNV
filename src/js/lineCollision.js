@@ -1,9 +1,9 @@
 import CNV from "./CNV/library";
 
-function lineCollision(target){
+function lineCollision(target, notThis){
     let isCollision;
     CNV.querySelectorAll(".line").forEach(line => {
-        if(target !== line){
+        if(target !== line && line !== notThis){
             let res = CNV.lineCollision(target, line);
             if(res.result) {
                 isCollision = true;

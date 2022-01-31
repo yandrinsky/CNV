@@ -6,7 +6,7 @@ import findCycles from "./fincCycles";
 
 let test_1;
 
-function collecting_statistics(lines, startLine){
+function collecting_statistics(lines, startLine, finishCount){
     let flag = false;
     let start_key = -1;
     let count = 0;
@@ -19,7 +19,6 @@ function collecting_statistics(lines, startLine){
         lines[key].branch_index = -1;
     }
     let count_loops = findCycles(startLine).length;
-    console.log(findCycles(startLine));
     let statistic_obj = {
         number_of_branches: 1,
         number_of_plots: 0,
@@ -67,6 +66,7 @@ function collecting_statistics(lines, startLine){
         }
     }
     statistic_obj.number_of_branches = count;
+    statistic_obj.number_of_finish = finishCount;
     return statistic_obj;
 }
 

@@ -45,8 +45,8 @@ const css = {
         color: "black",
     },
     stickyCircle:{
-        // radius: 5,
-        // color: "blue"
+        radius: 10,
+        color: "blue"
     },
     finishLine:{
         color: "blue",

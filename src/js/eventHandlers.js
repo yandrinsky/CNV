@@ -5,6 +5,7 @@ import drawingLine from "./drawingLine";
 import {BRANCHES} from "./SETTINGS";
 import Store from "./Store";
 import lineCollision from "./lineCollision";
+import state from "./analyzeGraph/analyzeState";
 
 function getBlackPointCoord(line){
     let t = 0.5;
@@ -138,7 +139,6 @@ function endCircleClick(data, e){
 
 }
 function resetStickToTailHandler(){
-    console.log("resetStickToTailHandler")
     for(let key in store.state.lines){
         let data = store.state.lines[key];
         data.line.onmouseenter = e => lineMouseEnter(data, e);
@@ -172,7 +172,9 @@ function setStickToTailHandler(currentData){
                 }
                 setTimeout(()=> {
                     data.line.onclick = e => {
-                        if(!lineCollision(currentData.line)){
+                        console.log("state.startLines.length ", state.startLines.length );
+                        console.log("data parents len ", data.parents.length );
+                        if(!lineCollision(currentData.line, data.line)){
                             console.log("clickSetstickTOToal");
                             data.line.classList.remove("stickyLine");
 
@@ -203,7 +205,8 @@ function setStickToTailHandler(currentData){
                         }
                     }
                 }, 10);
-            } else {
+            }
+            else if(state.startLines.length !== 1){
                 data.startCircle.onmouseenter = e => {
                     e.target.classList.add("startCircleActive");
                     e.target.classList.remove("hidden");

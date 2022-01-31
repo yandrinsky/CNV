@@ -15,6 +15,7 @@ import store from "./Store";
 import recover from "./storage/recover";
 import zHandlers from "./zHandlers";
 import Store from "./Store";
+import state from "./analyzeGraph/analyzeState";
 
 const canvas = document.querySelector("#canvas");
 const delLineBtn = document.querySelector("#delLine");
@@ -24,6 +25,7 @@ const modeField = document.querySelector("#mode");
 const savedCodeField = document.querySelector(".saved_code");
 const saveBtn = document.querySelector("#save");
 const stackBtn = document.querySelector("#stack");
+const info = document.querySelector("#info");
 
 canvas.width = window.innerWidth - 5;
 canvas.height = window.innerHeight - 100;
@@ -127,6 +129,22 @@ recoverBtn.onclick = e => {
 
 analyzeBtn.onclick = e => {
     analyze(store.state.lines);
+}
+
+"Object { number_of_branches: 0, number_of_plots: 0, number_of_mergers: 0, number_of_loops: 0 }"
+
+info.onclick = (e) => {
+    let i = state.analyzeInfo;
+    document.querySelector(".warning").innerHTML = `
+        Количество делений: ${i.number_of_branches}, 
+        Количество петель: ${i.number_of_loops},
+        Количество слияний: ${i.number_of_mergers},
+        Количество прямолинейных участков: ${i.number_of_plots},
+    `
+    document.querySelector(".warning").classList.remove('hidden');
+    setTimeout(()=> {
+        document.querySelector(".warning").classList.add('hidden');
+    }, 7000)
 }
 
 stackBtn.onclick = e => {
