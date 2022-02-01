@@ -154,9 +154,13 @@ info.onclick = (e) => {
 
 settings.onclick = (e) => {
     const li = [];
+    let test = false;
     const input = [];
     const select = document.createElement('select');
     const option = [];
+    const ul = document.createElement('ul');
+    ul.id = "setting_list";
+    document.querySelector(".setting_warning").prepend(ul);
     select.name = 'FINISH_LIMITS'
     select.classList.add("select");
     for(let i = 0; i < 3; i++) option[i] = document.createElement('option');
@@ -246,6 +250,23 @@ settings.onclick = (e) => {
         if(option[0].selected) FINISH_LIMITS = false;
         else if(option[1].selected) FINISH_LIMITS = input[6].value;
         else if(option[2].selected) FINISH_LIMITS = [input[6].value, input[7].value];
+    }
+
+    reset.onclick = (e) =>{
+        if(FINISH_LIMITS === false) option[0].selected = true;
+        else if(FINISH_LIMITS.length > 1) option[2].selected = true;
+        else option[1].selected = true;
+        input[6].remove();
+        input[7].remove();
+        if (CONTROL_SUM_WARNING) input[0].checked = true;
+        else input[0].checked = false;
+        if (LOOPS) input[4].checked = true;
+        else input[4].checked = false;
+        if (MERGES) input[5].checked = true;
+        else input[5].checked = false;
+        input[1].value = LINE_WIDTH_MIN;
+        input[2].value = LINE_WIDTH;
+        input[3].value = LINE_DIVISION;
     }
 
     document.querySelector(".setting_warning").classList.toggle('hidden');
