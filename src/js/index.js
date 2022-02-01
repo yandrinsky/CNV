@@ -152,7 +152,7 @@ info.onclick = (e) => {
     }, 7000)
 }
 
-settings.onclick = (e) => {
+settings.onclick = () => {
     const li = [];
     let test = false;
     const input = [];
@@ -164,6 +164,9 @@ settings.onclick = (e) => {
     select.name = 'FINISH_LIMITS'
     select.classList.add("select");
     for(let i = 0; i < 3; i++) option[i] = document.createElement('option');
+    option[0].classList.add("FINISH_LIMITS_option_0");
+    option[1].classList.add("FINISH_LIMITS_option_1");
+    option[2].classList.add("FINISH_LIMITS_option_2");
     option[0].value = 'No';
     option[1].value = 'Number';
     option[2].value = 'Arr';
@@ -182,13 +185,21 @@ settings.onclick = (e) => {
     }
 
     input[0].type = "checkbox";
+    input[0].classList.add("CONTROL_SUM_WARNING")
     input[4].type = "checkbox";
+    input[4].classList.add("LOOPS")
     input[5].type = "checkbox";
+    input[5].classList.add("MERGES")
     input[1].type = "text";
+    input[1].classList.add("LINE_WIDTH_MIN")
     input[2].type = "text";
+    input[2].classList.add("LINE_WIDTH")
     input[3].type = "text";
+    input[3].classList.add("LINE_DIVISION")
     input[6].type = "text";
+    input[6].classList.add("FINISH_LIMITS_1")
     input[7].type = "text";
+    input[7].classList.add("FINISH_LIMITS_2")
 
     if(document.querySelectorAll('.list').length === 0){
         li[0].innerHTML = `Выводить предупреждение о контрольной сумме: `;
@@ -240,33 +251,33 @@ settings.onclick = (e) => {
             li[6].append(input[7]);
         }
     }
-    save_setting.onclick = (e) => {
-        CONTROL_SUM_WARNING = input[0].checked;
-        LINE_WIDTH_MIN = input[1].value;
-        LINE_WIDTH = input[2].value;
-        LINE_DIVISION = input[3].value;
-        LOOPS = input[4].checked;
-        MERGES = input[5].checked;
-        if(option[0].selected) FINISH_LIMITS = false;
-        else if(option[1].selected) FINISH_LIMITS = input[6].value;
-        else if(option[2].selected) FINISH_LIMITS = [input[6].value, input[7].value];
+    save_setting.onclick = () => {
+        CONTROL_SUM_WARNING = document.querySelector(".CONTROL_SUM_WARNING").checked;
+        LINE_WIDTH_MIN = document.querySelector(".LINE_WIDTH_MIN").value;
+        LINE_WIDTH = document.querySelector(".LINE_WIDTH").value;
+        LINE_DIVISION = document.querySelector(".LINE_DIVISION").value;
+        LOOPS = document.querySelector(".LOOPS").checked;
+        MERGES = document.querySelector(".MERGES").checked;
+        if(document.querySelector(".FINISH_LIMITS_option_0").selected) FINISH_LIMITS = false;
+        else if(document.querySelector(".FINISH_LIMITS_option_1").selected) FINISH_LIMITS = document.querySelector(".FINISH_LIMITS_1").value;
+        else if(document.querySelector(".FINISH_LIMITS_option_2").selected) FINISH_LIMITS = [document.querySelector(".FINISH_LIMITS_1").value, document.querySelector(".FINISH_LIMITS_2").value];
     }
 
-    reset.onclick = (e) =>{
-        if(FINISH_LIMITS === false) option[0].selected = true;
-        else if(FINISH_LIMITS.length > 1) option[2].selected = true;
-        else option[1].selected = true;
-        input[6].remove();
-        input[7].remove();
-        if (CONTROL_SUM_WARNING) input[0].checked = true;
-        else input[0].checked = false;
-        if (LOOPS) input[4].checked = true;
-        else input[4].checked = false;
-        if (MERGES) input[5].checked = true;
-        else input[5].checked = false;
-        input[1].value = LINE_WIDTH_MIN;
-        input[2].value = LINE_WIDTH;
-        input[3].value = LINE_DIVISION;
+    reset.onclick = () =>{
+        if(FINISH_LIMITS === false) document.querySelector(".FINISH_LIMITS_option_0").selected = true;
+        else if(FINISH_LIMITS.length > 1) document.querySelector(".FINISH_LIMITS_option_2").selected = true;
+        else document.querySelector(".FINISH_LIMITS_option_1").selected = true;
+        if(document.querySelector(".FINISH_LIMITS_1") !== null) document.querySelector(".FINISH_LIMITS_1").remove();
+        if(document.querySelector(".FINISH_LIMITS_2") !== null) document.querySelector(".FINISH_LIMITS_2").remove();
+        if (CONTROL_SUM_WARNING) document.querySelector(".CONTROL_SUM_WARNING").checked = true;
+        else document.querySelector(".CONTROL_SUM_WARNING").checked = false;
+        if (LOOPS) document.querySelector(".LOOPS").checked = true;
+        else document.querySelector(".LOOPS").checked = false;
+        if (MERGES) document.querySelector(".MERGES").checked = true;
+        else document.querySelector(".MERGES").checked = false;
+        document.querySelector(".LINE_WIDTH_MIN").value = LINE_WIDTH_MIN;
+        document.querySelector(".LINE_WIDTH").value = LINE_WIDTH;
+        document.querySelector(".LINE_DIVISION").value = LINE_DIVISION;
     }
 
     document.querySelector(".setting_warning").classList.toggle('hidden');
