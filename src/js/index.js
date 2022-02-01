@@ -154,27 +154,98 @@ info.onclick = (e) => {
 
 settings.onclick = (e) => {
     const li = [];
+    const input = [];
+    const select = document.createElement('select');
+    const option = [];
+    select.name = 'FINISH_LIMITS'
+    select.classList.add("select");
+    for(let i = 0; i < 3; i++) option[i] = document.createElement('option');
+    option[0].value = 'No';
+    option[1].value = 'Number';
+    option[2].value = 'Arr';
+    option[0].innerHTML = 'Нет';
+    option[1].innerHTML = 'Число';
+    option[2].innerHTML = 'Диапазон';
+    if(FINISH_LIMITS === false) option[0].selected = true;
+    else if(FINISH_LIMITS.length > 1) option[2].selected = true;
+    else option[1].selected = true;
 
-    for(let i = 0; i < 7; i++) {
+    for(let i = 0; i < 8; i++) {
+        input[i] = document.createElement('input');
+        input[i].classList.add("input_setting");
         li[i] = document.createElement('li');
-        li[i].classList.add("list")
+        li[i].classList.add("list");
     }
 
+    input[0].type = "checkbox";
+    input[4].type = "checkbox";
+    input[5].type = "checkbox";
+    input[1].type = "text";
+    input[2].type = "text";
+    input[3].type = "text";
+    input[6].type = "text";
+    input[7].type = "text";
+
     if(document.querySelectorAll('.list').length === 0){
-        li[0].innerHTML = `Выводить предупреждение о контрольной сумме: ${CONTROL_SUM_WARNING}`;
+        li[0].innerHTML = `Выводить предупреждение о контрольной сумме: `;
         setting_list.append(li[0]);
-        li[1].innerHTML = `Минимальная ширина линии: ${LINE_WIDTH_MIN}`;
+        if (CONTROL_SUM_WARNING) input[0].checked = true;
+        li[0].append(input[0]);
+        li[1].innerHTML = `Минимальная ширина линии: `;
         setting_list.append(li[1]);
-        li[2].innerHTML = `Ширина линии: ${LINE_WIDTH}`;
+        input[1].value = LINE_WIDTH_MIN;
+        li[1].append(input[1]);
+        li[2].innerHTML = `Ширина линии: `;
         setting_list.append(li[2]);
-        li[3].innerHTML = `Коэффициент уменьшения ширины линии: ${LINE_DIVISION}`;
+        input[2].value = LINE_WIDTH;
+        li[2].append(input[2]);
+        li[3].innerHTML = `Коэффициент уменьшения ширины линии: `;
         setting_list.append(li[3]);
-        li[4].innerHTML = `Петли разрешены: ${LOOPS}`;
+        input[3].value = LINE_DIVISION;
+        li[3].append(input[3]);
+        li[4].innerHTML = `Петли разрешены: `;
         setting_list.append(li[4]);
-        li[5].innerHTML = `Слияния разрешены: ${MERGES}`;
+        if (LOOPS) input[4].checked = true;
+        li[4].append(input[4]);
+        li[5].innerHTML = `Слияния разрешены: `;
         setting_list.append(li[5]);
-        li[6].innerHTML = `Сохранения изменений: ${STACK}`;
+        if (MERGES) input[5].checked = true;
+        li[5].append(input[5]);
+        li[6].innerHTML = `Количество стоков: `;
         setting_list.append(li[6]);
+        li[6].append(select);
+        select.append(option[0]);
+        select.append(option[1]);
+        select.append(option[2]);
+    }
+    select.onclick= () => {
+        input[6].remove();
+        input[7].remove();
+        if(option[1].selected){
+            if(FINISH_LIMITS !== false && FINISH_LIMITS.length !== 2)input[6].value = FINISH_LIMITS;
+            else input[6].value = "";
+            input[6].classList.add("input_select");
+            li[6].append(input[6]);
+        }
+        else if(option[2].selected){
+            input[6].value = FINISH_LIMITS[0];
+            input[7].value = FINISH_LIMITS[1];
+            input[6].classList.add("input_select");
+            li[6].append(input[6]);
+            input[7].classList.add("input_select");
+            li[6].append(input[7]);
+        }
+    }
+    save_setting.onclick = (e) => {
+        CONTROL_SUM_WARNING = input[0].checked;
+        LINE_WIDTH_MIN = input[1].value;
+        LINE_WIDTH = input[2].value;
+        LINE_DIVISION = input[3].value;
+        LOOPS = input[4].checked;
+        MERGES = input[5].checked;
+        if(option[0].selected) FINISH_LIMITS = false;
+        else if(option[1].selected) FINISH_LIMITS = input[6].value;
+        else if(option[2].selected) FINISH_LIMITS = [input[6].value, input[7].value];
     }
 
     document.querySelector(".setting_warning").classList.toggle('hidden');
