@@ -16,6 +16,10 @@ import recover from "./storage/recover";
 import zHandlers from "./zHandlers";
 import Store from "./Store";
 import state from "./analyzeGraph/analyzeState";
+import { BRANCHES, LINE_WIDTH, STACK_LIMIT, SHOW_PATH,
+    CONTROL_SUM_WARNING, STACK, SHOW_CYCLES, SHOW_PRIORITIES,
+    START_POWER, NUMERIC_POWER, LINE_DIVISION, LINE_WIDTH_MIN,
+    LOOPS, MERGES, FINISH_LIMITS  } from "./SETTINGS";
 
 const canvas = document.querySelector("#canvas");
 const delLineBtn = document.querySelector("#delLine");
@@ -26,6 +30,7 @@ const savedCodeField = document.querySelector(".saved_code");
 const saveBtn = document.querySelector("#save");
 const stackBtn = document.querySelector("#stack");
 const info = document.querySelector("#info");
+const settings = document.querySelector("#settings");
 
 canvas.width = window.innerWidth - 5;
 canvas.height = window.innerHeight - 100;
@@ -145,6 +150,34 @@ info.onclick = (e) => {
     setTimeout(()=> {
         document.querySelector(".warning").classList.add('hidden');
     }, 7000)
+}
+
+settings.onclick = (e) => {
+    const li = [];
+
+    for(let i = 0; i < 7; i++) {
+        li[i] = document.createElement('li');
+        li[i].classList.add("list")
+    }
+
+    if(document.querySelectorAll('.list').length === 0){
+        li[0].innerHTML = `Выводить предупреждение о контрольной сумме: ${CONTROL_SUM_WARNING}`;
+        setting_list.append(li[0]);
+        li[1].innerHTML = `Минимальная ширина линии: ${LINE_WIDTH_MIN}`;
+        setting_list.append(li[1]);
+        li[2].innerHTML = `Ширина линии: ${LINE_WIDTH}`;
+        setting_list.append(li[2]);
+        li[3].innerHTML = `Коэффициент уменьшения ширины линии: ${LINE_DIVISION}`;
+        setting_list.append(li[3]);
+        li[4].innerHTML = `Петли разрешены: ${LOOPS}`;
+        setting_list.append(li[4]);
+        li[5].innerHTML = `Слияния разрешены: ${MERGES}`;
+        setting_list.append(li[5]);
+        li[6].innerHTML = `Сохранения изменений: ${STACK}`;
+        setting_list.append(li[6]);
+    }
+
+    document.querySelector(".setting_warning").classList.toggle('hidden');
 }
 
 stackBtn.onclick = e => {
